@@ -1,0 +1,1643 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Airline Manager 81 3⁄64</title>
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+    <style>
+        :root {
+            --bg-color: #0f172a;
+            --panel-color: #1e293b;
+            --accent-color: #6366f1;
+            --accent-hover: #4f46e5;
+            --text-color: #f8fafc;
+            --money-color: #10b981;
+            --token-color: #06b6d4;
+            --achievement-color: #eab308;
+            --input-bg: #0f172a;
+            --input-border: #334155;
+            --card-bg: rgba(255,255,255,0.03);
+            --card-border: #334155;
+        }
+
+        body.light-theme {
+            --bg-color: #f1f5f9;
+            --panel-color: #ffffff;
+            --accent-color: #4f46e5;
+            --accent-hover: #4338ca;
+            --text-color: #0f172a;
+            --money-color: #16a34a;
+            --token-color: #0891b2;
+            --achievement-color: #ca8a04;
+            --input-bg: #f8fafc;
+            --input-border: #cbd5e1;
+            --card-bg: rgba(0,0,0,0.02);
+            --card-border: #e2e8f0;
+        }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', system-ui, sans-serif; }
+        body { background-color: var(--bg-color); color: var(--text-color); display: flex; flex-direction: column; height: 100vh; overflow: hidden; transition: background-color 0.3s, color 0.3s; }
+
+        .overlay-screen {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(11, 15, 25, 0.95);
+            z-index: 10000; display: flex; flex-direction: column; justify-content: center; align-items: center; padding: 20px;
+        }
+        .modal-box { background: var(--panel-color); padding: 30px; border-radius: 12px; border: 2px solid var(--accent-color); max-width: 550px; width: 100%; text-align: center; box-shadow: 0 20px 40px rgba(0,0,0,0.6); color: var(--text-color); }
+
+        header { background-color: var(--panel-color); padding: 12px 20px; display: flex; justify-content: space-between; align-items: center; border-bottom: 2px solid var(--card-border); z-index: 1000; }
+        .stats-container { display: flex; gap: 15px; flex-wrap: wrap; align-items: center; }
+        .stat-box { background: rgba(0, 0, 0, 0.15); padding: 6px 14px; border-radius: 6px; font-weight: bold; font-size: 13px; }
+        body:not(.light-theme) .stat-box { background: rgba(0, 0, 0, 0.3); }
+        .stat-money { color: var(--money-color); }
+        .stat-tokens { color: var(--token-color); }
+
+        .gear-btn { background: none; border: none; font-size: 20px; cursor: pointer; color: var(--text-color); padding: 5px; display: flex; align-items: center; transition: transform 0.3s ease; }
+        .gear-btn:hover { transform: rotate(45deg); color: var(--accent-color); }
+        .settings-row { display: flex; justify-content: space-between; align-items: center; padding: 12px 0; border-bottom: 1px solid var(--card-border); text-align: left; }
+        
+        .switch { position: relative; display: inline-block; width: 46px; height: 24px; }
+        .switch input { opacity: 0; width: 0; height: 0; }
+        .slider { position: absolute; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0; background-color: #ccc; transition: .3s; border-radius: 24px; }
+        .slider:before { position: absolute; content: ""; height: 18px; width: 18px; left: 3px; bottom: 3px; background-color: white; transition: .3s; border-radius: 50%; }
+        input:checked + .slider { background-color: var(--accent-color); }
+        input:checked + .slider:before { transform: translateX(22px); }
+
+        .unit-toggle-bar { display: flex; background: var(--input-bg); border-radius: 20px; padding: 2px; border: 1px solid var(--input-border); }
+        .unit-btn { background: none; border: none; color: #94a3b8; padding: 4px 10px; font-size: 11px; font-weight: bold; border-radius: 15px; cursor: pointer; transition: all 0.2s; }
+        .unit-btn.active { background: var(--accent-color); color: white; }
+
+        .main-layout { display: flex; flex: 1; overflow: hidden; }
+        #map { flex: 2; height: 100%; background: #0b0f19; }
+
+        .control-panel { flex: 1; max-width: 460px; background-color: var(--panel-color); border-left: 2px solid var(--card-border); display: flex; flex-direction: column; }
+        .tabs { display: flex; background: rgba(0,0,0,0.1); flex-wrap: wrap; }
+        .tab-btn { flex: 1; min-width: 75px; padding: 12px 2px; background: none; border: none; color: #94a3b8; font-weight: 600; font-size: 11px; cursor: pointer; text-align: center; border-bottom: 3px solid transparent; }
+        .tab-btn.active { color: var(--text-color); background: var(--panel-color); border-bottom: 3px solid var(--accent-color); }
+
+        .tab-content { padding: 15px; flex: 1; overflow-y: auto; display: none; }
+        .tab-content.active { display: block; }
+
+        .card { background: var(--card-bg); border: 1px solid var(--card-border); border-radius: 8px; padding: 12px; margin-bottom: 12px; transition: border-color 0.3s; }
+        .btn { background-color: var(--accent-color); color: white; border: none; padding: 8px 12px; border-radius: 6px; cursor: pointer; font-weight: 600; width: 100%; margin-top: 8px; }
+        .btn:hover { background-color: var(--accent-hover); }
+        .btn:disabled { background-color: #475569; color: #94a3b8; cursor: not-allowed; }
+        .btn-danger { background-color: #ef4444; }
+        .btn-danger:hover { background-color: #dc2626; }
+
+        .flex-row { display: flex; justify-content: space-between; font-size: 13px; color: #94a3b8; margin-top: 4px; }
+        .aircraft-img { width: 100%; height: 110px; background-size: cover; background-position: center; border-radius: 6px; margin-bottom: 8px; border: 1px solid var(--card-border); }
+
+        .tutorial-highlight { border: 2px solid var(--achievement-color) !important; background: rgba(234, 179, 8, 0.05) !important; box-shadow: 0 0 10px rgba(234, 179, 8, 0.4); }
+
+        #interactive-tutorial-bubble {
+            position: fixed; bottom: 30px; left: 30px; width: 380px; background: var(--panel-color);
+            border: 2px solid var(--achievement-color); border-radius: 10px; padding: 20px; z-index: 1050;
+            box-shadow: 0 15px 30px rgba(0,0,0,0.5); display: none; flex-direction: column; gap: 12px;
+        }
+
+        details { background: rgba(0,0,0,0.05); padding: 6px; border-radius: 4px; margin-top: 4px; border: 1px solid var(--card-border); }
+        summary { font-weight: 600; cursor: pointer; color: var(--text-color); padding: 2px; font-size: 13px; display: flex; align-items: center; gap: 8px; }
+        details details { margin-left: 12px; background: rgba(0,0,0,0.02); }
+        .dir-airport { padding: 6px; font-size: 12px; color: #94a3b8; border-bottom: 1px solid var(--card-border); cursor: pointer; border-radius: 4px; }
+        .dir-airport:hover { background: rgba(99, 102, 241, 0.15); color: var(--text-color); }
+        .dir-locked-msg { padding: 6px; font-size: 11px; color: #ef4444; font-style: italic; }
+
+        #achievement-popup {
+            position: fixed; top: -100px; left: 50%; transform: translateX(-50%); background: #1e1b4b; border: 2px solid var(--achievement-color); padding: 15px 30px; border-radius: 50px; box-shadow: 0 10px 25px rgba(0,0,0,0.5); display: flex; align-items: center; gap: 15px; z-index: 100000; transition: top 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+        #achievement-popup.show { top: 30px; }
+
+        .plane-marker-icon {
+            font-size: 20px;
+            color: #eab308;
+            text-shadow: 0 0 3px #000;
+            text-align: center;
+            line-height: 1;
+            transition: transform 0.1s linear;
+        }
+
+        #contract-modal, #hub-confirm-modal {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.7);
+            z-index: 20000; display: none; justify-content: center; align-items: center;
+        }
+
+        .flag-icon {
+            width: 20px;
+            height: 14px;
+            object-fit: cover;
+            border-radius: 2px;
+            border: 1px solid rgba(255,255,255,0.2);
+            display: inline-block;
+            vertical-align: middle;
+        }
+    </style>
+</head>
+<body>
+
+    <div id="hub-confirm-modal">
+        <div class="modal-box" style="border-color: var(--achievement-color);">
+            <h3 style="color: var(--achievement-color); margin-bottom: 10px;">🚁 Heliport Hub Selection Confirmation</h3>
+            <p style="font-size: 14px; margin-bottom: 15px; color: #cbd5e1; text-align: left;">
+                You are establishing your hub at a <strong>Heliport</strong>. 
+                <br><br>
+                <strong>⚠️WARNING⚠️:</strong> Only helicopters can fly into and out of <strong>Heliports</strong>. Standard fixed-wing aircraft cannot operate flights into or out of heliports.
+            </p>
+            <div style="display: flex; gap: 10px;">
+                <button class="btn btn-danger" style="margin:0;" onclick="cancelHubConfirmation()">Cancel</button>
+                <button class="btn" style="margin:0; background-color: var(--money-color);" onclick="acceptHubConfirmation()">Confirm</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="contract-modal">
+        <div class="modal-box" style="border-color: var(--token-color);">
+            <h3 style="color: var(--token-color); margin-bottom: 10px;">🚁 Urgent Helicopter Assignment</h3>
+            <p id="contract-description" style="font-size: 14px; margin-bottom: 15px; color: #cbd5e1;"></p>
+            <p id="contract-reward" style="font-size: 13px; font-weight: bold; margin-bottom: 20px; color: var(--money-color);"></p>
+            <div style="display: flex; gap: 10px;">
+                <button class="btn btn-danger" style="margin:0;" onclick="declineContract()">Decline</button>
+                <button class="btn" style="margin:0;" id="accept-contract-btn" onclick="acceptContract()">Accept Contract</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="achievement-popup">
+        <span style="font-size: 30px;">🏆</span>
+        <div>
+            <h4 style="color: var(--achievement-color); font-size: 13px; text-transform: uppercase;">Achievement Unlocked!</h4>
+            <p id="pop-title" style="font-weight: bold; font-size: 15px; color: white;"></p>
+            <p id="pop-reward" style="font-size: 12px; color: #a5b4fc;"></p>
+        </div>
+    </div>
+
+    <div id="setup-screen" class="overlay-screen">
+        <div class="modal-box">
+            <h2 style="color: var(--accent-color); margin-bottom: 5px;">Airline Manager 81 3⁄64</h2>
+            <p style="color: #94a3b8; font-size: 13px; margin-bottom: 20px;">Airline Manager Simulator</p>
+            
+            <label style="display:block; text-align:left; font-size:12px; font-weight:bold; margin-bottom:5px;">AIRLINE NAME:</label>
+            <input type="text" id="airline-name-input" value="" placeholder="Enter unique airline name..." style="width:100%; padding:10px; background:var(--input-bg); border:1px solid var(--input-border); color:var(--text-color); border-radius:6px; font-weight:bold; margin-bottom:15px;">
+
+            <label style="display:block; text-align:left; font-size:12px; font-weight:bold; margin-bottom:5px;">SELECT HUB REGION / NATION:</label>
+            <select id="hub-region-select" style="width: 100%; padding: 12px; background: var(--input-bg); color: var(--text-color); border: 1px solid var(--input-border); border-radius: 6px; font-weight: bold; margin-bottom: 15px;" onchange="populateHubAirports()">
+                <option value="">-- Choose a Region --</option>
+            </select>
+
+            <label style="display:block; text-align:left; font-size:12px; font-weight:bold; margin-bottom:5px;">SELECT PRIMARY OPERATIONS HUB:</label>
+            <select id="hub-select" style="width: 100%; padding: 12px; background: var(--input-bg); color: var(--text-color); border: 1px solid var(--input-border); border-radius: 6px; font-weight: bold; margin-bottom: 20px;">
+                <option value="">-- Choose a Region First --</option>
+            </select>
+            <button class="btn" style="padding: 12px;" onclick="checkSetupHubType()">Initialize Corporate Operations</button>
+        </div>
+    </div>
+
+    <div id="interactive-tutorial-bubble">
+        <h4 style="color: var(--achievement-color); font-size: 14px;" id="t-bubble-title">Flight Academy</h4>
+        <p style="font-size: 13px; color: #cbd5e1; line-height: 1.5;" id="t-bubble-text"></p>
+        <button class="btn" style="background: var(--achievement-color); color:#000; margin-top: 5px;" id="t-bubble-btn" onclick="advanceInteractiveTutorial()">Next Exercise</button>
+    </div>
+
+    <div id="settings-screen" class="overlay-screen" style="display:none;">
+        <div class="modal-box" style="max-width: 400px;">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
+                <h3>Corporate Settings</h3>
+                <button style="background:none; border:none; color:var(--text-color); font-size:20px; cursor:pointer;" onclick="closeSettingsScreen()">✕</button>
+            </div>
+            
+            <div class="settings-row">
+                <span>Dark Mode Enabled</span>
+                <label class="switch">
+                    <input type="checkbox" id="theme-toggle-checkbox" onchange="toggleThemeLayout(this.checked)">
+                    <span class="slider"></span>
+                </label>
+            </div>
+
+            <div class="settings-row">
+                <span>Training Protocols</span>
+                <button class="btn" style="margin: 0; width: auto; padding: 6px 12px; font-size: 12px; background: var(--achievement-color); color: #000;" onclick="triggerRedoTutorial()">Redo Tutorial</button>
+            </div>
+
+            <div style="margin-top: 40px; padding-top: 15px; border-top: 2px dashed var(--card-border);">
+                <p style="font-size:11px; color:#94a3b8; margin-bottom:10px; text-align:left;">Liquidation eliminates core airline structures, fleet hangars, and tracking data instantly.</p>
+                <button class="btn btn-danger" style="margin: 0;" onclick="openResetScreen()">Liquidate Corporate Account</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="reset-screen" class="overlay-screen" style="display:none; z-index:11000;">
+        <div class="modal-box" style="border-color: #ef4444; max-width:450px;">
+            <h3 style="color: #ef4444; margin-bottom: 10px;">⚠️ Confirm Full Corporate Liquidation?</h3>
+            <p style="font-size:13px; color:#94a3b8; margin-bottom:20px;">This action completely deletes your airline, routes, capital assets, hangar inventory, and records. It will take effect immediately.</p>
+            <div style="display:flex; gap:10px;">
+                <button class="btn" style="background:#475569;" onclick="closeResetScreen()">Cancel</button>
+                <button class="btn btn-danger" onclick="executeAccountReset()">Confirm Hard Reset</button>
+            </div>
+        </div>
+    </div>
+
+    <header>
+        <div>
+            <h2 id="airline-banner" style="font-size:18px;">Airline Manager 81 3⁄64</h2>
+            <p style="font-size:11px; color:#94a3b8;">HUB: <span id="hq-banner-text">-</span></p>
+        </div>
+        <div class="stats-container">
+            <div class="unit-toggle-bar">
+                <button id="unit-nm" class="unit-btn active" onclick="setDistanceUnit('NM')">NM</button>
+                <button id="unit-mi" class="unit-btn" onclick="setDistanceUnit('MI')">MI</button>
+                <button id="unit-km" class="unit-btn" onclick="setDistanceUnit('KM')">KM</button>
+            </div>
+            <div id="stat-money-box" class="stat-box stat-money">Cash: $<span id="cash-display">-</span></div>
+            <div id="stat-tokens-box" class="stat-box stat-tokens">Tokens: <span id="tokens-display">-</span> ✈</div>
+            <button class="gear-btn" onclick="openSettingsScreen()" title="Open System Configurations">⚙</button>
+        </div>
+    </header>
+
+    <div class="main-layout">
+        <div id="map"></div>
+
+        <div class="control-panel">
+            <div class="tabs" id="control-tab-headers">
+                <button id="tab-btn-routes" class="tab-btn active" onclick="switchTab('routes')">Routes</button>
+                <button id="tab-btn-market" class="tab-btn" onclick="switchTab('market')">Market</button>
+                <button id="tab-btn-regions" class="tab-btn" onclick="switchTab('regions')">Airspace</button>
+                <button id="tab-btn-achievements" class="tab-btn" onclick="switchTab('achievements')">Achievements</button>
+                <button id="tab-btn-directory" class="tab-btn" onclick="switchTab('directory')">Directory</button>
+            </div>
+
+            <div id="routes" class="tab-content active">
+                <h3>Flight Corridors</h3>
+                <div id="route-creation-card" class="card" style="margin-top: 10px; background: rgba(99, 102, 241, 0.05); border-color: var(--accent-color);">
+                    <h4>Establish Commercial Leg</h4>
+                    <p style="font-size:11px; color:var(--token-color); margin-bottom: 8px;">Route Creation Fee: 10 AeroTokens</p>
+                    <div class="flex-row"><span>Origin Hub:</span>
+                        <select id="route-orig" style="background:var(--input-bg); color:var(--text-color); border:1px solid var(--input-border); padding:2px; border-radius:4px; width:60%;" onchange="updateDestinationsDemand()"></select>
+                    </div>
+                    <div class="flex-row" style="margin-top: 6px;"><span>Destination:</span>
+                        <select id="route-dest" style="background:var(--input-bg); color:var(--text-color); border:1px solid var(--input-border); padding:2px; border-radius:4px; width:60%;" onchange="displaySelectedDemand()"></select>
+                    </div>
+                    <div class="flex-row" style="margin-top: 6px; font-weight: bold; display: none;" id="route-demand-row">
+                        <span>Route Target Demand:</span><span id="route-demand-value" style="color: var(--token-color);">100%</span>
+                    </div>
+                    <button class="btn" onclick="createRoute()">Open Flight Route</button>
+                </div>
+                <h4 style="margin-top:15px; margin-bottom:5px;">Active Route Matrices</h4>
+                <div id="active-routes-list"></div>
+            </div>
+
+            <div id="market" class="tab-content">
+                <h3>Fleet Catalog</h3>
+                <div id="aircraft-catalog" style="margin-top:10px;"></div>
+            </div>
+
+            <div id="regions" class="tab-content">
+                <h3>Sector Border Clearances</h3>
+                <p style="font-size:11px; color:#94a3b8; margin-bottom:10px; font-style:italic;">Showing closest 5 locked sectors relative to your fleet hubs.</p>
+                <div id="region-list" style="margin-top:10px;"></div>
+            </div>
+
+            <div id="achievements" class="tab-content">
+                <h3>Achievements</h3>
+                <div id="achievements-list" style="margin-top:15px;"></div>
+            </div>
+
+            <div id="directory" class="tab-content">
+                <h3>Global Directory Explorer</h3>
+                <div id="inspect-card" class="card" style="display: none; border-left: 4px solid var(--token-color); margin-top:10px;">
+                    <h4 id="ins-name" style="color: var(--token-color);">No Target</h4>
+                    <div class="flex-row"><span>Status:</span><span id="ins-status">-</span></div>
+                    <div class="flex-row"><span>Base Category Demand:</span><span id="ins-demand" style="color: var(--achievement-color); font-weight: bold;">-</span></div>
+                    <div class="flex-row"><span>Unlock Border Cost ($):</span><span id="ins-cost" style="color: var(--money-color); font-weight: bold;">-</span></div>
+                    <div class="flex-row"><span>Distance from Base:</span><span id="ins-distance">-</span></div>
+                    <div id="hub-action-zone"></div>
+                </div>
+                <div id="directory-tree" style="margin-top:10px;"></div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    <script>
+        const regions = {
+            "New York (US)": {
+                unlocked: false, baseCost: 40, continent: "North America", nation: "USA", flag: "🇺🇸", isSplit: true,
+                polygon: [[45.01, -73.35], [45.01, -74.91], [44.96, -74.98], [44.23, -76.15], [43.62, -76.22], [43.51, -76.92], [43.64, -77.78], [43.34, -79.16], [42.99, -78.93], [42.45, -79.76], [42.00, -79.76], [42.00, -74.69], [41.36, -74.69], [40.99, -73.91], [40.50, -74.26], [40.64, -73.78], [41.15, -72.01], [41.00, -71.85], [41.25, -73.30], [42.05, -73.50], [42.75, -73.27], [44.40, -73.36], [45.01, -73.35]],
+                airports: [
+                    { name: "JFK International (JFK)", lat: 40.6413, lng: -73.7781, isHub: false, baseDemand: 98, type: "airport" },
+                    { name: "Albany Regional (ALB)", lat: 42.7483, lng: -73.8020, isHub: false, baseDemand: 52, type: "airport" },
+                    { name: "Manhattan West Heliport (JRA)", lat: 40.7544, lng: -74.0094, isHub: false, baseDemand: 65, type: "heliport" }
+                ]
+            },
+            "California (US)": {
+                unlocked: false, baseCost: 55, continent: "North America", nation: "USA", flag: "🇺🇸", isSplit: true,
+                polygon: [[42.00, -124.41], [42.00, -120.00], [39.00, -120.00], [34.35, -114.14], [32.74, -114.14], [32.53, -117.12], [33.32, -117.78], [34.45, -120.65], [35.50, -121.20], [36.50, -121.95], [37.75, -122.55], [38.58, -123.32], [40.40, -124.41], [42.00, -124.41]],
+                airports: [
+                    { name: "Los Angeles (LAX)", lat: 33.9416, lng: -118.4085, isHub: false, baseDemand: 100, type: "airport" },
+                    { name: "San Francisco (SFO)", lat: 37.6213, lng: -122.3790, isHub: false, baseDemand: 92, type: "airport" },
+                    { name: "Catalina Island Heliport (CIB)", lat: 33.3451, lng: -118.3289, isHub: false, baseDemand: 40, type: "heliport" }
+                ]
+            },
+            "Ohio (US)": {
+                unlocked: false, baseCost: 42, continent: "North America", nation: "USA", flag: "🇺🇸", isSplit: true,
+                polygon: [[41.69, -84.80], [41.75, -82.80], [42.32, -80.51], [40.61, -80.51], [39.32, -80.85], [38.45, -82.63], [39.10, -84.81], [41.69, -84.80]],
+                airports: [
+                    { name: "John Glenn Columbus (CMH)", lat: 39.9980, lng: -82.8919, isHub: false, baseDemand: 84, type: "airport" },
+                    { name: "Cleveland Hopkins (CLE)", lat: 41.4117, lng: -81.8498, isHub: false, baseDemand: 80, type: "airport" },
+                    { name: "Cleveland Clinic Heliport (CCL)", lat: 41.5012, lng: -81.6211, isHub: false, baseDemand: 50, type: "heliport" }
+                ]
+            },
+            "Oklahoma (US)": {
+                unlocked: false, baseCost: 38, continent: "North America", nation: "USA", flag: "🇺🇸", isSplit: true,
+                polygon: [[37.00, -103.00], [37.00, -94.62], [35.39, -94.43], [33.64, -94.43], [33.87, -97.37], [34.40, -99.99], [36.50, -100.00], [36.50, -103.00], [37.00, -103.00]],
+                airports: [
+                    { name: "Will Rogers World (OKC)", lat: 35.3931, lng: -97.6007, isHub: false, baseDemand: 76, type: "airport" },
+                    { name: "Tulsa International (TUL)", lat: 36.1984, lng: -95.8881, isHub: false, baseDemand: 73, type: "airport" },
+                    { name: "OKC Integris Heliport (OKH)", lat: 35.5122, lng: -97.5810, isHub: false, baseDemand: 45, type: "heliport" }
+                ]
+            },
+            "Ontario (CA)": {
+                unlocked: false, baseCost: 45, continent: "North America", nation: "Canada", flag: "🇨🇦", isSplit: true,
+                polygon: [[51.15, -79.71], [49.00, -79.52], [46.30, -77.95], [45.45, -75.50], [45.00, -74.75], [44.20, -76.35], [43.60, -79.40], [42.90, -78.90], [42.50, -80.20], [42.00, -82.50], [42.30, -83.10], [43.00, -82.40], [46.00, -83.80], [46.50, -84.40], [48.00, -89.20], [48.10, -95.15], [55.15, -95.15], [56.85, -88.90], [55.20, -85.10], [52.20, -80.60], [51.15, -79.71]],
+                airports: [
+                    { name: "Toronto Pearson (YYZ)", lat: 43.6777, lng: -79.6248, isHub: false, baseDemand: 95, type: "airport" },
+                    { name: "Ottawa International (YOW)", lat: 45.3225, lng: -75.6657, isHub: false, baseDemand: 74, type: "airport" },
+                    { name: "Toronto Island Heliport (CPZ9)", lat: 43.6311, lng: -79.3792, isHub: false, baseDemand: 58, type: "heliport" }
+                ]
+            },
+            "British Columbia (CA)": {
+                unlocked: false, baseCost: 47, continent: "North America", nation: "Canada", flag: "🇨🇦", isSplit: true,
+                polygon: [[60.00, -139.00], [60.00, -120.00], [49.00, -120.00], [49.00, -123.00], [48.30, -124.70], [54.30, -133.10], [60.00, -139.00]],
+                airports: [
+                    { name: "Vancouver International (YVR)", lat: 49.1967, lng: -123.1840, isHub: false, baseDemand: 94, type: "airport" },
+                    { name: "Victoria International (YYJ)", lat: 48.6469, lng: -123.4260, isHub: false, baseDemand: 78, type: "airport" },
+                    { name: "Vancouver Harbour Heliport (CBC7)", lat: 49.2886, lng: -123.1111, isHub: false, baseDemand: 72, type: "heliport" }
+                ]
+            },
+            "Quebec (CA)": {
+                unlocked: false, baseCost: 48, continent: "North America", nation: "Canada", flag: "🇨🇦", isSplit: true,
+                polygon: [[62.50, -77.50], [62.00, -66.00], [51.50, -57.00], [51.50, -68.00], [48.00, -64.00], [45.00, -71.50], [45.00, -74.75], [45.55, -75.50], [47.90, -79.50], [55.00, -79.50], [62.50, -77.50]],
+                airports: [
+                    { name: "Montreal-Trudeau (YUL)", lat: 45.4657, lng: -73.7455, isHub: false, baseDemand: 92, type: "airport" },
+                    { name: "Quebec City Jean Lesage (YQB)", lat: 46.7911, lng: -71.3933, isHub: false, baseDemand: 75, type: "airport" },
+                    { name: "Montreal Downtown Heliport (CSD4)", lat: 45.4961, lng: -73.5512, isHub: false, baseDemand: 60, type: "heliport" }
+                ]
+            },
+            "England (UK)": {
+                unlocked: false, baseCost: 50, continent: "Europe", nation: "United Kingdom", flag: "🇬🇧", isSplit: true,
+                polygon: [[55.81, -2.03], [55.61, -1.75], [54.81, -1.41], [53.58, 0.15], [52.96, 1.15], [51.95, 1.28], [51.44, 1.44], [51.11, 1.45], [50.71, -0.75], [50.55, -2.44], [50.15, -5.21], [50.05, -5.71], [50.50, -4.55], [51.21, -4.25], [51.60, -2.71], [52.00, -3.05], [52.75, -3.20], [53.40, -3.20], [54.20, -3.00], [54.65, -3.60], [55.10, -3.10], [55.81, -2.03]],
+                airports: [
+                    { name: "London Heathrow (LHR)", lat: 51.4700, lng: -0.4543, isHub: false, baseDemand: 99, type: "airport" },
+                    { name: "Manchester Airport (MAN)", lat: 53.3588, lng: -2.2749, isHub: false, baseDemand: 81, type: "airport" },
+                    { name: "London Heliport Battersea (EGLW)", lat: 51.4697, lng: -0.1783, isHub: false, baseDemand: 78, type: "heliport" }
+                ]
+            },
+            "Scotland (UK)": {
+                unlocked: false, baseCost: 45, continent: "Europe", nation: "United Kingdom", flag: "🇬🇧", isSplit: true,
+                polygon: [[58.67, -3.08], [57.65, -1.84], [56.00, -2.55], [55.81, -2.03], [55.10, -3.10], [54.80, -4.90], [55.30, -4.95], [56.30, -6.20], [58.20, -5.30], [58.67, -3.08]],
+                airports: [
+                    { name: "Edinburgh Airport (EDI)", lat: 55.9508, lng: -3.3636, isHub: false, baseDemand: 88, type: "airport" },
+                    { name: "Glasgow Airport (GLA)", lat: 55.8719, lng: -4.4331, isHub: false, baseDemand: 83, type: "airport" },
+                    { name: "Aberdeen Heliport East (EGPD)", lat: 57.2010, lng: -2.2044, isHub: false, baseDemand: 70, type: "heliport" }
+                ]
+            },
+            "Wales (UK)": {
+                unlocked: false, baseCost: 35, continent: "Europe", nation: "United Kingdom", flag: "🇬🇧", isSplit: true,
+                polygon: [[53.43, -3.34], [53.30, -3.15], [52.90, -3.05], [52.00, -3.05], [51.60, -2.71], [51.45, -3.00], [51.39, -3.25], [51.65, -5.10], [52.00, -5.35], [52.80, -4.75], [53.43, -4.40], [53.43, -3.34]],
+                airports: [
+                    { name: "Cardiff Airport (CWL)", lat: 51.3967, lng: -3.3433, isHub: false, baseDemand: 74, type: "airport" },
+                    { name: "Cardiff Tremorfa Heliport (EGTC)", lat: 51.4744, lng: -3.1412, isHub: false, baseDemand: 48, type: "heliport" }
+                ]
+            },
+            "Northern Ireland (UK)": {
+                unlocked: false, baseCost: 35, continent: "Europe", nation: "United Kingdom", flag: "🇬🇧", isSplit: true,
+                polygon: [[55.20, -6.20], [54.50, -5.40], [54.05, -6.30], [54.10, -6.50], [54.20, -7.20], [54.40, -7.90], [54.55, -8.15], [54.90, -7.30], [55.15, -7.00], [55.20, -6.20]],
+                airports: [
+                    { name: "Belfast International (BFS)", lat: 54.6575, lng: -6.2158, isHub: false, baseDemand: 78, type: "airport" },
+                    { name: "Belfast City Heliport (EGAC)", lat: 54.6181, lng: -5.8725, isHub: false, baseDemand: 52, type: "heliport" }
+                ]
+            },
+            "Ireland": {
+                unlocked: false, baseCost: 46, continent: "Europe", nation: "Ireland", flag: "🇮🇪", isSplit: false,
+                polygon: [[54.05, -6.30], [53.50, -6.05], [53.25, -6.00], [52.20, -6.30], [51.60, -8.20], [51.45, -9.45], [51.75, -10.15], [52.60, -9.90], [53.00, -10.20], [54.20, -10.05], [54.30, -10.10], [54.65, -8.50], [55.15, -8.25], [55.38, -7.30], [54.90, -7.30], [54.55, -8.15], [54.40, -7.90], [54.20, -7.20], [54.10, -6.50], [54.05, -6.30]],
+                airports: [
+                    { name: "Dublin Airport (DUB)", lat: 53.4264, lng: -6.2499, isHub: false, baseDemand: 94, type: "airport" },
+                    { name: "Cork Airport (ORK)", lat: 51.8413, lng: -8.4911, isHub: false, baseDemand: 76, type: "airport" },
+                    { name: "Dublin Castle Heliport (DCH)", lat: 53.3429, lng: -6.2674, isHub: false, baseDemand: 54, type: "heliport" }
+                ]
+            },
+            "Gibraltar": {
+                unlocked: false, baseCost: 25, continent: "Europe", nation: "Gibraltar", flag: "🇬🇮", isSplit: false,
+                polygon: [[36.155, -5.36], [36.155, -5.33], [36.110, -5.33], [36.110, -5.36], [36.155, -5.36]],
+                airports: [
+                    { name: "Gibraltar International (GIB)", lat: 36.1512, lng: -5.3497, isHub: false, baseDemand: 71, type: "airport" },
+                    { name: "Gibraltar Naval Heliport (LXGB)", lat: 36.1432, lng: -5.3551, isHub: false, baseDemand: 42, type: "heliport" }
+                ]
+            },
+            "New South Wales (AU)": {
+                unlocked: false, baseCost: 50, continent: "Oceania", nation: "Australia", flag: "🇦🇺", isSplit: true,
+                polygon: [[-29.00, 141.00], [-29.00, 153.65], [-37.50, 149.98], [-37.50, 140.96], [-34.00, 141.00], [-29.00, 141.00]],
+                airports: [
+                    { name: "Sydney Kingsford (SYD)", lat: -33.9461, lng: 151.1772, isHub: false, baseDemand: 96, type: "airport" },
+                    { name: "Newcastle Airport (NTL)", lat: -32.7950, lng: 151.8344, isHub: false, baseDemand: 48, type: "airport" },
+                    { name: "Sydney Darling Harbour Heliport (HSH)", lat: -33.8732, lng: 151.1995, isHub: false, baseDemand: 68, type: "heliport" }
+                ]
+            },
+            "Australian Capital Territory (AU)": {
+                unlocked: false, baseCost: 30, continent: "Oceania", nation: "Australia", flag: "🇦🇺", isSplit: true,
+                polygon: [[-35.12, 149.00], [-35.12, 149.26], [-35.58, 149.24], [-35.93, 149.12], [-35.54, 148.74], [-35.12, 149.00]],
+                airports: [
+                    { name: "Canberra Airport (CBR)", lat: -35.3069, lng: 149.1950, isHub: false, baseDemand: 82, type: "airport" },
+                    { name: "Canberra Hospital Heliport (CHH)", lat: -35.3461, lng: 149.1012, isHub: false, baseDemand: 42, type: "heliport" }
+                ]
+            },
+            "Western Australia (AU)": {
+                unlocked: false, baseCost: 52, continent: "Oceania", nation: "Australia", flag: "🇦🇺", isSplit: true,
+                polygon: [[-13.75, 129.00], [-35.15, 129.00], [-35.15, 115.00], [-22.00, 114.00], [-13.75, 126.00], [-13.75, 129.00]],
+                airports: [
+                    { name: "Perth Airport (PER)", lat: -31.9403, lng: 115.9669, isHub: false, baseDemand: 90, type: "airport" },
+                    { name: "Broome International (BME)", lat: -17.9472, lng: 122.2281, isHub: false, baseDemand: 55, type: "airport" },
+                    { name: "Perth City Heliport (PCH)", lat: -31.9610, lng: 115.8450, isHub: false, baseDemand: 50, type: "heliport" }
+                ]
+            },
+            "Japan": {
+                unlocked: false, baseCost: 60, continent: "Asia", nation: "Japan", flag: "🇯🇵", isSplit: false,
+                polygon: [[45.52, 141.93], [43.38, 145.81], [43.30, 145.80], [42.60, 143.43], [41.80, 140.80], [41.53, 141.68], [38.30, 141.50], [35.70, 140.85], [34.90, 139.90], [34.60, 136.80], [34.50, 136.80], [33.15, 139.80], [31.00, 130.65], [32.30, 130.30], [33.85, 130.80], [35.55, 133.20], [37.95, 139.10], [40.40, 140.05], [41.55, 140.40], [42.30, 142.30], [45.52, 141.93]],
+                airports: [
+                    { name: "Tokyo Haneda (HND)", lat: 35.5494, lng: 139.7798, isHub: false, baseDemand: 100, type: "airport" },
+                    { name: "Osaka Itami (ITM)", lat: 34.7855, lng: 135.4382, isHub: false, baseDemand: 86, type: "airport" },
+                    { name: "Ark Hills Heliport Tokyo (ARK)", lat: 35.6672, lng: 139.7401, isHub: false, baseDemand: 80, type: "heliport" }
+                ]
+            },
+            "Palau": {
+                unlocked: false, baseCost: 28, continent: "Oceania", nation: "Palau", flag: "🇵🇼", isSplit: false,
+                polygon: [[8.0, 134.0], [8.0, 135.0], [6.0, 135.0], [6.0, 134.0], [8.0, 134.0]],
+                airports: [
+                    { name: "Palau International (ROR)", lat: 7.3644, lng: 134.5442, isHub: false, baseDemand: 68, type: "airport" },
+                    { name: "Koror State Heliport (KOR)", lat: 7.3412, lng: 134.4780, isHub: false, baseDemand: 50, type: "heliport" }
+                ]
+            },
+            "France": {
+                unlocked: false, baseCost: 55, continent: "Europe", nation: "France", flag: "🇫🇷", isSplit: false,
+                polygon: [
+                    [[51.10, 2.55], [49.95, 4.25], [49.20, 6.15], [49.00, 8.10], [47.55, 7.50], [46.45, 6.50], [45.15, 7.10], [43.70, 7.50], [43.45, 6.75], [43.15, 6.00], [43.40, 4.80], [42.50, 3.10], [42.60, 1.80], [42.75, 1.45], [43.30, -1.75], [46.00, -1.25], [48.00, -4.50], [48.65, -4.65], [49.70, -1.95], [50.10, 1.60], [51.10, 2.55]], 
+                    [[43.02, 9.30], [42.70, 9.55], [42.00, 9.50], [41.38, 9.22], [41.50, 8.75], [41.95, 8.60], [42.65, 8.65], [43.02, 9.30]] 
+                ],
+                airports: [
+                    { name: "Paris CdG (CDG)", lat: 49.0097, lng: 2.5479, isHub: false, baseDemand: 98, type: "airport" },
+                    { name: "Nice Côte d'Azur (NCE)", lat: 43.6653, lng: 7.2150, isHub: false, baseDemand: 79, type: "airport" },
+                    { name: "Paris Issy-les-Moulineaux Heliport (JDP)", lat: 48.8333, lng: 2.2719, isHub: false, baseDemand: 74, type: "heliport" }
+                ]
+            },
+            "Guadeloupe": {
+                unlocked: false, baseCost: 26, continent: "North America", nation: "Guadeloupe", flag: "🇬🇵", isSplit: false,
+                polygon: [[16.50, -61.80], [16.50, -61.00], [15.80, -61.00], [15.80, -61.80], [16.50, -61.80]],
+                airports: [
+                    { name: "Pointe-à-Pitre International (PTP)", lat: 16.2653, lng: -61.5318, isHub: false, baseDemand: 76, type: "airport" },
+                    { name: "Marie-Galante Heliport (GBH)", lat: 15.8825, lng: -61.2642, isHub: false, baseDemand: 46, type: "heliport" }
+                ]
+            },
+            "Martinique": {
+                unlocked: false, baseCost: 26, continent: "North America", nation: "Martinique", flag: "🇲🇶", isSplit: false,
+                polygon: [[14.90, -61.25], [14.90, -60.80], [14.35, -60.80], [14.35, -61.25], [14.90, -61.25]],
+                airports: [
+                    { name: "Martinique Aimé Césaire (FDF)", lat: 14.5910, lng: -61.0031, isHub: false, baseDemand: 78, type: "airport" },
+                    { name: "Fort-de-France Hydro-Heliport (FFH)", lat: 14.6045, lng: -61.0691, isHub: false, baseDemand: 48, type: "heliport" }
+                ]
+            },
+            "Mexico": {
+                unlocked: false, baseCost: 52, continent: "North America", nation: "Mexico", flag: "🇲🇽", isSplit: false,
+                polygon: [[32.50, -117.10], [32.70, -114.70], [31.30, -111.00], [31.30, -108.20], [29.80, -104.50], [29.50, -102.50], [26.00, -97.10], [21.00, -97.30], [20.50, -97.30], [18.50, -94.30], [20.50, -90.70], [21.30, -90.30], [21.40, -87.00], [18.20, -88.10], [16.10, -89.10], [14.60, -92.20], [16.20, -95.00], [15.60, -96.50], [16.80, -100.00], [20.50, -105.50], [23.00, -106.30], [31.00, -114.00], [22.80, -109.90], [24.50, -110.50], [32.00, -116.90], [32.50, -117.10]],
+                airports: [
+                    { name: "Mexico City Benito Juárez (MEX)", lat: 19.4363, lng: -99.0721, isHub: false, baseDemand: 96, type: "airport" },
+                    { name: "Cancún International (CUN)", lat: 21.0365, lng: -86.8771, isHub: false, baseDemand: 90, type: "airport" },
+                    { name: "Polanco Skies Heliport (MEX1)", lat: 19.4326, lng: -99.1912, isHub: false, baseDemand: 68, type: "heliport" }
+                ]
+            },
+            "South Africa": {
+                unlocked: false, baseCost: 58, continent: "Africa", nation: "South Africa", flag: "🇿🇦", isSplit: false,
+                polygon: [[-22.12, 29.38], [-22.42, 31.31], [-24.03, 31.84], [-26.85, 32.88], [-32.20, 28.80], [-34.18, 22.10], [-34.83, 20.00], [-33.10, 17.90], [-28.60, 16.45], [-25.70, 20.00], [-26.90, 20.70], [-21.70, 25.00], [-22.12, 29.38]],
+                airports: [
+                    { name: "O.R. Tambo Joburg (JNB)", lat: -26.1367, lng: 28.2461, isHub: false, baseDemand: 94, type: "airport" },
+                    { name: "Cape Town International (CPT)", lat: -33.9748, lng: 18.6017, isHub: false, baseDemand: 91, type: "airport" },
+                    { name: "Sandton City Heliport (JHB1)", lat: -26.1072, lng: 28.0525, isHub: false, baseDemand: 65, type: "heliport" }
+                ]
+            },
+            "Egypt": {
+                unlocked: false, baseCost: 54, continent: "Africa", nation: "Egypt", flag: "🇪🇬", isSplit: false,
+                polygon: [[31.55, 25.00], [31.30, 34.20], [29.50, 34.95], [22.00, 36.80], [22.00, 25.00], [31.55, 25.00]],
+                airports: [
+                    { name: "Cairo International (CAI)", lat: 30.1219, lng: 31.4056, isHub: false, baseDemand: 95, type: "airport" },
+                    { name: "Hurghada Airport (HRG)", lat: 27.1783, lng: 33.7994, isHub: false, baseDemand: 76, type: "airport" },
+                    { name: "Cairo Nile Tower Heliport (CNH)", lat: 30.0444, lng: 31.2357, isHub: false, baseDemand: 60, type: "heliport" }
+                ]
+            },
+            "Somaliland": {
+                unlocked: false, baseCost: 32, continent: "Africa", nation: "Somaliland", flag: "https://upload.wikimedia.org/wikipedia/commons/4/4d/Flag_of_Somaliland.svg", isSplit: false,
+                polygon: [[11.50, 43.25], [11.98, 43.35], [10.50, 49.00], [8.00, 49.00], [8.00, 47.50], [9.00, 45.00], [9.50, 43.00], [11.50, 43.25]],
+                airports: [
+                    { name: "Hargeisa Egal Intl (HGA)", lat: 9.5179, lng: 44.0888, isHub: false, baseDemand: 65, type: "airport" },
+                    { name: "Berbera Port Heliport (BBO)", lat: 10.4391, lng: 45.0125, isHub: false, baseDemand: 45, type: "heliport" }
+                ]
+            },
+            "Abkhazia": {
+                unlocked: false, baseCost: 26, continent: "Europe", nation: "Abkhazia", flag: "https://upload.wikimedia.org/wikipedia/commons/7/7a/Flag_of_Abkhazia.svg", isSplit: false,
+                polygon: [[43.50, 40.00], [43.60, 41.00], [42.70, 42.00], [42.40, 41.50], [43.50, 40.00]],
+                airports: [
+                    { name: "Sukhumi Babushara (SUI)", lat: 42.8581, lng: 41.1306, isHub: false, baseDemand: 58, type: "airport" },
+                    { name: "Gagra Coast Heliport (GGR)", lat: 43.2810, lng: 40.2644, isHub: false, baseDemand: 40, type: "heliport" }
+                ]
+            },
+            "South Ossetia": {
+                unlocked: false, baseCost: 25, continent: "Europe", nation: "South Ossetia", flag: "https://upload.wikimedia.org/wikipedia/commons/1/12/Flag_of_South_Ossetia.svg", isSplit: false,
+                polygon: [[42.70, 43.50], [42.80, 44.50], [42.10, 44.60], [42.00, 43.60], [42.70, 43.50]],
+                airports: [
+                    { name: "Tskhinvali Airfield (TXL)", lat: 42.2258, lng: 43.9672, isHub: false, baseDemand: 45, type: "airport" },
+                    { name: "Java Mountain Base Heliport (JMH)", lat: 42.3922, lng: 43.9211, isHub: false, baseDemand: 38, type: "heliport" }
+                ]
+            },
+            "Liechtenstein": {
+                unlocked: false, baseCost: 24, continent: "Europe", nation: "Liechtenstein", flag: "🇱🇮", isSplit: false,
+                polygon: [[47.27, 9.47], [47.28, 9.57], [47.05, 9.60], [47.04, 9.48], [47.27, 9.47]],
+                airports: [
+                    { name: "Balzers Heliport (BZR)", lat: 47.0672, lng: 9.4975, isHub: false, baseDemand: 60, type: "heliport" },
+                    { name: "Vaduz Hospital Heliport (VDZ)", lat: 47.1411, lng: 9.5214, isHub: false, baseDemand: 55, type: "heliport" }
+                ]
+            },
+            "Israel": {
+                unlocked: false, baseCost: 52, continent: "Asia", nation: "Israel", flag: "🇮🇱", isSplit: false,
+                polygon: [[33.30, 35.10], [33.40, 35.90], [29.50, 34.90], [31.30, 34.20], [33.30, 35.10]],
+                airports: [
+                    { name: "Ben Gurion Intl (TLV)", lat: 32.0055, lng: 34.8854, isHub: false, baseDemand: 96, type: "airport" },
+                    { name: "Ramon Airport (ETM)", lat: 29.7251, lng: 35.0111, isHub: false, baseDemand: 72, type: "airport" },
+                    { name: "Tel Aviv Ichilov Heliport (ICH)", lat: 32.0805, lng: 34.7895, isHub: false, baseDemand: 64, type: "heliport" }
+                ]
+            },
+            "Falkland Islands": {
+                unlocked: false, baseCost: 30, continent: "South America", nation: "Falkland Islands", flag: "🇫🇰", isSplit: false,
+                polygon: [[-51.00, -61.50], [-51.00, -57.50], [-52.50, -57.50], [-52.50, -61.50], [-51.00, -61.50]],
+                airports: [
+                    { name: "Mount Pleasant (MPN)", lat: -51.8228, lng: -58.4472, isHub: false, baseDemand: 64, type: "airport" },
+                    { name: "Stanley Heliport Complex (PSY)", lat: -51.6912, lng: -57.8510, isHub: false, baseDemand: 52, type: "heliport" }
+                ]
+            },
+            "Brazil": {
+                unlocked: false, baseCost: 65, continent: "South America", nation: "Brazil", flag: "🇧🇷", isSplit: false,
+                polygon: [[4.43, -51.52], [2.25, -60.85], [1.15, -67.00], [-7.40, -73.80], [-11.00, -71.10], [-13.40, -72.40], [-22.50, -58.00], [-22.90, -53.50], [-27.35, -53.70], [-30.15, -57.50], [-33.74, -53.30], [-28.50, -48.80], [-22.90, -43.20], [-13.00, -38.50], [-5.50, -35.60], [-2.50, -44.30], [1.30, -48.90], [4.43, -51.52]],
+                airports: [
+                    { name: "Guarulhos International (GRU)", lat: -23.4356, lng: -46.4731, isHub: false, baseDemand: 97, type: "airport" },
+                    { name: "Galeão Rio Intl (GIG)", lat: -22.8100, lng: -43.2506, isHub: false, baseDemand: 91, type: "airport" },
+                    { name: "São Paulo Fluvial Heliport (SBJD)", lat: -23.5505, lng: -46.6333, isHub: false, baseDemand: 85, type: "heliport" }
+                ]
+            },
+            "Chile": {
+                unlocked: false, baseCost: 48, continent: "South America", nation: "Chile", flag: "🇨🇱", isSplit: false,
+                polygon: [[-17.50, -69.40], [-20.50, -68.50], [-22.40, -68.00], [-24.30, -68.80], [-26.85, -68.30], [-30.20, -69.90], [-32.65, -70.10], [-34.25, -70.00], [-36.20, -71.10], [-39.00, -71.40], [-43.30, -71.70], [-48.60, -72.40], [-52.40, -71.60], [-55.00, -68.60], [-56.50, -67.20], [-54.00, -74.50], [-49.00, -75.80], [-41.50, -74.00], [-33.00, -72.00], [-24.00, -70.50], [-18.30, -70.40], [-17.50, -69.40]],
+                airports: [
+                    { name: "Santiago Arturo Merino (SCL)", lat: -33.3930, lng: -70.7858, isHub: false, baseDemand: 92, type: "airport" },
+                    { name: "Antofagasta Andrés Sabella (ANF)", lat: -23.4444, lng: -70.4451, isHub: false, baseDemand: 74, type: "airport" },
+                    { name: "Titanium La Portada Heliport (TLP)", lat: -33.4140, lng: -70.6012, isHub: false, baseDemand: 58, type: "heliport" }
+                ]
+            },
+            "Argentina": {
+                unlocked: false, baseCost: 55, continent: "South America", nation: "Argentina", flag: "🇦🇷", isSplit: false,
+                polygon: [[-22.00, -65.00], [-22.00, -62.30], [-23.85, -60.95], [-25.40, -57.70], [-27.35, -53.70], [-28.20, -55.80], [-30.15, -57.50], [-34.10, -58.30], [-38.50, -57.50], [-41.00, -62.50], [-47.20, -65.70], [-52.40, -68.40], [-55.00, -66.50], [-55.00, -68.60], [-52.40, -71.60], [-48.60, -72.40], [-43.30, -71.70], [-39.00, -71.40], [-36.20, -71.10], [-34.25, -70.00], [-32.65, -70.10], [-30.20, -69.90], [-26.85, -68.30], [-24.30, -68.80], [-22.40, -68.00], [-20.50, -68.50], [-17.50, -69.40], [-22.00, -67.00], [-22.00, -65.00]],
+                airports: [
+                    { name: "Ministro Pistarini Ezeiza (EZE)", lat: -34.8222, lng: -58.5358, isHub: false, baseDemand: 94, type: "airport" },
+                    { name: "Córdoba Taravella Intl (COR)", lat: -31.3100, lng: -64.2081, isHub: false, baseDemand: 80, type: "airport" },
+                    { name: "Baires Madero Heliport (BAM)", lat: -34.6015, lng: -58.3620, isHub: false, baseDemand: 62, type: "heliport" }
+                ]
+            }
+        };
+
+        const aircraftCatalog = {
+            "ATR 72-600": { name: "ATR 72-600", category: "ATR", price: 32000, pax: 72, rangeNM: 740, speed: 0.5, topSpeedKnots: 275, img: "https://images.unsplash.com/photo-1517646287270-a5a9ca602e5c?auto=format&fit=crop&w=400&q=80", type: "plane" },
+            "Airbus A350-900": { name: "Airbus A350-900", category: "Airbus", price: 310000, pax: 350, rangeNM: 8100, speed: 1.6, topSpeedKnots: 510, img: "https://images.unsplash.com/photo-1559136555-9303baea8ebd?auto=format&fit=crop&w=400&q=80", type: "plane" },
+            "Boeing 727-200": { name: "Boeing 727-200", category: "Boeing", price: 85000, pax: 155, rangeNM: 2500, speed: 0.9, topSpeedKnots: 465, img: "https://images.unsplash.com/photo-1583608205776-bfd35f0d9f83?auto=format&fit=crop&w=400&q=80", type: "plane" },
+            "Boeing 737-800": { name: "Boeing 737-800", category: "Boeing", price: 145000, pax: 189, rangeNM: 3115, speed: 1.2, topSpeedKnots: 477, img: "https://images.unsplash.com/photo-1436491865332-7a61a109cc05?auto=format&fit=crop&w=400&q=80", type: "plane" },
+            "Cessna 208 Caravan": { name: "Cessna 208 Caravan", category: "Other", price: 15000, pax: 12, rangeNM: 632, speed: 0.3, topSpeedKnots: 185, img: "https://images.unsplash.com/photo-1540962351504-03099e0a754b?auto=format&fit=crop&w=400&q=80", type: "plane" },
+            "Bell 407 Helicopter": { name: "Bell 407 Helicopter", category: "Other", price: 20000, pax: 6, rangeNM: 320, speed: 0.2, topSpeedKnots: 140, img: "https://images.unsplash.com/photo-1534447677768-be436bb09401?auto=format&fit=crop&w=400&q=80", type: "helicopter" }
+        };
+
+        const achievements = {
+            "cadet": { title: "Flight Academy Graduate", desc: "Complete the operational training sequence", unlocked: false, badge: "🎓", rewardDesc: "Starting Aircraft, $180,000, and +15 AeroTokens" },
+            "spinning_around": { title: "Spinning Around", desc: "Buy a helicopter for the first time", unlocked: false, badge: "🚁", rewardDesc: "$10,000 and +10 AeroTokens" },
+            "globetrotter": { title: "Globetrotter", desc: "Unlock airfields across 4 distinct nations", unlocked: false, badge: "🌍", rewardDesc: "$150,000" },
+            "millionaire": { title: "Millionaire", desc: "Exceed a cash treasury balance of $1,000,000", unlocked: false, badge: "💰", rewardDesc: "+150 AeroTokens" }
+        };
+
+        const DEFAULT_STATE = {
+            cash: 0, 
+            tokens: 0,
+            airlineName: "",
+            primaryHub: "",
+            hangar: { "Cessna 208 Caravan": 0, "ATR 72-600": 0, "Boeing 727-200": 0, "Boeing 737-800": 0, "Airbus A350-900": 0, "Bell 407 Helicopter": 0 }, 
+            routes: [],
+            distanceUnit: "NM",
+            multiplierX: 1350,
+            tutorialActive: false,
+            interactiveStage: 0,
+            lightTheme: false
+        };
+
+        let gameState = {};
+        let map, baseMapLayer = null, regionLayers = {}, flightMarkers = [];
+        let currentActiveContract = null;
+
+        window.onload = function() {
+            populateRegionSetupDropdown();
+            if (localStorage.getItem('am81_savegame_pro')) {
+                loadProgress();
+                document.getElementById('setup-screen').style.display = 'none';
+            } else {
+                gameState = JSON.parse(JSON.stringify(DEFAULT_STATE));
+                document.getElementById('setup-screen').style.display = 'flex';
+            }
+            initSimulationEngine();
+        };
+
+        function populateRegionSetupDropdown() {
+            const rSelect = document.getElementById('hub-region-select');
+            rSelect.innerHTML = '<option value="">-- Choose a Region --</option>';
+            
+            Object.keys(regions).sort().forEach(rKey => {
+                const opt = document.createElement('option');
+                opt.value = rKey;
+                
+                let flagSymbol = "";
+                if (typeof regions[rKey].flag === 'string' && !regions[rKey].flag.startsWith('http')) {
+                    flagSymbol = regions[rKey].flag + " ";
+                }
+                
+                opt.innerText = `${flagSymbol}${regions[rKey].nation} (${rKey})`;
+                rSelect.appendChild(opt);
+            });
+        }
+
+        function populateHubAirports() {
+            const rSelect = document.getElementById('hub-region-select').value;
+            const hSelect = document.getElementById('hub-select');
+            hSelect.innerHTML = '<option value="">-- Choose an Asset Location --</option>';
+            
+            if(!rSelect || !regions[rSelect]) return;
+
+            regions[rSelect].airports.forEach(ap => {
+                const opt = document.createElement('option');
+                opt.value = ap.name;
+                opt.innerText = `${ap.type === 'heliport' ? '🚁' : '🛫'} ${ap.name}`;
+                hSelect.appendChild(opt);
+            });
+        }
+
+        function checkSetupHubType() {
+            const chosenHub = document.getElementById('hub-select').value;
+            const apData = findAirportData(chosenHub);
+            
+            if (!apData) {
+                alert("Please select a valid operation location asset before initialization.");
+                return;
+            }
+
+            if (apData.type === 'heliport') {
+                document.getElementById('hub-confirm-modal').style.display = 'flex';
+            } else {
+                confirmSetup();
+            }
+        }
+
+        function cancelHubConfirmation() {
+            document.getElementById('hub-confirm-modal').style.display = 'none';
+        }
+
+        function acceptHubConfirmation() {
+            document.getElementById('hub-confirm-modal').style.display = 'none';
+            confirmSetup();
+        }
+
+        function confirmSetup() {
+            const inputName = document.getElementById('airline-name-input').value.trim();
+            const chosenRegion = document.getElementById('hub-region-select').value;
+            const chosenHub = document.getElementById('hub-select').value;
+
+            if(!inputName || !chosenRegion || !chosenHub) {
+                alert("Please provide a valid airline name, region, and operation location asset before initialization.");
+                return;
+            }
+            
+            gameState.airlineName = inputName;
+            gameState.primaryHub = chosenHub;
+            gameState.tutorialActive = true;
+            gameState.interactiveStage = 0;
+
+            for (const r of Object.values(regions)) {
+                r.unlocked = false;
+                r.airports.forEach(a => a.isHub = false);
+            }
+
+            regions[chosenRegion].unlocked = true;
+            regions[chosenRegion].airports.forEach(a => {
+                if(a.name === chosenHub) a.isHub = true;
+            });
+
+            document.getElementById('setup-screen').style.display = 'none';
+            saveProgress();
+            
+            if(map) map.remove();
+            initSimulationEngine();
+            startInteractiveTutorial();
+        }
+
+        function startInteractiveTutorial() {
+            if (!gameState.tutorialActive) return;
+            gameState.interactiveStage = 0;
+            renderCurrentTutorialStep();
+        }
+
+        function renderCurrentTutorialStep() {
+            document.querySelectorAll('.tutorial-highlight').forEach(el => el.classList.remove('tutorial-highlight'));
+
+            if (!gameState.tutorialActive || gameState.interactiveStage >= 4) {
+                document.getElementById('interactive-tutorial-bubble').style.display = 'none';
+                completeTutorialRewardSequence();
+                return;
+            }
+
+            document.getElementById('interactive-tutorial-bubble').style.display = 'flex';
+            
+            if (gameState.interactiveStage === 0) {
+                document.getElementById('t-bubble-title').innerText = "Exercise 1: Operational Base Established";
+                document.getElementById('t-bubble-text').innerText = "Excellent choice! Your airline has been granted administrative zoning rights. The map tracks your operations seamlessly.";
+                switchTab('routes');
+                const hubData = findAirportData(gameState.primaryHub);
+                if (hubData && map) map.flyTo([hubData.lat, hubData.lng], 5);
+            } else if (gameState.interactiveStage === 1) {
+                document.getElementById('t-bubble-title').innerText = "Exercise 2: Create a Route Corridor";
+                document.getElementById('t-bubble-text').innerText = "Let's structure your first route. Notice the highlighted route configuration card. Choose your destination and click 'Open Flight Route'. Opening a route costs 10 tokens.";
+                document.getElementById('route-creation-card').classList.add('tutorial-highlight');
+                switchTab('routes');
+            } else if (gameState.interactiveStage === 2) {
+                document.getElementById('t-bubble-title').innerText = "Exercise 3: Financial Oversight & Fleet Control";
+                document.getElementById('t-bubble-text').innerText = "Your Cash and Token totals are tracked here. Finishing this tutorial rewards you starter equipment and resources immediately.";
+                document.getElementById('stat-money-box').classList.add('tutorial-highlight');
+              document.getElementById('stat-tokens-box').classList.add('tutorial-highlight');
+                switchTab('market');
+            } else if (gameState.interactiveStage === 3) {
+                document.getElementById('t-bubble-title').innerText = "Exercise 4: Expanding Global Access";
+                document.getElementById('t-bubble-text').innerText = "As you make profits, visit the Airspace and Market tabs to expand your airline.";
+                document.getElementById('control-tab-headers').classList.add('tutorial-highlight');
+                switchTab('achievements');
+            }
+
+            document.getElementById('t-bubble-btn').innerText = (gameState.interactiveStage === 3) ? "Graduate & Claim Starter Pack" : "Next Exercise";
+        }
+
+        function toggleThemeLayout(useDark) {
+            gameState.lightTheme = !useDark;
+            if(useDark) {
+                document.body.classList.remove('light-theme');
+            } else {
+                document.body.classList.add('light-theme');
+            }
+            saveProgress();
+            updateMapStyle();
+        }
+
+        function openSettingsScreen() {
+            document.getElementById('theme-toggle-checkbox').checked = !gameState.lightTheme;
+            document.getElementById('settings-screen').style.display = 'flex';
+        }
+        function closeSettingsScreen() { document.getElementById('settings-screen').style.display = 'none'; }
+        
+        function saveProgress() {
+            const rawSaveData = {
+                gameState: gameState,
+                regionsUnlockedStatus: Object.keys(regions).reduce((acc, key) => {
+                    acc[key] = { unlocked: regions[key].unlocked, airports: regions[key].airports.map(a => ({ name: a.name, isHub: a.isHub })) };
+                    return acc;
+                }, {}),
+                achievementsStatus: Object.keys(achievements).reduce((acc, key) => {
+                    acc[key] = achievements[key].unlocked;
+                    return acc;
+                }, {})
+            };
+            localStorage.setItem('am81_savegame_pro', JSON.stringify(rawSaveData));
+        }
+
+        function loadProgress() {
+            const parsed = JSON.parse(localStorage.getItem('am81_savegame_pro'));
+            gameState = parsed.gameState;
+            
+            for(const key in parsed.regionsUnlockedStatus) {
+                if(regions[key]) {
+                    regions[key].unlocked = parsed.regionsUnlockedStatus[key].unlocked;
+                    parsed.regionsUnlockedStatus[key].airports.forEach(savedAp => {
+                        const targetAp = regions[key].airports.find(a => a.name === savedAp.name);
+                        if(targetAp) targetAp.isHub = savedAp.isHub;
+                    });
+                }
+            }
+            for(const key in parsed.achievementsStatus) {
+                if(achievements[key]) achievements[key].unlocked = parsed.achievementsStatus[key];
+            }
+            
+            if(gameState.lightTheme) {
+                document.body.classList.add('light-theme');
+            } else {
+                document.body.classList.remove('light-theme');
+            }
+        }
+
+        function openResetScreen() { document.getElementById('reset-screen').style.display = 'flex'; }
+        function closeResetScreen() { 
+            document.getElementById('reset-screen').style.display = 'none'; 
+            document.getElementById('settings-screen').style.display = 'none';
+        }
+        
+        function executeAccountReset() {
+            localStorage.removeItem('am81_savegame_pro');
+            
+            gameState = JSON.parse(JSON.stringify(DEFAULT_STATE));
+            for (const r of Object.values(regions)) {
+                r.unlocked = false;
+                r.airports.forEach(a => a.isHub = false);
+            }
+            for (const key in achievements) {
+                achievements[key].unlocked = false;
+            }
+
+            flightMarkers.forEach(m => map.removeLayer(m));
+            flightMarkers = [];
+            
+            closeResetScreen();
+            
+            document.getElementById('setup-screen').style.display = 'flex';
+            document.getElementById('airline-name-input').value = "";
+            document.getElementById('hub-region-select').value = "";
+            document.getElementById('hub-select').innerHTML = '<option value="">-- Choose a Region First --</option>';
+            
+            document.getElementById('airline-banner').innerText = "Airline Manager 81 3⁄64";
+            document.getElementById('hq-banner-text').innerText = "-";
+            renderMapGraphics();
+            buildDirectoryTree();
+            updateUI();
+        }
+
+        function initSimulationEngine() {
+            document.getElementById('airline-banner').innerText = gameState.airlineName || "Airline Manager 81 3⁄64";
+            document.getElementById('hq-banner-text').innerText = gameState.primaryHub || "None Established";
+
+            const southWest = L.latLng(-85, -180);
+            const northEast = L.latLng(85, 180);
+            const bounds = L.latLngBounds(southWest, northEast);
+
+            map = L.map('map', { 
+                minZoom: 2, 
+                maxZoom: 7,
+                maxBounds: bounds,
+                maxBoundsViscosity: 1.0
+            }).setView([20, 0], 2);
+
+            updateMapStyle();
+            renderMapGraphics();
+            buildDirectoryTree();
+            updateUI();
+            
+            if (gameState.tutorialActive) {
+                renderCurrentTutorialStep();
+            }
+
+            setInterval(gameSimulationTick, 100);
+            setInterval(rollContractChance, 65000); 
+        }
+
+        function updateMapStyle() {
+            if(baseMapLayer && map) {
+                map.removeLayer(baseMapLayer);
+            }
+            
+            let mapUrl = 'https://{s}.basemaps.cartocdn.com/rastertiles/voyager_labels_under/{z}/{x}/{y}{r}.png';
+            if (!gameState.lightTheme) {
+                mapUrl = 'https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png';
+            }
+
+            baseMapLayer = L.tileLayer(mapUrl, {
+                attribution: '&copy; OpenStreetMap contributors &copy; CARTO',
+                noWrap: true
+            }).addTo(map);
+        }
+
+        function convertDistance(nmValue) {
+            if (gameState.distanceUnit === "MI") return `${Math.round(nmValue * 1.15078)} MI`;
+            if (gameState.distanceUnit === "KM") return `${Math.round(nmValue * 1.852)} KM`;
+            return `${nmValue} NM`;
+        }
+
+        function setDistanceUnit(unit) {
+            gameState.distanceUnit = unit;
+            document.querySelectorAll('.unit-btn').forEach(b => b.classList.remove('active'));
+            document.getElementById(`unit-${unit.toLowerCase()}`).classList.add('active');
+            updateUI();
+            const openIns = document.getElementById('ins-name').innerText;
+            if(openIns && openIns !== "No Target") inspectAirport(openIns);
+        }
+
+        function renderMapGraphics() {
+            Object.values(regionLayers).forEach(l => map.removeLayer(l));
+            regionLayers = {};
+            
+            for (const [name, data] of Object.entries(regions)) {
+                const borderStrokeColor = data.unlocked ? "#10b981" : "#ef4444";
+                const polyData = Array.isArray(data.polygon[0][0]) ? data.polygon : [data.polygon];
+                
+                regionLayers[name] = L.polygon(polyData, { 
+                    color: borderStrokeColor, 
+                    weight: 2, 
+                    fillOpacity: 0.08,
+                    dashArray: data.unlocked ? null : "4, 4"
+                }).addTo(map);
+
+                data.airports.forEach(ap => {
+                    if(data.unlocked) {
+                        const fillColorNode = ap.isHub ? '#eab308' : (ap.type === "heliport" ? '#a855f7' : '#06b6d4');
+                        L.circleMarker([ap.lat, ap.lng], {
+                            radius: ap.isHub ? 7 : 5, color: '#ffffff', weight: 1, fillColor: fillColorNode, fillOpacity: 1
+                        }).addTo(map).bindPopup(`<b>${ap.name}</b><br>Type: ${ap.type.toUpperCase()}<br>Base Demand: ${ap.baseDemand}%`);
+                    }
+                });
+            }
+        }
+
+        function calculateBearing(lat1, lng1, lat2, lng2) {
+            const dLng = (lng2 - lng1) * Math.PI / 180;
+            const rLat1 = lat1 * Math.PI / 180;
+            const rLat2 = lat2 * Math.PI / 180;
+            const y = Math.sin(dLng) * Math.cos(rLat2);
+            const x = Math.cos(rLat1) * Math.sin(rLat2) - Math.sin(rLat1) * Math.cos(rLat2) * Math.cos(dLng);
+            return (Math.atan2(y, x) * 180 / Math.PI + 360) % 360;
+        }
+
+        function rollContractChance() {
+            if (document.getElementById('contract-modal').style.display === 'flex') return;
+            
+            const totalHelis = gameState.hangar["Bell 407 Helicopter"] || 0;
+            let activeHeliRoutes = 0;
+            gameState.routes.forEach(r => {
+                if (r.assignedAircraft === "Bell 407 Helicopter") activeHeliRoutes++;
+            });
+            
+            if (totalHelis === 0 && activeHeliRoutes === 0) return;
+            if (Math.random() > 0.35) return;
+
+            const targetHub = findAirportData(gameState.primaryHub);
+            if (!targetHub) return;
+
+            const eventTypes = [
+                { desc: "A VIP must be transported to an Oil Rig coordinate assignment.", reward: 25000 },
+                { desc: "A Search & Rescue Mission has been officially issued in deep waters.", reward: 35000 },
+                { desc: `A Police Chase is happening in ${targetHub.name.split(' ')[0]} and news stations want you to report.`, reward: 18000 }
+            ];
+
+            const matchEvent = eventTypes[Math.floor(Math.random() * eventTypes.length)];
+            currentActiveContract = matchEvent;
+
+            document.getElementById('contract-description').innerText = matchEvent.desc;
+            document.getElementById('contract-reward').innerText = `Completion Payout: +$${matchEvent.reward.toLocaleString()}`;
+            
+            const hasFreeHeli = gameState.hangar["Bell 407 Helicopter"] > 0;
+            document.getElementById('accept-contract-btn').disabled = !hasFreeHeli;
+            if(!hasFreeHeli) {
+                document.getElementById('contract-reward').innerText += " (Requires unassigned helicopter in hangar)";
+            }
+
+            document.getElementById('contract-modal').style.display = 'flex';
+        }
+
+        function acceptContract() {
+            if (!currentActiveContract || gameState.hangar["Bell 407 Helicopter"] <= 0) return;
+            
+            gameState.hangar["Bell 407 Helicopter"]--;
+            const hubAp = findAirportData(gameState.primaryHub);
+
+            const contractId = Date.now();
+            gameState.routes.push({
+                id: contractId, origin: hubAp.name, destination: "Contract Vector Assignment",
+                origLat: hubAp.lat, origLng: hubAp.lng, destLat: hubAp.lat + (Math.random() * 2 - 1), destLng: hubAp.lng + (Math.random() * 2 - 1),
+                distanceNM: 140, assignedAircraft: "Bell 407 Helicopter", aircraftSpeed: 0.2,
+                activeFlights: 1, flights: [{ progress: 0, directionForward: true }], routeDemand: 100,
+                isSpecialContract: true, rewardCash: currentActiveContract.reward
+            });
+
+            document.getElementById('contract-modal').style.display = 'none';
+            currentActiveContract = null;
+            saveProgress();
+            updateUI();
+        }
+
+        function declineContract() {
+            document.getElementById('contract-modal').style.display = 'none';
+            currentActiveContract = null;
+        }
+
+        function gameSimulationTick() {
+            flightMarkers.forEach(m => map.removeLayer(m));
+            flightMarkers = [];
+
+            if (!gameState.routes) return;
+
+            gameState.routes.forEach(route => {
+                if (route.assignedAircraft && route.activeFlights > 0) {
+                    route.flights.forEach(f => {
+                        f.progress += route.aircraftSpeed;
+                        
+                        const dLat = route.destLat - route.origLat;
+                        const dLng = route.destLng - route.origLng;
+                        
+                        let curLat, curLng, bearing;
+                        if (f.directionForward) {
+                            curLat = route.origLat + (dLat * (f.progress / 100));
+                            curLng = route.origLng + (dLng * (f.progress / 100));
+                            bearing = calculateBearing(curLat, curLng, route.destLat, route.destLng);
+                        } else {
+                            curLat = route.destLat - (dLat * (f.progress / 100));
+                            curLng = route.destLng - (dLng * (f.progress / 100));
+                            bearing = calculateBearing(curLat, curLng, route.origLat, route.origLng);
+                        }
+
+                        const typeOfVehicle = aircraftCatalog[route.assignedAircraft].type;
+                        const renderAngle = (typeOfVehicle === "helicopter") ? (bearing + 90) : (bearing - 90);
+                        const glyIcon = (typeOfVehicle === "helicopter") ? "🚁" : "✈";
+
+                        const planeIcon = L.divIcon({
+                            className: 'plane-marker-icon',
+                            html: `<div style="transform: rotate(${renderAngle}deg); color: ${typeOfVehicle==='helicopter'?'#c084fc':'#eab308'};">${glyIcon}</div>`,
+                            iconSize: [20, 20],
+                            iconAnchor: [10, 10]
+                        });
+
+                        const marker = L.marker([curLat, curLng], { icon: planeIcon }).addTo(map);
+                        flightMarkers.push(marker);
+
+                        if (f.progress >= 100) {
+                            if (route.isSpecialContract) {
+                                gameState.cash += route.rewardCash;
+                                gameState.hangar["Bell 407 Helicopter"]++;
+                                setTimeout(() => {
+                                    const idx = gameState.routes.findIndex(r => r.id === route.id);
+                                    if(idx !== -1) gameState.routes.splice(idx, 1);
+                                    saveProgress();
+                                    updateUI();
+                                }, 10);
+                                return;
+                            }
+
+                            f.progress = 0;
+                            f.directionForward = !f.directionForward;
+                            
+                            const capacityPayload = aircraftCatalog[route.assignedAircraft].pax;
+                            const demandMod = (route.routeDemand || 100) / 100;
+                            const cycleEarnings = Math.round(route.distanceNM * 0.45 * capacityPayload * demandMod);
+                            
+                            gameState.cash += cycleEarnings;
+
+                            const distanceThreshold = Math.max(100, route.distanceNM);
+                            const tokenOdds = Math.min(0.95, (distanceThreshold / 4000));
+                            if (Math.random() < tokenOdds) {
+                                const tokenAmt = Math.max(1, Math.floor(route.distanceNM / 1200));
+                                gameState.tokens += tokenAmt;
+                            }
+
+                            checkMilestones();
+                            saveProgress();
+                            updateUI();
+                        }
+                    });
+                }
+            });
+        }
+
+        function getRouteDemandFactor(ap1Name, ap2Name) {
+            const ap1 = findAirportData(ap1Name);
+            const ap2 = findAirportData(ap2Name);
+            if (!ap1 || !ap2) return 100;
+            return Math.round((ap1.baseDemand + ap2.baseDemand) / 2);
+        }
+
+        function updateDestinationsDemand() {
+            const orig = document.getElementById('route-orig').value;
+            const dest = document.getElementById('route-dest').value;
+            const row = document.getElementById('route-demand-row');
+            const val = document.getElementById('route-demand-value');
+
+            if (orig && dest && orig !== dest) {
+                const combinedDemand = getRouteDemandFactor(orig, dest);
+                row.style.display = 'flex';
+                val.innerText = `${combinedDemand}%`;
+            } else {
+                row.style.display = 'none';
+            }
+        }
+
+        function displaySelectedDemand() {
+            updateDestinationsDemand();
+        }
+
+        function createRoute() {
+            if (gameState.tokens < 10) {
+                alert("Insufficient Resources: Establishing a commercial leg requires 10 AeroTokens.");
+                return;
+            }
+
+            const orig = document.getElementById('route-orig').value;
+            const dest = document.getElementById('route-dest').value;
+
+            if (!orig || !dest || orig === dest) return;
+            if (gameState.routes.some(r => r.origin === orig && r.destination === dest)) return;
+
+            gameState.tokens -= 10;
+
+            const ap1 = findAirportData(orig);
+            const ap2 = findAirportData(dest);
+            const distanceNM = Math.round(L.latLng(ap1.lat, ap1.lng).distanceTo(L.latLng(ap2.lat, ap2.lng)) / 1852);
+            const routeDemand = getRouteDemandFactor(orig, dest);
+
+            gameState.routes.push({
+                id: Date.now(), origin: orig, destination: dest,
+                origLat: ap1.lat, origLng: ap1.lng, destLat: ap2.lat, destLng: ap2.lng,
+                distanceNM: distanceNM, assignedAircraft: null, aircraftSpeed: 0,
+                activeFlights: 0, flights: [], routeDemand: routeDemand
+            });
+
+            saveProgress();
+            updateUI();
+        }
+
+        function assignAircraftToRoute(routeId, type) {
+            const route = gameState.routes.find(r => r.id === routeId);
+            if (!route) return;
+
+            if (type === "") {
+                if (route.assignedAircraft) {
+                    gameState.hangar[route.assignedAircraft]++;
+                    route.assignedAircraft = null;
+                    route.activeFlights = 0;
+                    route.flights = [];
+                }
+                saveProgress();
+                updateUI();
+                return;
+            }
+
+            const origAp = findAirportData(route.origin);
+            const destAp = findAirportData(route.destination);
+            const aircraftType = aircraftCatalog[type].type;
+
+            if ((origAp.type === 'heliport' || destAp.type === 'heliport') && aircraftType !== 'helicopter') {
+                alert("Zoning Restriction: Standard fixed-wing aircraft cannot fly into or out of heliports. Only helicopters are authorized.");
+                return;
+            }
+
+            if (gameState.hangar[type] <= 0) return;
+            if (aircraftCatalog[type].rangeNM < route.distanceNM) {
+                alert("Operation Aborted: Distance exceeds airframe range limitations.");
+                return;
+            }
+
+            if (route.assignedAircraft) gameState.hangar[route.assignedAircraft]++;
+            
+            gameState.hangar[type]--;
+            route.assignedAircraft = type;
+            route.aircraftSpeed = aircraftCatalog[type].speed;
+            route.activeFlights = 1;
+            route.flights = [{ progress: 0, directionForward: true }];
+
+            saveProgress();
+            updateUI();
+        }
+
+        function scrapRouteLine(routeId) {
+            const idx = gameState.routes.findIndex(r => r.id === routeId);
+            if(idx === -1) return;
+            const r = gameState.routes[idx];
+            if(r.assignedAircraft) gameState.hangar[r.assignedAircraft]++;
+            gameState.routes.splice(idx, 1);
+            saveProgress();
+            updateUI();
+        }
+
+        function purchaseAircraft(type) {
+            const spec = aircraftCatalog[type];
+            if (gameState.cash >= spec.price) {
+                gameState.cash -= spec.price;
+                gameState.hangar[type]++;
+                
+                if (spec.type === 'helicopter' && !achievements.spinning_around.unlocked) {
+                    achievements.spinning_around.unlocked = true;
+                    gameState.cash += 10000;
+                    gameState.tokens += 10;
+                    triggerMilestonePopupNotification(achievements.spinning_around.title, achievements.spinning_around.rewardDesc);
+                }
+
+                checkMilestones();
+                saveProgress();
+                updateUI();
+            }
+        }
+
+        function unlockRegionViaCash(rName) {
+            const target = regions[rName];
+            const computedPrice = target.baseCost * gameState.multiplierX;
+
+            if (gameState.cash >= computedPrice) {
+                gameState.cash -= computedPrice;
+                target.unlocked = true;
+                
+                renderMapGraphics();
+                buildDirectoryTree();
+                checkMilestones();
+                saveProgress();
+                updateUI();
+
+                const openIns = document.getElementById('ins-name').innerText;
+                if(openIns && findRegionNameByAirport(openIns) === rName) inspectAirport(openIns);
+            }
+        }
+
+        function purchaseSecondaryHub(airportName) {
+            const targetAp = findAirportData(airportName);
+            if (!targetAp) return;
+
+            if (targetAp.type === 'heliport') {
+                const conf = confirm(`Are you sure you want to purchase ${airportName} as a Corporate Operations Hub?\n\nNote: Only helicopters can operate out of heliports!`);
+                if (!conf) return;
+            }
+
+            if (gameState.cash >= 160000 && gameState.tokens >= 45) {
+                gameState.cash -= 160000;
+                gameState.tokens -= 45;
+                targetAp.isHub = true;
+                renderMapGraphics();
+                inspectAirport(airportName);
+                saveProgress();
+                updateUI();
+            }
+        }
+
+        function getShortestDistanceToHubs(regionData) {
+            let shortest = Infinity;
+            let targetHubs = [];
+            
+            for (const r of Object.values(regions)) {
+                r.airports.forEach(a => { if (a.isHub) targetHubs.push(a); });
+            }
+
+            if (targetHubs.length === 0) {
+                const fallback = findAirportData(gameState.primaryHub);
+                if (fallback) targetHubs.push(fallback);
+            }
+
+            regionData.airports.forEach(ap => {
+                targetHubs.forEach(hub => {
+                    const dist = L.latLng(ap.lat, ap.lng).distanceTo(L.latLng(hub.lat, hub.lng));
+                    if (dist < shortest) shortest = dist;
+                });
+            });
+
+            return shortest;
+        }
+
+        function inspectAirport(airportName) {
+            const ap = findAirportData(airportName);
+            const rName = findRegionNameByAirport(airportName);
+            const parentReg = regions[rName];
+
+            if(map) map.flyTo([ap.lat, ap.lng], 4);
+
+            const baseHub = findAirportData(gameState.primaryHub) || ap;
+            const distanceNM = Math.round(L.latLng(baseHub.lat, baseHub.lng).distanceTo(L.latLng(ap.lat, ap.lng)) / 1852);
+
+            document.getElementById('inspect-card').style.display = 'block';
+            document.getElementById('ins-name').innerText = ap.name;
+            document.getElementById('ins-status').innerText = parentReg.unlocked ? (ap.isHub ? "Corporate Hub" : "Operational Outpost") : "Locked Borders";
+            document.getElementById('ins-status').style.color = parentReg.unlocked ? "var(--money-color)" : "#ef4444";
+            document.getElementById('ins-demand').innerText = `${ap.baseDemand}%`;
+            document.getElementById('ins-cost').innerText = parentReg.unlocked ? "Clearance Authorized" : `$${(parentReg.baseCost * gameState.multiplierX).toLocaleString()}`;
+            document.getElementById('ins-distance').innerText = convertDistance(distanceNM);
+
+            const actionZone = document.getElementById('hub-action-zone');
+            if (parentReg.unlocked && !ap.isHub) {
+                const canAfford = gameState.cash >= 160000 && gameState.tokens >= 45;
+                actionZone.innerHTML = `
+                    <div style="border-top:1px solid var(--card-border); margin-top:8px; padding-top:8px;">
+                        <p style="font-size:11px; color:var(--text-color); margin-bottom:4px;">Establish Secondary Operations Hub:</p>
+                        <div class="flex-row" style="margin-bottom:4px;"><span>Cost Profile:</span><span>$160,000 & 45 ✈</span></div>
+                        <button class="btn" style="background:var(--achievement-color); color:#000;" ${!canAfford?'disabled':''} onclick="purchaseSecondaryHub('${airportName}')">Buy Operations Hub</button>
+                    </div>
+                `;
+            } else {
+                actionZone.innerHTML = '';
+            }
+        }
+
+        function buildDirectoryTree() {
+            const tree = {};
+
+            for (const r of Object.values(regions)) {
+                if (!tree[r.continent]) tree[r.continent] = {};
+                
+                let nationKeyWithFlag = `${r.nation}&&&`;
+                if (typeof r.flag === 'string' && r.flag.startsWith('http')) {
+                    nationKeyWithFlag += `<img src="${r.flag}" class="flag-icon">`;
+                } else {
+                    nationKeyWithFlag += r.flag;
+                }
+
+                if (!tree[r.continent][nationKeyWithFlag]) tree[r.continent][nationKeyWithFlag] = { isSplit: r.isSplit, subNodes: {} };
+                
+                if (r.isSplit) {
+                    const structuralName = findRegionKeyByObject(r).split(' (')[0];
+                    tree[r.continent][nationKeyWithFlag].subNodes[structuralName] = { unlocked: r.unlocked, airports: r.airports.map(a => a.name) };
+                } else {
+                    if (!tree[r.continent][nationKeyWithFlag].subNodes["Base"]) {
+                        tree[r.continent][nationKeyWithFlag].subNodes["Base"] = { unlocked: r.unlocked, airports: [] };
+                    }
+                    r.airports.forEach(a => tree[r.continent][nationKeyWithFlag].subNodes["Base"].airports.push(a.name));
+                }
+            }
+
+            const container = document.getElementById('directory-tree');
+            container.innerHTML = '';
+
+            for (const cont in tree) {
+                const contDoc = document.createElement('details');
+                contDoc.innerHTML = `<summary>🗺 ${cont}</summary>`;
+                
+                for (const natKey in tree[cont]) {
+                    const [natName, natFlagHtml] = natKey.split('&&&');
+                    const natDoc = document.createElement('details');
+                    natDoc.innerHTML = `<summary>${natFlagHtml} ${natName}</summary>`;
+                    
+                    const dataset = tree[cont][natKey];
+                    if (dataset.isSplit) {
+                        for (const subReg in dataset.subNodes) {
+                            const subDoc = document.createElement('details');
+                            subDoc.innerHTML = `<summary>📍 ${subReg}</summary>`;
+                            
+                            if (dataset.subNodes[subReg].unlocked) {
+                                dataset.subNodes[subReg].airports.forEach(ap => {
+                                    const row = document.createElement('div');
+                                    const apData = findAirportData(ap);
+                                    row.className = 'dir-airport'; row.innerHTML = `${apData.type === 'heliport'?'🚁':'🛫'} ${ap}`;
+                                    row.onclick = (e) => { e.stopPropagation(); inspectAirport(ap); };
+                                    subDoc.appendChild(row);
+                                });
+                            } else {
+                                const lockedRow = document.createElement('div');
+                                lockedRow.className = 'dir-locked-msg'; lockedRow.innerText = "🔒 Content Locked: Buy Space Access";
+                                subDoc.appendChild(lockedRow);
+                            }
+                            natDoc.appendChild(subDoc);
+                        }
+                    } else {
+                        if (dataset.subNodes["Base"].unlocked) {
+                            dataset.subNodes["Base"].airports.forEach(ap => {
+                                const row = document.createElement('div');
+                                const apData = findAirportData(ap);
+                                row.className = 'dir-airport'; row.innerHTML = `${apData.type==='heliport'?'🚁':'🛫'} ${ap}`;
+                                row.onclick = (e) => { e.stopPropagation(); inspectAirport(ap); };
+                                natDoc.appendChild(row);
+                            });
+                        } else {
+                            const lockedRow = document.createElement('div');
+                            lockedRow.className = 'dir-locked-msg'; lockedRow.innerText = "🔒 Content Locked: Buy Space Access";
+                            natDoc.appendChild(lockedRow);
+                        }
+                    }
+                    contDoc.appendChild(natDoc);
+                }
+                container.appendChild(contDoc);
+            }
+        }
+
+        function triggerMilestonePopupNotification(title, reward) {
+            document.getElementById('pop-title').innerText = title;
+            document.getElementById('pop-reward').innerText = "Reward(s): " + reward;
+            const element = document.getElementById('achievement-popup');
+            element.classList.add('show');
+            setTimeout(() => element.classList.remove('show'), 5000);
+        }
+
+        function checkMilestones() {
+            if (!gameState.cash && gameState.cash !== 0) return;
+
+            if (!achievements.globetrotter.unlocked) {
+                const unlockedNationsCount = new Set(Object.values(regions).filter(r => r.unlocked).map(r => r.nation)).size;
+                if (unlockedNationsCount >= 4) {
+                    achievements.globetrotter.unlocked = true;
+                    gameState.cash += 150000;
+                    triggerMilestonePopupNotification(achievements.globetrotter.title, achievements.globetrotter.rewardDesc);
+                }
+            }
+            if (!achievements.millionaire.unlocked && gameState.cash >= 1000000) {
+                achievements.millionaire.unlocked = true;
+                gameState.tokens += 150;
+                triggerMilestonePopupNotification(achievements.millionaire.title, achievements.millionaire.rewardDesc);
+            }
+        }
+
+        function advanceInteractiveTutorial() {
+            gameState.interactiveStage++;
+            saveProgress();
+            renderCurrentTutorialStep();
+        }
+
+        function completeTutorialRewardSequence() {
+            if (!achievements.cadet.unlocked) {
+                achievements.cadet.unlocked = true;
+                gameState.tutorialActive = false;
+                gameState.cash += 180000;
+                gameState.tokens += 15; 
+                gameState.hangar["Cessna 208 Caravan"] = Math.max(gameState.hangar["Cessna 208 Caravan"], 1);
+
+                triggerMilestonePopupNotification(achievements.cadet.title, achievements.cadet.rewardDesc);
+                saveProgress();
+                updateUI();
+            }
+        }
+
+        function updateUI() {
+            if (!gameState.cash && gameState.cash !== 0) return;
+
+            document.getElementById('cash-display').innerText = gameState.cash.toLocaleString();
+            document.getElementById('tokens-display').innerText = gameState.tokens.toLocaleString();
+
+            const origSelect = document.getElementById('route-orig');
+            const destSelect = document.getElementById('route-dest');
+            
+            let hubsList = [], unlockedAirfields = [];
+            for (const r of Object.values(regions)) {
+                if (r.unlocked) {
+                    r.airports.forEach(a => {
+                        if (a.isHub) hubsList.push(a.name);
+                        unlockedAirfields.push(a.name);
+                    });
+                }
+            }
+
+            const prevOrig = origSelect.value;
+            const prevDest = destSelect.value;
+
+            origSelect.innerHTML = hubsList.map(h => `<option value="${h}">${h}</option>`).join('');
+            destSelect.innerHTML = unlockedAirfields.map(g => `<option value="${g}">${g}</option>`).join('');
+
+            if(prevOrig) origSelect.value = prevOrig;
+            if(prevDest) destSelect.value = prevDest;
+
+            updateDestinationsDemand();
+
+            const rContainer = document.getElementById('active-routes-list');
+            rContainer.innerHTML = '';
+            if(!gameState.routes || gameState.routes.length === 0) {
+                rContainer.innerHTML = `<p style="font-size:12px; color:#64748b; font-style:italic; padding:5px;">No active operational tracks registered.</p>`;
+            } else {
+                gameState.routes.forEach(route => {
+                    const card = document.createElement('div');
+                    card.className = 'card';
+
+                    let planeSelectorOptions = `<option value="">-- No Vehicle Assigned --</option>`;
+                    for (const [type, count] of Object.entries(gameState.hangar)) {
+                        if (count > 0 || route.assignedAircraft === type) {
+                            const isSelected = route.assignedAircraft === type ? 'selected' : '';
+                            planeSelectorOptions += `<option value="${type}" ${isSelected}>${type} (Hangar: ${count})</option>`;
+                        }
+                    }
+
+                    const badge = route.isSpecialContract ? "🚁 CONTRACT" : "LINE";
+                    card.innerHTML = `
+                        <div style="display:flex; justify-content:space-between; align-items:center;">
+                            <span style="font-weight:bold; font-size:13px; color:var(--token-color)">[${badge}] ${route.origin.split(' (')[0]} ➔ ${route.destination.split(' (')[0]}</span>
+                            <button onclick="scrapRouteLine(${route.id})" style="background:none; border:none; color:#ef4444; font-weight:bold; cursor:pointer; font-size:11px;">Scrap</button>
+                        </div>
+                        <div class="flex-row"><span>Distance Profile:</span><span>${convertDistance(route.distanceNM)}</span></div>
+                        <div class="flex-row"><span>Target Demand:</span><span style="color:var(--achievement-color); font-weight:bold;">${route.routeDemand || 100}%</span></div>
+                        ${route.isSpecialContract ? `<div class="flex-row" style="color:var(--money-color); font-weight:bold;"><span>Contract Run Reward:</span><span>+$${route.rewardCash.toLocaleString()}</span></div>` : `
+                        <select onchange="assignAircraftToRoute(${route.id}, this.value)" style="background:var(--input-bg); color:var(--text-color); border:1px solid var(--input-border); padding:4px; font-size:12px; border-radius:4px; width:100%; margin-top:6px;">
+                            ${planeSelectorOptions}
+                        </select>
+                        `}
+                    `;
+                    rContainer.appendChild(card);
+                });
+            }
+
+            const catalog = document.getElementById('aircraft-catalog');
+            catalog.innerHTML = '';
+            
+            const categories = ["ATR", "Airbus", "Boeing", "Other"];
+            categories.forEach(cat => {
+                const groupDetails = document.createElement('details');
+                groupDetails.open = true;
+                groupDetails.innerHTML = `<summary style="font-size: 14px; padding: 4px 0; color: var(--accent-color);">🧬 ${cat} Fleet Inventory</summary>`;
+                
+                const matchedPlanes = Object.entries(aircraftCatalog)
+                    .filter(([_, data]) => data.category === cat)
+                    .sort((a, b) => a[0].localeCompare(b[0]));
+
+                matchedPlanes.forEach(([id, plane]) => {
+                    const card = document.createElement('div');
+                    card.className = 'card';
+                    card.style.marginTop = "8px";
+                    card.innerHTML = `
+                        <h4>${plane.name} ${plane.type === 'helicopter' ? '🚁' : '✈'}</h4>
+                        <div class="aircraft-img" style="background-image: url('${plane.img}')"></div>
+                        <div class="flex-row"><span>Payload Capacity:</span><span style="color:var(--text-color); font-weight:bold;">${plane.pax} Seats/Staff</span></div>
+                        <div class="flex-row"><span>Max Operational Range:</span><span>${convertDistance(plane.rangeNM)}</span></div>
+                        <div class="flex-row"><span>Top Speed Profile:</span><span style="color:var(--token-color); font-weight:bold;">${plane.topSpeedKnots} Knots</span></div>
+                        <div class="flex-row"><span>Airframe Procurement Cost:</span><span style="color:var(--money-color); font-weight:bold;">$${plane.price.toLocaleString()}</span></div>
+                        <button class="btn" ${gameState.cash < plane.price ? 'disabled':''} onclick="purchaseAircraft('${id}')">Procure Airframe</button>
+                    `;
+                    groupDetails.appendChild(card);
+                });
+                catalog.appendChild(groupDetails);
+            });
+
+            const shop = document.getElementById('region-list');
+            shop.innerHTML = '';
+            
+            const sortedLockedRegions = Object.entries(regions)
+                .filter(([_, data]) => !data.unlocked)
+                .map(([name, data]) => ({ name, data, distance: getShortestDistanceToHubs(data) }))
+                .sort((a, b) => a.distance - b.distance)
+                .slice(0, 5);
+
+            if (sortedLockedRegions.length === 0) {
+                shop.innerHTML = `<p style="font-size:12px; color:var(--money-color); font-style:italic;">All global airspaces successfully cleared and available.</p>`;
+            } else {
+                sortedLockedRegions.forEach(({ name, data }) => {
+                    const card = document.createElement('div');
+                    card.className = 'card';
+                    const cost = data.baseCost * gameState.multiplierX;
+                    
+                    let flagHtml = '';
+                    if (typeof data.flag === 'string' && data.flag.startsWith('http')) {
+                        flagHtml = `<img src="${data.flag}" class="flag-icon"> `;
+                    } else {
+                        flagHtml = data.flag + ' ';
+                    }
+
+                    card.innerHTML = `
+                        <h4>${flagHtml}${name}</h4>
+                        <div class="flex-row"><span>Classification Context:</span><span>${data.continent} Sector</span></div>
+                        <div class="flex-row"><span>Authorization Permit Cost:</span><span style="color:var(--money-color); font-weight:bold;">$${cost.toLocaleString()}</span></div>
+                        <button class="btn" ${gameState.cash < cost ? 'disabled':''} onclick="unlockRegionViaCash('${name}')">Purchase Space Access</button>
+                    `;
+                    shop.appendChild(card);
+                });
+            }
+
+            const achList = document.getElementById('achievements-list');
+            achList.innerHTML = '';
+            for (const [id, ach] of Object.entries(achievements)) {
+                const item = document.createElement('div');
+                item.className = 'card'; item.style.borderColor = ach.unlocked ? 'var(--achievement-color)' : 'var(--card-border)';
+                item.innerHTML = `
+                    <div style="display:flex; gap:12px; align-items:center;">
+                        <span style="font-size:24px;">${ach.badge}</span>
+                        <div>
+                            <h4 style="color:${ach.unlocked?'var(--achievement-color)':'var(--text-color)'}">${ach.title}</h4>
+                            <p style="font-size:11px; color:#94a3b8">${ach.desc} | <span style="font-style:italic; color:#94a3b8">Reward(s): ${ach.rewardDesc}</span></p>
+                        </div>
+                    </div>
+                `;
+                achList.appendChild(item);
+            }
+        }
+
+        function findAirportData(name) {
+            for (const r of Object.values(regions)) {
+                const match = r.airports.find(a => a.name === name);
+                if (match) return match;
+            }
+            return null;
+        }
+
+        function findRegionNameByAirport(name) {
+            for (const [regKey, r] of Object.entries(regions)) {
+                if (r.airports.some(a => a.name === name)) return regKey;
+            }
+            return null;
+        }
+
+        function findRegionKeyByObject(obj) { return Object.keys(regions).find(key => regions[key] === obj); }
+
+        function switchTab(tabId) {
+            document.querySelectorAll('.tab-content').forEach(el => el.classList.remove('active'));
+            document.querySelectorAll('.tab-btn').forEach(el => el.classList.remove('active'));
+            
+            const contentPane = document.getElementById(tabId);
+            if(contentPane) contentPane.classList.add('active');
+            
+            const headerBtn = document.getElementById(`tab-btn-${tabId}`);
+            if(headerBtn) headerBtn.classList.add('active');
+        }
+    </script>
+</body>
+</html>
