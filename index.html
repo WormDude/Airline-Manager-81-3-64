@@ -2035,9 +2035,8 @@ const cost = Math.ceil(needed * dynamicRepairCost);
             if (!achievements.graduation.unlocked) {
                 achievements.graduation.unlocked = true;
                 gameState.tutorialActive = false;
-                gameState.cash += 150000000000;
-                gameState.tokens += 25000000000;
-                gameState.rank += 25000000000;
+                gameState.cash += 150000;
+                gameState.tokens += 25;
                 triggerMilestonePopupNotification(achievements.graduation.title, achievements.graduation.rewardDesc);
                 document.getElementById('interactive-tutorial-bubble').style.display = 'none';
                 saveProgress(); updateUI();
