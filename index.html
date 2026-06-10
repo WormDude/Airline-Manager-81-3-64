@@ -639,6 +639,7 @@
         const HERCULE_ICON_B64 = 'https://github.com/WormDude/Airline-Manager-81-3-64/blob/main/hercules.png?raw=true';
         const STRATO_ICON_B64 = 'https://github.com/WormDude/Airline-Manager-81-3-64/blob/main/stratolaunch.png?raw=true';
         const WRIGHT_ICON_B64 = 'https://github.com/WormDude/Airline-Manager-81-3-64/blob/main/wright.png?raw=true';
+        const VICKERS_ICON_B64 = 'https://github.com/WormDude/Airline-Manager-81-3-64/blob/main/vickers.png?raw=true';
         const EARNINGS_MULTIPLIER = 0.22;
         const CARGO_EARNINGS_MULTIPLIER = 0.35;
  
@@ -675,7 +676,9 @@
                 polygon: [[31.0,-87.6],[31.0,-85.0],[30.7,-81.5],[29.0,-80.8],[25.0,-80.0],[24.5,-81.0],[25.0,-82.0],[28.0,-82.8],[29.8,-84.0],[29.8,-85.5],[30.3,-87.6],[31.0,-87.6]],
                 airports: [
                     { name: "Miami International (MIA)", lat: 25.7959, lng: -80.2870, isHub: false, baseDemand: 95, type: "airport", isCoastal: true },
-                    { name: "Orlando International (MCO)", lat: 28.4312, lng: -81.3081, isHub: false, baseDemand: 90, type: "airport" }
+                    { name: "Orlando International (MCO)", lat: 28.4312, lng: -81.3081, isHub: false, baseDemand: 90, type: "airport" },
+                    { name: "Jacksonville International Airport (JAX)", lat: 30.4941, lng: -81.6878, isHub: false, baseDemand: 72, type: "airport", isCoastal: false },
+{ name: "Pensacola International Airport (PNS)", lat: 30.4733, lng: -87.1867, isHub: false, baseDemand: 48, type: "airport", isCoastal: true }
                 ]
             },
             "Ohio (US)": { unlocked: false, baseCost: 43, continent: "North America", nation: "USA", flag: "🇺🇸", isSplit: true,
@@ -691,21 +694,28 @@
                 polygon: [[32.5,-117.1],[32.7,-115.1],[31.3,-108.2],[31.8,-106.5],[29.3,-103.0],[29.0,-100.5],[25.8,-97.2],[21.0,-97.3],[19.0,-95.3],[19.0,-91.3],[21.5,-90.0],[21.5,-87.0],[18.2,-88.1],[14.6,-92.2],[16.2,-95.0],[15.0,-98.3],[18.0,-105.3],[23.0,-106.3],[31.0,-114.0],[22.5,-109.1],[22.5,-110.1]],
                 airports: [
                     { name: "Mexico City Intl (MEX)", lat: 19.4363, lng: -99.0721, isHub: false, baseDemand: 96, type: "airport" },
-                    { name: "Cancún Intl (CUN)", lat: 21.0365, lng: -86.8771, isHub: false, baseDemand: 90, type: "airport", isCoastal: true }
+                    { name: "Cancún Intl (CUN)", lat: 21.0365, lng: -86.8771, isHub: false, baseDemand: 90, type: "airport", isCoastal: true },
+                    { name: "General Roberto Fierro Villalobos International Airport (CUU)", lat: 28.7028, lng: -105.9644, isHub: false, baseDemand: 54, type: "airport" },
+{ name: "Loreto International Airport (LTO)", lat: 25.9892, lng: -111.3483, isHub: false, baseDemand: 28, type: "airport", isCoastal: true },
+{ name: "General Juan N. Álvarez International Airport (ACA)", lat: 16.7572, lng: -99.7539, isHub: false, baseDemand: 65, type: "airport", isCoastal: true }
                 ]
             },
             "Cuba": { unlocked: false, baseCost: 40, continent: "North America", nation: "Cuba", flag: "🇨🇺", isSplit: false,
-                polygon: [[23.0,-82.0],[23.3,-80.0],[21.0,-74.0],[20.0,-74.0],[22.0,-84.0],[23.0,-82.0]],
+                polygon: [[23.3,-83.0],[23.3,-80.0],[21.0,-74.0],[20.0,-74.0],[19.78, -77.76],[20.4, -78.1],[21.57, -85.25],[23.0,-84.0]],
                 airports: [
                     { name: "José Martí Intl (HAV)", lat: 22.9892, lng: -82.4091, isHub: false, baseDemand: 75, type: "airport", isCoastal: true },
-                    { name: "Juan Gualberto (VRA)", lat: 23.0342, lng: -81.4358, isHub: false, baseDemand: 65, type: "airport", isCoastal: true }
+                    { name: "Juan Gualberto (VRA)", lat: 23.0342, lng: -81.4358, isHub: false, baseDemand: 65, type: "airport", isCoastal: true },
+                    { name: "Antonio Maceo International Airport (SCU)", lat: 19.9697, lng: -75.8364, isHub: false, baseDemand: 42, type: "airport", isCoastal: true },
+{ name: "Frank Pais International Airport (HOG)", lat: 20.7856, lng: -76.3150, isHub: false, baseDemand: 45, type: "airport", isCoastal: true }
                 ]
             },
             "Haiti": { unlocked: false, baseCost: 32, continent: "North America", nation: "Haiti", flag: "🇭🇹", isSplit: false,
-                polygon: [[19.9,-73.4],[19.9,-71.7],[18.0,-71.7],[18.0,-74.5],[18.5,-74.5],[18.5,-72.5],[19.9,-73.4]],
+                polygon: [[19.9,-73.4],[19.9,-71.7],[18.0,-71.7],[18.0,-74.5],[18.8,-74.5],[18.7,-73.5],[19.6,-73.7]],
                 airports: [
                     { name: "Toussaint Louverture (PAP)", lat: 18.5800, lng: -72.2925, isHub: false, baseDemand: 55, type: "airport", isCoastal: true },
-                    { name: "Cap-Haïtien Intl (CAP)", lat: 19.7331, lng: -72.1947, isHub: false, baseDemand: 40, type: "airport", isCoastal: true }
+                    { name: "Cap-Haïtien Intl (CAP)", lat: 19.7331, lng: -72.1947, isHub: false, baseDemand: 40, type: "airport", isCoastal: true },
+                    { name: "Anse-a-Galets Airport (HT-0002)", lat: 18.8358, lng: -72.8631, isHub: false, baseDemand: 12, type: "airport", isCoastal: true },
+{ name: "Port-de-Paix Airport (PAX)", lat: 19.9336, lng: -72.8147, isHub: false, baseDemand: 25, type: "airport", isCoastal: true }
                 ]
             },
             "Ontario (CA)": { unlocked: false, baseCost: 50, continent: "North America", nation: "Canada", flag: "🇨🇦", isSplit: true,
@@ -834,7 +844,9 @@
                 airports: [
                     { name: "Eurico de Aguiar Salles International Airport (VIX)", lat: -20.2581, lng: -40.2864, isHub: false, baseDemand: 48, type: "airport", isCoastal: true },
                     { name: "Galeão Intl (GIG)", lat: -22.8100, lng: -43.2506, isHub: false, baseDemand: 91, type: "airport", isCoastal: true },
-                    { name: "São Paulo/Guarulhos International Airport (GRU)", lat: -23.4356, lng: -46.4731, isHub: false, baseDemand: 95, type: "airport" }
+                    { name: "São Paulo/Guarulhos International Airport (GRU)", lat: -23.4356, lng: -46.4731, isHub: false, baseDemand: 95, type: "airport" },
+                    { name: "Presidente Juscelino Kubitschek International Airport (BSB)", lat: -15.8711, lng: -47.9186, isHub: false, baseDemand: 90, type: "airport" },
+{ name: "Atlas Brasil Cantanhede International Airport (BVB)", lat: 2.8414, lng: -60.6922, isHub: false, baseDemand: 35, type: "airport" }
                 ]
             },
             "England (UK)": { unlocked: false, baseCost: 52, continent: "Europe", nation: "United Kingdom", flag: "🇬🇧", isSplit: true,
@@ -939,7 +951,7 @@
                 ]
             },
             "Austria": { unlocked: false, baseCost: 60, continent: "Europe", nation: "Austria", flag: "🇦🇹", isSplit: false,
-                polygon: [[49,15.0],[48.7,16.2],[48.0,17.1],[46.8,16.0],[46.6,13.0],[46.7,12.6],[47.0,11.8],[46.8,10.5],[47.05,9.48],[47.05,9.58],[47.15,9.63],[47.27,9.53],[47.5,9.5],[47.5,10.0],[48.0,13.0],[48.5,14.0]],
+                polygon: [[49,15.0],[48.7,16.7],[48.0,17.1],[46.8,16.0],[46.6,13.0],[46.7,12.6],[47.0,11.8],[46.8,10.5],[47.05,9.48],[47.05,9.58],[47.15,9.63],[47.27,9.53],[47.5,9.5],[47.5,10.0],[48.0,13.0],[48.5,14.0]],
                 airports: [
                     { name: "Vienna International (VIE)", lat: 48.1103, lng: 16.5697, isHub: false, baseDemand: 88, type: "airport" },
                     { name: "Salzburg Airport (SZG)", lat: 47.7933, lng: 13.0043, isHub: false, baseDemand: 65, type: "airport" },
@@ -947,16 +959,27 @@
                     { name: "Wiener Neustadt East (LOAN)", lat: 47.8444, lng: 16.2647, isHub: false, baseDemand: 26, type: "airport" }
                 ]
             },
+            "Czech Republic": { unlocked: false, baseCost: 60, continent: "Europe", nation: "Czech Republic", flag: "🇨🇿", isSplit: false,
+                polygon: [[49,15.0],[48.7,16.7],[49.68, 18.97],[51.0,15.0],[50.5,12.0],[48.5,14.0]],
+                airports: [
+                    { name: "Václav Havel Airport Prague (PRG)", lat: 50.1008, lng: 14.2600, isHub: false, baseDemand: 85, type: "airport" },
+{ name: "České Budějovice South Bohemian Airport (JCL)", lat: 48.9464, lng: 14.4278, isHub: false, baseDemand: 20, type: "airport" },
+{ name: "Leoš Janáček Airport Ostrava (OSR)", lat: 49.6961, lng: 18.1111, isHub: false, baseDemand: 38, type: "airport" },
+{ name: "Karlovy Vary Airport (KLV)", lat: 50.2031, lng: 12.9150, isHub: false, baseDemand: 18, type: "airport" }
+                ]
+            },
             "Luxembourg": { unlocked: false, baseCost: 55, continent: "Europe", nation: "Luxembourg", flag: "🇱🇺", isSplit: false,
                 polygon: [[50.3,5.9],[49.8,6.5],[49.2,6.3],[49.20,6.15],[49.4,5.7],[50.2,5.7]],
                 airports: [
-                    { name: "Luxembourg Airport (LUX)", lat: 49.6266, lng: 6.2115, isHub: false, baseDemand: 70, type: "airport" }
+                    { name: "Luxembourg Airport (LUX)", lat: 49.6266, lng: 6.2115, isHub: false, baseDemand: 70, type: "airport" },
+                    { name: "Ettelbruck Heliport (ELET)", lat: 49.8475, lng: 6.0983, isHub: false, baseDemand: 10, type: "heliport" }
                 ]
             },
             "Andorra": { unlocked: false, baseCost: 50, continent: "Europe", nation: "Andorra", flag: "🇦🇩", isSplit: false,
                 polygon: [[42.65,1.4],[42.65,1.8],[42.4,1.8],[42.4,1.4],[42.65,1.4]],
                 airports: [
-                    { name: "Andorra la Vella Heliport", lat: 42.5000, lng: 1.5167, isHub: false, baseDemand: 45, type: "heliport" }
+                    { name: "Andorra la Vella Heliport", lat: 42.5000, lng: 1.5167, isHub: false, baseDemand: 45, type: "heliport" },
+                    { name: "Terra Guindaldes Heliport (AD-0001)", lat: 42.5539, lng: 1.5456, isHub: false, baseDemand: 6, type: "heliport" }
                 ]
             },
             "Belgium": { unlocked: false, baseCost: 52, continent: "Europe", nation: "Belgium", flag: "🇧🇪", isSplit: false,
@@ -987,9 +1010,14 @@
                 ]
             },
             "Guernsey": { unlocked: false, baseCost: 42, continent: "Europe", nation: "Guernsey", flag: "🇬🇬", isSplit: false,
-                polygon: [[49.5,-2.6],[49.5,-2.5],[49.4,-2.5],[49.4,-2.6],[49.5,-2.6]],
+                polygon: [
+                    [[49.5,-2.6],[49.5,-2.5],[49.4,-2.5],[49.4,-2.6],[49.5,-2.6]],
+                    [[49.7, -2.26],[49.76, -2.27],[49.76, -2.1],[49.69, -2.1],[49.7, -2.26]],
+                ],
+
                 airports: [
-                    { name: "Guernsey Airport (GCI)", lat: 49.4350, lng: -2.6020, isHub: false, baseDemand: 52, type: "airport", isCoastal: true }
+                    { name: "Guernsey Airport (GCI)", lat: 49.4350, lng: -2.6020, isHub: false, baseDemand: 52, type: "airport", isCoastal: true },
+                    { name: "Alderney Airport (ACI)", lat: 49.7061, lng: -2.2147, isHub: false, baseDemand: 24, type: "airport", isCoastal: true }
                 ]
             },
             "Malta": { unlocked: false, baseCost: 45, continent: "Europe", nation: "Malta", flag: "🇲🇹", isSplit: false,
@@ -1007,7 +1035,7 @@
                 ]
             },
             "Poland": { unlocked: false, baseCost: 48, continent: "Europe", nation: "Poland", flag: "🇵🇱", isSplit: false,
-                polygon: [[54.8,14.2],[54.8,18.0],[54.3,22.8],[49.2,22.8],[49.2,18.0],[51.0,15.0],[54.8,14.2]],
+                polygon: [[54.8,14.2],[54.8,18.0],[54.3,22.8],[49.2,22.8],[49.68, 18.97],[51.0,15.0],[54.8,14.2]],
                 airports: [
                     { name: "Warsaw Chopin (WAW)", lat: 52.1657, lng: 20.9671, isHub: false, baseDemand: 85, type: "airport" },
                     { name: "Kraków John Paul II (KRK)", lat: 50.0777, lng: 19.7848, isHub: false, baseDemand: 75, type: "airport" },
@@ -1079,11 +1107,12 @@
                     { name: "Beijing Capital (PEK)", lat: 40.0799, lng: 116.6031, isHub: false, baseDemand: 99, type: "airport" },
                     { name: "Shanghai Pudong (PVG)", lat: 31.1443, lng: 121.8083, isHub: false, baseDemand: 98, type: "airport", isCoastal: true },
                     { name: "Guangzhou Baiyun (CAN)", lat: 28.3983, lng: 113.2988, isHub: false, baseDemand: 95, type: "airport", isCoastal: true },
-                    { name: "Seni Heliport (CN-0370)", lat: 31.4741, lng: 92.0543, isHub: false, baseDemand: 40, type: "heliport" }
+                    { name: "Seni Heliport (CN-0370)", lat: 31.4741, lng: 92.0543, isHub: false, baseDemand: 40, type: "heliport" },
+                    { name: "Xi'an Xianyang International Airport (XIY)", lat: 34.4472, lng: 108.7517, isHub: false, baseDemand: 92, type: "airport" }
                 ]
             },
             "India": { unlocked: false, baseCost: 58, continent: "Asia", nation: "India", flag: "🇮🇳", isSplit: false,
-                polygon: [[33.85,74.5],[37.0,74.5],[34, 80],[31,78],[30.4,80.0],[28.8,80.1],[26.4,88.0],[21.5,88.0],[11.0,79.5],[8.0,77.5],[19.0,72.5],[23.5,68.0],[28.0,70.0],[31.0,74.5],[33.85,74.5]],
+                polygon: [[33.85,74.5],[37.0,74.5],[34, 80],[31,78],[30.4,80.0],[28.8,80.1],[27.46, 83.1],[26.4,88.0],[21.5,88.0],[11.0,79.5],[8.0,77.5],[19.0,72.5],[23.5,68.0],[28.0,70.0],[31.0,74.5],[33.85,74.5]],
                 airports: [
                     { name: "Indira Gandhi Intl (DEL)", lat: 28.5562, lng: 77.1000, isHub: false, baseDemand: 98, type: "airport" },
                     { name: "Chhatrapati Shivaji (BOM)", lat: 19.0896, lng: 72.8656, isHub: false, baseDemand: 95, type: "airport", isCoastal: true },
@@ -1117,15 +1146,20 @@
                 ]
             },
             "Nepal": { unlocked: false, baseCost: 35, continent: "Asia", nation: "Nepal", flag: "🇳🇵", isSplit: false,
-                polygon: [[30.4,80.0],[27.8,88.2],[26.4,88.0],[28.8,80.1],[30.4,80.0]],
+                polygon: [[30.4,80.0],[27.8,88.2],[26.4,88.0],[27.46, 83.1],[28.8,80.1],[30.4,80.0]],
                 airports: [
-                    { name: "Tribhuvan Intl (KTM)", lat: 27.6966, lng: 85.3592, isHub: false, baseDemand: 65, type: "airport" }
+                    { name: "Tribhuvan Intl (KTM)", lat: 27.6966, lng: 85.3592, isHub: false, baseDemand: 65, type: "airport" },
+                    { name: "Gautam Buddha International Airport (BWA)", lat: 27.5094, lng: 83.4158, isHub: false, baseDemand: 40, type: "airport" },
+{ name: "Pokhara International Airport (PHH)", lat: 28.2003, lng: 84.0014, isHub: false, baseDemand: 45, type: "airport" }
                 ]
             },
             "Mongolia": { unlocked: false, baseCost: 38, continent: "Asia", nation: "Mongolia", flag: "🇲🇳", isSplit: false,
                 polygon: [[52.0,100.0],[49.5,115.0],[46.0,120.0],[42.0,105.0],[45.0,90.0],[49.29, 87.6],[50.0,90.0],[52.0,100.0]],
                 airports: [
-                    { name: "Chinggis Khaan Intl (UBN)", lat: 47.6492, lng: 106.8227, isHub: false, baseDemand: 55, type: "airport" }
+                    { name: "Chinggis Khaan Intl (UBN)", lat: 47.6492, lng: 106.8227, isHub: false, baseDemand: 55, type: "airport" },
+                    { name: "Buyant-Ukhaa International Airport (ULN)", lat: 47.8431, lng: 106.7664, isHub: false, baseDemand: 58, type: "airport" },
+{ name: "Altai Airport (LTI)", lat: 46.3764, lng: 96.2208, isHub: false, baseDemand: 18, type: "airport" },
+{ name: "Dalanzadgad Airport (DLZ)", lat: 43.5156, lng: 104.4258, isHub: false, baseDemand: 22, type: "airport" }
                 ]
             },
             "Malaysia": { unlocked: false, baseCost: 50, continent: "Asia", nation: "Malaysia", flag: "🇲🇾", isSplit: false,
@@ -1199,7 +1233,8 @@
                 polygon: [[23.5,11.5],[23.0,15.0],[17.0,15.6],[13.2,13.0],[13.8,5.0],[12.0,3.0],[15.0,0.0],[15.3,4.0],[19.0,4.2],[23.5,11.5]],
                 airports: [
                     { name: "Niamey Diori Hamani (NIM)", lat: 13.4815, lng: 2.1836, isHub: false, baseDemand: 50, type: "airport" },
-                    { name: "Mano Dayak Intl (AJY)", lat: 16.9667, lng: 7.9904, isHub: false, baseDemand: 35, type: "airport" }
+                    { name: "Mano Dayak Intl (AJY)", lat: 16.9667, lng: 7.9904, isHub: false, baseDemand: 35, type: "airport" },
+                    { name: "Tahoua Airport (THZ)", lat: 14.8931, lng: 5.2636, isHub: false, baseDemand: 15, type: "airport" }
                 ]
             },
             "South Africa": { unlocked: false, baseCost: 55, continent: "Africa", nation: "South Africa", flag: "🇿🇦", isSplit: false,
@@ -1269,13 +1304,13 @@
                 ]
             },
             "Queensland (AU)": { unlocked: false, baseCost: 48, continent: "Oceania", nation: "Australia", flag: "🇦🇺", isSplit: true,
-                polygon: [[-10.0,142.0],[-10.0,154.0],[-28.0,154.0],[-28.0,141.0],[-26.0,141.0],[-26.0,138.0],[-10.0,138.0],[-10.0,142.0]],
+                polygon: [[-10.0,142.0],[-10.0,154.0],[-28.0,154.0],[-29.0,141.0],[-26.0,141.0],[-26.0,138.0],[-10.0,138.0],[-10.0,142.0]],
                 airports: [
                     { name: "Brisbane Airport (BNE)", lat: -27.3842, lng: 153.1170, isHub: false, baseDemand: 90, type: "airport", isCoastal: true },
                     { name: "Cairns Airport (CNS)", lat: -16.8858, lng: 145.7550, isHub: false, baseDemand: 75, type: "airport", isCoastal: true }
                 ]
             },
-            "South Georgia": { unlocked: false, baseCost: 35, continent: "Antarctica", nation: "South Georgia", flag: "🇬🇸", isSplit: false,
+            "South Georgia and the South Sandwich Islands": { unlocked: false, baseCost: 35, continent: "Antarctica", nation: "South Georgia", flag: "🇬🇸", isSplit: false,
                 polygon: [[-55.0,-38.5],[-53.5,-38.5],[-53.5,-35.5],[-55.0,-35.5]],
                 airports: [
                     { name: "King Edward Point Heliport", lat: -54.2833, lng: -36.4967, isHub: false, baseDemand: 30, type: "heliport", isCoastal: true },
@@ -1287,7 +1322,10 @@
                 airports: [
                     { name: "McMurdo Station Airfield (MCM)", lat: -77.8510, lng: 166.7237, isHub: false, baseDemand: 40, type: "airport", isCoastal: true },
                     { name: "Rothera Research Station (RTA)", lat: -67.5671, lng: -68.1277, isHub: false, baseDemand: 32, type: "airport", isCoastal: true },
-                    { name: "South Pole Station Helipad (SPO)", lat: -89.9950, lng: 0.0, isHub: false, baseDemand: 20, type: "heliport" }
+                    { name: "South Pole Station Helipad (SPO)", lat: -89.9950, lng: 0.0, isHub: false, baseDemand: 20, type: "heliport" },
+                    { name: "Concordia Skyway (AT03)", lat: -75.1017, lng: 123.3325, isHub: false, baseDemand: 5, type: "airport" },
+                    { name: "Wolfs Fang Runway (AQ-0011)", lat: -71.5303, lng: 8.8003, isHub: false, baseDemand: 12, type: "airport" },
+                    { name: "Orcadas Base Heliport (SAYO)", lat: -60.7378, lng: -44.7383, isHub: false, baseDemand: 5, type: "heliport", isCoastal: true }
                 ]
             }
         };
@@ -1312,6 +1350,7 @@
         // ===== CARGO AIRCRAFT (unlock at rank 10+) =====
         const cargoCatalog = {
             "Cessna 208B Cargomaster":  { name: "Cessna 208B Cargomaster", category: "Cargo", price: 22000,   cargo: 1587,  rangeNM: 792,  topSpeedKnots: 185, minRank: 10, iconSize: 24, img: "https://upload.wikimedia.org/wikipedia/commons/thumb/3/30/Cessna_208B_Caravan_%27N876FE%27_FedEx_%2813006463414%29.jpg/1280px-Cessna_208B_Caravan_%27N876FE%27_FedEx_%2813006463414%29.jpg", type: "cargo-plane", isCargo: true },
+            "Sikorsky S-64 Skycrane":   { name: "Sikorsky S-64 Skycrane",   category: "Other",  price: 650000, cargo: 9100,   rangeNM: 200,  topSpeedKnots: 115, minRank: 12,  iconSize: 24, img: "https://upload.wikimedia.org/wikipedia/commons/thumb/5/56/Air-Crane_-_Flickr_-_Beige_Alert_%28cropped%29.jpg/1280px-Air-Crane_-_Flickr_-_Beige_Alert_%28cropped%29.jpg", type: "helicopter", isCargo: true },
             "ATR 72 Freighter":         { name: "ATR 72 Freighter",        category: "Cargo", price: 85000,   cargo: 8900,  rangeNM: 950,  topSpeedKnots: 270, minRank: 10, iconSize: 26, img: "https://upload.wikimedia.org/wikipedia/commons/9/99/ATR_3.jpg", type: "cargo-plane", isCargo: true },
             "Boeing 737-800F":          { name: "Boeing 737-800F",         category: "Cargo", price: 320000,  cargo: 23900, rangeNM: 2025, topSpeedKnots: 454, minRank: 11, iconSize: 28, img: "https://upload.wikimedia.org/wikipedia/commons/thumb/a/a4/G-NPTA_Boeing_737-86N_BCF_%28West_Atlantic_UK%29_at_East_Midlands_Airport.jpg/1280px-G-NPTA_Boeing_737-86N_BCF_%28West_Atlantic_UK%29_at_East_Midlands_Airport.jpg", type: "cargo-plane", isCargo: true },
             "Boeing 767-300F":          { name: "Boeing 767-300F",         category: "Cargo", price: 580000,  cargo: 52700, rangeNM: 3225, topSpeedKnots: 461, minRank: 11, iconSize: 30, img: "https://upload.wikimedia.org/wikipedia/commons/thumb/2/2d/N107FE%40PEK_%2820190520150305%29.jpg/1280px-N107FE%40PEK_%2820190520150305%29.jpg", type: "cargo-plane", isCargo: true },
@@ -1341,6 +1380,7 @@
             "Wright Flyer":   { name: "Wright Flyer",       category: "Secret", price: 15000,  pax: 1, rangeNM: 0.1,  topSpeedKnots: 26, minRank: 1, iconSize: 24, img: "https://upload.wikimedia.org/wikipedia/commons/thumb/8/86/First_flight2.jpg/1920px-First_flight2.jpg", type: "plane" },
             "Mil V-12":   { name: "Mil V-12",       category: "Secret", price: 5000000,  cargo: 44200, rangeNM: 270,  topSpeedKnots: 140, minRank: 1, iconSize: 42, img: "https://upload.wikimedia.org/wikipedia/commons/6/68/Mil_V-12_prototype.jpg", type: "helicopter", isCargo: true },
             "Scaled Composites Model 351 Stratolaunch":   { name: "Scaled Composites Model 351 Stratolaunch",       category: "Secret", price: 15000000,  cargo: 250000, rangeNM: 1000,  topSpeedKnots: 460, minRank: 1, iconSize: 44, img: "https://upload.wikimedia.org/wikipedia/commons/thumb/b/b6/230113-_Stratolaunch_Talon_Photo_Chase-091.jpg/1280px-230113-_Stratolaunch_Talon_Photo_Chase-091.jpg", type: "plane", isCargo: true },
+            "Kaman K-MAX":   { name: "Kaman K-MAX",       category: "Secret", price: 800000,  cargo: 2342, rangeNM: 300,  topSpeedKnots: 80, minRank: 1, iconSize: 28, img: "https://upload.wikimedia.org/wikipedia/commons/thumb/5/50/Kaman_K-1200_Rotex.jpg/1280px-Kaman_K-1200_Rotex.jpg", type: "helicopter", isCargo: true },
         };
  
         // ===== ACHIEVEMENTS =====
@@ -1436,13 +1476,14 @@
             { id: "a380_drop",   label: "Airbus A380",    icon: "🛫", rarity: "legendary", rarityLabel: "LEGENDARY",weight: 1,  apply: (gs) => { gs.hangar["Airbus A380"] = (gs.hangar["Airbus A380"]||0)+1; } },
             { id: "wright_drop",   label: "Wright Flyer",    icon: "🛫", rarity: "legendary", rarityLabel: "LEGENDARY",weight: 1,  apply: (gs) => { gs.hangar["Wright Flyer"] = (gs.hangar["Wright Flyer"]||0)+1; } },
             // MYTHIC (secret aircraft — extremely rare)
-            { id: "sr71_drop",   label: "SR-71 Blackbird",icon: "🔥", rarity: "mythic",    rarityLabel: "MYTHIC",   weight: 0.3,apply: (gs) => { gs.hangar["Lockheed SR-71 Blackbird"] = (gs.hangar["Lockheed SR-71 Blackbird"]||0)+1; } },
-            { id: "lun_drop",    label: "Lun Ekranoplan", icon: "🔥", rarity: "mythic",    rarityLabel: "MYTHIC",   weight: 0.3,apply: (gs) => { gs.hangar["Lun-Class Ekranoplan"] = (gs.hangar["Lun-Class Ekranoplan"]||0)+1; } },
-            { id: "h4_drop",     label: "Hughes H-4",     icon: "🔥", rarity: "mythic",    rarityLabel: "MYTHIC",   weight: 0.3,apply: (gs) => { gs.hangar["Hughes H-4 Hercules"] = (gs.hangar["Hughes H-4 Hercules"]||0)+1; } },
-            { id: "me323_drop",  label: "Me 323 Gigant",  icon: "🔥", rarity: "mythic",    rarityLabel: "MYTHIC",   weight: 0.3,apply: (gs) => { gs.hangar["Messerschmitt Me 323 Gigant"] = (gs.hangar["Messerschmitt Me 323 Gigant"]||0)+1; } },
+            { id: "sr71_drop",   label: "Lockheed SR-71 Blackbird",icon: "🔥", rarity: "mythic",    rarityLabel: "MYTHIC",   weight: 0.3,apply: (gs) => { gs.hangar["Lockheed SR-71 Blackbird"] = (gs.hangar["Lockheed SR-71 Blackbird"]||0)+1; } },
+            { id: "lun_drop",    label: "Lun-Class Ekranoplan", icon: "🔥", rarity: "mythic",    rarityLabel: "MYTHIC",   weight: 0.3,apply: (gs) => { gs.hangar["Lun-Class Ekranoplan"] = (gs.hangar["Lun-Class Ekranoplan"]||0)+1; } },
+            { id: "h4_drop",     label: "Hughes H-4 Hercules",     icon: "🔥", rarity: "mythic",    rarityLabel: "MYTHIC",   weight: 0.3,apply: (gs) => { gs.hangar["Hughes H-4 Hercules"] = (gs.hangar["Hughes H-4 Hercules"]||0)+1; } },
+            { id: "me323_drop",  label: "Messerschmitt Me 323 Gigant",  icon: "🔥", rarity: "mythic",    rarityLabel: "MYTHIC",   weight: 0.3,apply: (gs) => { gs.hangar["Messerschmitt Me 323 Gigant"] = (gs.hangar["Messerschmitt Me 323 Gigant"]||0)+1; } },
             { id: "Mil V-12",  label: "Mil V-12",  icon: "🔥", rarity: "mythic",    rarityLabel: "MYTHIC",   weight: 0.3,apply: (gs) => { gs.hangar["Mil V-12"] = (gs.hangar["Mil V-12"]||0)+1; } },
             { id: "Lockheed Martin SR-72",  label: "Lockheed Martin SR-72",  icon: "🔥", rarity: "mythic",    rarityLabel: "MYTHIC",   weight: 0.3,apply: (gs) => { gs.hangar["Lockheed Martin SR-72"] = (gs.hangar["Lockheed Martin SR-72"]||0)+1; } },
             { id: "Scaled Composites Model 351 Stratolaunch",  label: "Scaled Composites Model 351 Stratolaunch",  icon: "🔥", rarity: "mythic",    rarityLabel: "MYTHIC",   weight: 0.3,apply: (gs) => { gs.hangar["Scaled Composites Model 351 Stratolaunch"] = (gs.hangar["Scaled Composites Model 351 Stratolaunch"]||0)+1; } },
+            { id: "Kaman K-MAX",  label: "Kaman K-MAX",  icon: "🔥", rarity: "mythic",    rarityLabel: "MYTHIC",   weight: 0.3,apply: (gs) => { gs.hangar["Kaman K-MAX"] = (gs.hangar["Kaman K-MAX"]||0)+1; } },
         ];
  
         function unlockSecretAchievement(id) {
@@ -2506,8 +2547,14 @@ const cost = Math.ceil(needed * dynamicRepairCost);
                             htmlContent = `<img src="${HELICOPTER_ICON_B64}" style="transform:rotate(${bearing}deg); width:28px; height:28px; cursor:pointer; filter: drop-shadow(0 0 2px #000) ${dimFilter};">`;
                         } else if (f.type === "Mil V-12") {
                             htmlContent = `<img src="${HELICOPTER_ICON_B64}" style="transform:rotate(${bearing}deg); width:28px; height:28px; cursor:pointer; filter: drop-shadow(0 0 2px #000) ${dimFilter};">`;
+                        } else if (f.type === "Sikorsky S-64 Skycrane") {
+                            htmlContent = `<img src="${HELICOPTER_ICON_B64}" style="transform:rotate(${bearing}deg); width:28px; height:28px; cursor:pointer; filter: drop-shadow(0 0 2px #000) ${dimFilter};">`;
+                        } else if (f.type === "Kaman K-MAX") {
+                            htmlContent = `<img src="${HELICOPTER_ICON_B64}" style="transform:rotate(${bearing}deg); width:28px; height:28px; cursor:pointer; filter: drop-shadow(0 0 2px #000) ${dimFilter};">`;
                         } else if (f.type === "McDonnell Douglas DC-10") {
                             htmlContent = `<img src="${COFFIN_ICON_B64}" style="transform:rotate(${bearing}deg); width:28px; height:28px; cursor:pointer; filter: drop-shadow(0 0 2px #000) ${dimFilter};">`;
+                        } else if (f.type === "Vickers VC10") {
+                            htmlContent = `<img src="${VICKERS_ICON_B64}" style="transform:rotate(${bearing}deg); width:28px; height:28px; cursor:pointer; filter: drop-shadow(0 0 2px #000) ${dimFilter};">`;
                         } else if (f.type === "Airbus A380") {
                             htmlContent = `<img src="${QUEEN_ICON_B64}" style="transform:rotate(${bearing}deg); width:28px; height:28px; cursor:pointer; filter: drop-shadow(0 0 2px #000) ${dimFilter};">`;
                         } else if (f.type === "Boeing 747-8") {
@@ -2521,6 +2568,8 @@ const cost = Math.ceil(needed * dynamicRepairCost);
                         } else if (f.type === "Antonov An-225 Mriya") {
                             htmlContent = `<img src="${UKRAINEGIANT_ICON_B64}" style="transform:rotate(${bearing}deg); width:28px; height:28px; cursor:pointer; filter: drop-shadow(0 0 2px #000) ${dimFilter};">`;
                         } else if (f.type === "Hughes H-4 Hercules") {
+                            htmlContent = `<img src="${HERCULE_ICON_B64}" style="transform:rotate(${bearing}deg); width:28px; height:28px; cursor:pointer; filter: drop-shadow(0 0 2px #000) ${dimFilter};">`;
+                        } else if (f.type === "Messerschmitt Me 323 Gigant") {
                             htmlContent = `<img src="${HERCULE_ICON_B64}" style="transform:rotate(${bearing}deg); width:28px; height:28px; cursor:pointer; filter: drop-shadow(0 0 2px #000) ${dimFilter};">`;
                         } else if (f.type === "Scaled Composites Model 351 Stratolaunch") {
                             htmlContent = `<img src="${STRATO_ICON_B64}" style="transform:rotate(${bearing}deg); width:28px; height:28px; cursor:pointer; filter: drop-shadow(0 0 2px #000) ${dimFilter};">`;
@@ -2684,6 +2733,7 @@ updateUI();
 
             if (type === "Lun-Class Ekranoplan" && (!origAp?.isCoastal || !destAp?.isCoastal)) { alert("The Lun-Class Ekranoplan can only operate between coastal airports!");
             return; }
+            // ... (rest of the function remains the same)
             if (type === "Hughes H-4 Hercules" && (!origAp?.isCoastal || !destAp?.isCoastal)) { alert("The Hughes H-4 Hercules can only operate between coastal airports!"); return; }
             if ((gameState.hangar[type] || 0) <= 0 || allCrafts[type].rangeNM < route.distanceNM) { alert("Invalid selection or insufficient range."); return; }
             gameState.hangar[type]--;
@@ -2872,7 +2922,6 @@ updateUI();
                 gameState.cash += 125000; gameState.tokens += 35;
                 triggerMilestonePopupNotification(achievements.rank_15.title, achievements.rank_15.rewardDesc);
             }
-            // NEW: Add these missing fallback checks to make the high-rank achievements obtainable
             if (gameState.rank >= 50 && !achievements.rank_50.unlocked) {
                 achievements.rank_50.unlocked = true;
                 gameState.cash += 250000; gameState.tokens += 50;
