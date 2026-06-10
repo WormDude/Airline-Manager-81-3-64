@@ -834,7 +834,7 @@
                 airports: [
                     { name: "Eurico de Aguiar Salles International Airport (VIX)", lat: -20.2581, lng: -40.2864, isHub: false, baseDemand: 48, type: "airport", isCoastal: true },
                     { name: "Galeão Intl (GIG)", lat: -22.8100, lng: -43.2506, isHub: false, baseDemand: 91, type: "airport", isCoastal: true },
-                    { name: "São Paulo/Guarulhos International Airport (GRU)", lat: -23.4356, lng: -46.4731, isHub: true, baseDemand: 95, type: "airport" }
+                    { name: "São Paulo/Guarulhos International Airport (GRU)", lat: -23.4356, lng: -46.4731, isHub: false, baseDemand: 95, type: "airport" }
                 ]
             },
             "England (UK)": { unlocked: false, baseCost: 52, continent: "Europe", nation: "United Kingdom", flag: "🇬🇧", isSplit: true,
@@ -1052,7 +1052,7 @@
             "Russia": { unlocked: false, baseCost: 75, continent: "Europe", nation: "Russia", flag: "🇷🇺", isSplit: false,
                 polygon: [
                     [[69.76, 31.4],[69, 29],[62.9, 31.58],[60,28],[56,28],[55.7, 31.26],[52.6, 34],[50,40],[49.26, 40.3],[45.59, 37.5],[45.5, 36.7],[45, 36.5],[43.38, 39.96],[43.6, 40.1],[43.25, 41.65],[43.26, 42.9],[42.5, 45.8],[42.17, 45.7],[41.2, 47.8],[41.89, 48.6],[46.1, 49.38],[48.4, 46.1],[51.77, 48.56],[51.49, 59.4],[54,60],[55.6, 68.89],[54.5, 76.89],[51.49, 80.6],[49.29, 87.6],[50.0,90.0],[52.0,100.0],[49.5,115],[52,120],[53,120],[48,134],[43,131],[42.57,130.6],[43,135],[46,140],[46,160],[65,180],[83,180],[83,170],[83,140],[83,50]],
-                    [[75.3,-180.8],[65.0,-180.0],[64,-170.7],[67,-167.8]], // russia west map
+                    [[75.3,-180.8],[65.0,-180.0],[64,-170.7],[67,-167.8]], // russia west
                   [[55.0,23.0],[54.3,22.8],[54.6,19.7],[55.3,21.0]] // Kaliningrad
                 ],
                 airports: [
@@ -1074,7 +1074,7 @@
                 ]
             },
             "China": { unlocked: false, baseCost: 58, continent: "Asia", nation: "China", flag: "🇨🇳", isSplit: false,
-                polygon: [[53,120],[48,134],[43,131],[42,130],[39,124],[34,119],[30,122],[22,114],[20,110],[21,100],[24,97],[27.8,88.2],[31,78],[33.85,74.5],[37.0,74.5],[40,73],[45,90],[42,105],[46,120],[49.5,115],[52,120],[53,120]],
+                polygon: [[53,120],[48,134],[43,131],[42,130],[39,124],[34,119],[30,122],[22,114],[20,110],[21,100],[24,97],[27.8,88.2],[31,78],[34, 80],[37.0,74.5],[40,74],[42.1, 80.5],[49.29, 87.6],[45,90],[42,105],[46,120],[49.5,115],[52,120],[53,120]],
                 airports: [
                     { name: "Beijing Capital (PEK)", lat: 40.0799, lng: 116.6031, isHub: false, baseDemand: 99, type: "airport" },
                     { name: "Shanghai Pudong (PVG)", lat: 31.1443, lng: 121.8083, isHub: false, baseDemand: 98, type: "airport", isCoastal: true },
@@ -1083,18 +1083,37 @@
                 ]
             },
             "India": { unlocked: false, baseCost: 58, continent: "Asia", nation: "India", flag: "🇮🇳", isSplit: false,
-                polygon: [[33.85,74.5],[31,78],[30.4,80.0],[28.8,80.1],[26.4,88.0],[21.5,88.0],[11.0,79.5],[8.0,77.5],[19.0,72.5],[23.5,68.0],[28.0,70.0],[31.0,74.5],[33.85,74.5]],
+                polygon: [[33.85,74.5],[37.0,74.5],[34, 80],[31,78],[30.4,80.0],[28.8,80.1],[26.4,88.0],[21.5,88.0],[11.0,79.5],[8.0,77.5],[19.0,72.5],[23.5,68.0],[28.0,70.0],[31.0,74.5],[33.85,74.5]],
                 airports: [
                     { name: "Indira Gandhi Intl (DEL)", lat: 28.5562, lng: 77.1000, isHub: false, baseDemand: 98, type: "airport" },
                     { name: "Chhatrapati Shivaji (BOM)", lat: 19.0896, lng: 72.8656, isHub: false, baseDemand: 95, type: "airport", isCoastal: true },
                     { name: "Ganga Helipad (IN-0314)", lat: 30.1472, lng: 78.2974, isHub: false, baseDemand: 20, type: "heliport" }
                 ]
             },
+            "Sri Lanka": { unlocked: false, baseCost: 58, continent: "Asia", nation: "Sri Lanka", flag: "🇱🇰", isSplit: false,
+                polygon: [[10.8, 80],[6.8, 82.6],[5.8, 80.98],[5.8, 79.58],[7.5, 78.6]],
+                airports: [
+                    { name: "Colombo Ratmalana International Airport (RML)", lat: 6.8222, lng: 79.8861, isHub: false, baseDemand: 35, type: "airport", isCoastal: true },
+{ name: "Bandaranaike International Colombo Airport (CMB)", lat: 7.1808, lng: 79.8842, isHub: false, baseDemand: 88, type: "airport", isCoastal: true },
+{ name: "Mattala Rajapaksa International Airport (HRI)", lat: 6.2906, lng: 81.1219, isHub: false, baseDemand: 20, type: "airport", isCoastal: true },
+{ name: "Jaffna International Airport (JAF)", lat: 9.7925, lng: 80.0681, isHub: false, baseDemand: 22, type: "airport", isCoastal: true }
+                ]
+            },
             "Pakistan": { unlocked: false, baseCost: 45, continent: "Asia", nation: "Pakistan", flag: "🇵🇰", isSplit: false,
-                polygon: [[37.0,74.5],[31.0,74.5],[28.0,70.0],[24.0,68.0],[25.0,62.0],[30.0,61.0],[34.0,69.0],[37.0,74.5]],
+                polygon: [[37.0,74.5],[31.0,74.5],[28.0,70.0],[24.0,68.0],[25.0,62.0],[27.0,63.0],[30.0,61.0],[30.0,65.0],[31.0,67.0],[32.0,69.0],[34.0,71.0],[36.6,71.6],[37.0,74.5]],
                 airports: [
                     { name: "Islamabad Intl (ISB)", lat: 33.5498, lng: 72.8315, isHub: false, baseDemand: 80, type: "airport" },
-                    { name: "Jinnah Intl (KHI)", lat: 24.9065, lng: 67.1608, isHub: false, baseDemand: 85, type: "airport", isCoastal: true }
+                    { name: "Jinnah Intl (KHI)", lat: 24.9065, lng: 67.1608, isHub: false, baseDemand: 85, type: "airport", isCoastal: true },
+                    { name: "Multan International Airport (MUX)", lat: 30.2025, lng: 71.4192, isHub: false, baseDemand: 42, type: "airport" },
+{ name: "Sialkot International Airport (SKT)", lat: 32.5358, lng: 74.3414, isHub: false, baseDemand: 45, type: "airport" }
+                ]
+            },
+            "Afghanistan": { unlocked: false, baseCost: 45, continent: "Asia", nation: "Afghanistan", flag: "🇦🇫", isSplit: false,
+                polygon: [[37.0,74.5],[37.4,74.44],[37.4,73.0],[36.8,72.0],[36.7,71.8],[38.2,71.6],[38.5,71],[37,69],[37.5,65],[36,63],[35.4,61],[34,60],[31.5,61],[31.0,62],[30.0,61.0],[30.0,65.0],[32.0,69.0],[34.0,71.0],[36.6,71.6]],
+                airports: [
+                    { name: "Kabul International Airport (KBL)", lat: 34.5658, lng: 69.2125, isHub: false, baseDemand: 68, type: "airport" },
+{ name: "Herat International Airport (HEA)", lat: 34.2100, lng: 62.2283, isHub: false, baseDemand: 28, type: "airport" },
+{ name: "Ahmad Shah Baba International Airport (KDH)", lat: 31.5058, lng: 65.8478, isHub: false, baseDemand: 32, type: "airport" }
                 ]
             },
             "Nepal": { unlocked: false, baseCost: 35, continent: "Asia", nation: "Nepal", flag: "🇳🇵", isSplit: false,
@@ -1104,7 +1123,7 @@
                 ]
             },
             "Mongolia": { unlocked: false, baseCost: 38, continent: "Asia", nation: "Mongolia", flag: "🇲🇳", isSplit: false,
-                polygon: [[52.0,100.0],[49.5,115.0],[46.0,120.0],[42.0,105.0],[45.0,90.0],[50.0,90.0],[52.0,100.0]],
+                polygon: [[52.0,100.0],[49.5,115.0],[46.0,120.0],[42.0,105.0],[45.0,90.0],[49.29, 87.6],[50.0,90.0],[52.0,100.0]],
                 airports: [
                     { name: "Chinggis Khaan Intl (UBN)", lat: 47.6492, lng: 106.8227, isHub: false, baseDemand: 55, type: "airport" }
                 ]
@@ -1976,8 +1995,12 @@ const cost = Math.ceil(needed * dynamicRepairCost);
             const hSelect = document.getElementById('hub-select');
             const chosenHub = hSelect.value;
             const chosenRegion = hSelect.options[hSelect.selectedIndex].dataset.region;
-            if (!inputName || !chosenRegion || !chosenHub) { alert("Please provide valid inputs."); return; }
- 
+            if (!inputName || !chosenRegion || !chosenHub) { alert("Please provide valid inputs."); return;
+            }
+            
+            // Get the data for the chosen hub to check its type
+            const apData = findAirportData(chosenHub);
+
             gameState.airlineName = inputName;
             gameState.primaryHub = chosenHub;
             gameState.tutorialActive = true;
@@ -1988,14 +2011,20 @@ const cost = Math.ceil(needed * dynamicRepairCost);
             gameState.hangar = {};
             gameState.speedBoostEndTime = 0;
             gameState.cratesClaimed = 0;
- 
+
             // Give starting cash (no region unlock money — region unlock removed from tutorial)
-            for (const r of Object.values(regions)) { r.unlocked = false; r.airports.forEach(a => a.isHub = false); }
+            for (const r of Object.values(regions)) { r.unlocked = false;
+            r.airports.forEach(a => a.isHub = false); }
             regions[chosenRegion].unlocked = true;
             regions[chosenRegion].airports.forEach(a => { if (a.name === chosenHub) a.isHub = true; });
- 
-            gameState.cash = 18000;
- 
+
+            // NEW: Adjust starting cash if the chosen hub is a heliport
+            if (apData && apData.type === 'heliport') {
+                gameState.cash = 42000;
+            } else {
+                gameState.cash = 18000;
+            }
+
             document.getElementById('setup-screen').style.display = 'none';
             saveProgress();
             if (map) map.remove();
@@ -2646,7 +2675,15 @@ updateUI();
             if (!route || type === "") return;
             const allCrafts = { ...aircraftCatalog, ...cargoCatalog, ...legacyAircraftCatalog, ...secretCatalog };
             const origAp = findAirportData(route.origin), destAp = findAirportData(route.destination);
-            if (type === "Lun-Class Ekranoplan" && (!origAp?.isCoastal || !destAp?.isCoastal)) { alert("The Lun-Class Ekranoplan can only operate between coastal airports!"); return; }
+
+            // NEW: Enforce heliport restrictions
+            if ((origAp?.type === 'heliport' || destAp?.type === 'heliport') && allCrafts[type].type !== 'helicopter') {
+                alert("Only helicopters can fly into and out of heliports!");
+                return;
+            }
+
+            if (type === "Lun-Class Ekranoplan" && (!origAp?.isCoastal || !destAp?.isCoastal)) { alert("The Lun-Class Ekranoplan can only operate between coastal airports!");
+            return; }
             if (type === "Hughes H-4 Hercules" && (!origAp?.isCoastal || !destAp?.isCoastal)) { alert("The Hughes H-4 Hercules can only operate between coastal airports!"); return; }
             if ((gameState.hangar[type] || 0) <= 0 || allCrafts[type].rangeNM < route.distanceNM) { alert("Invalid selection or insufficient range."); return; }
             gameState.hangar[type]--;
@@ -2834,6 +2871,22 @@ updateUI();
                 achievements.rank_15.unlocked = true;
                 gameState.cash += 125000; gameState.tokens += 35;
                 triggerMilestonePopupNotification(achievements.rank_15.title, achievements.rank_15.rewardDesc);
+            }
+            // NEW: Add these missing fallback checks to make the high-rank achievements obtainable
+            if (gameState.rank >= 50 && !achievements.rank_50.unlocked) {
+                achievements.rank_50.unlocked = true;
+                gameState.cash += 250000; gameState.tokens += 50;
+                triggerMilestonePopupNotification(achievements.rank_50.title, achievements.rank_50.rewardDesc);
+            }
+            if (gameState.rank >= 100 && !achievements.rank_100.unlocked) {
+                achievements.rank_100.unlocked = true;
+                gameState.cash += 500000; gameState.tokens += 100;
+                triggerMilestonePopupNotification(achievements.rank_100.title, achievements.rank_100.rewardDesc);
+            }
+            if (gameState.rank >= 1000 && !achievements.rank_1000.unlocked) {
+                achievements.rank_1000.unlocked = true;
+                gameState.cash += 2500000; gameState.tokens += 500;
+                triggerMilestonePopupNotification(achievements.rank_1000.title, achievements.rank_1000.rewardDesc);
             }
             if (!achievements.route_master.unlocked && gameState.routes.length >= 10) {
                 achievements.route_master.unlocked = true;
@@ -3269,3 +3322,4 @@ return `<div style="background:rgba(0,0,0,0.2);padding:6px;border-radius:4px;mar
     </script>
 </body>
 </html>
+
