@@ -446,11 +446,11 @@
                     <option value="">-- Choose a Region --</option>
                 </select>
             </div>
-            <label style="display:block; text-align:left; font-size:12px; font-weight:bold; margin-bottom:5px;">SELECT PRIMARY OPERATIONS HUB:</label>
+            <label style="display:block; text-align:left; font-size:12px; font-weight:bold; margin-bottom:5px;">SELECT HUB:</label>
             <select id="hub-select" style="width:100%; padding:12px; background:var(--input-bg); color:var(--text-color); border:1px solid var(--input-border); border-radius:6px; font-weight:bold; margin-bottom:20px;">
                 <option value="">-- Choose a Nation/Region First --</option>
             </select>
-            <button class="btn" style="padding:12px;" onclick="checkSetupHubType()">Initialize Corporate Operations</button>
+            <button class="btn" style="padding:12px;" onclick="checkSetupHubType()">Start Airline</button>
         </div>
     </div>
  
@@ -465,7 +465,7 @@
     <div id="settings-screen" class="overlay-screen" style="display:none;">
         <div class="modal-box" style="max-width: 400px;">
             <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
-                <h3>Corporate Settings</h3>
+                <h3>Settings</h3>
                 <button style="background:none; border:none; color:var(--text-color); font-size:20px; cursor:pointer;" onclick="closeSettingsScreen()">✕</button>
             </div>
             <div class="settings-row">
@@ -498,9 +498,16 @@
                     <button id="speed-kmh" class="unit-btn" onclick="setSpeedUnit('KMH')">KMH</button>
                 </div>
             </div>
+            <div class="settings-row">
+    <span>Show Medical/Hospital Heliports</span>
+    <label class="switch">
+        <input type="checkbox" id="hospital-marker-checkbox" onchange="toggleHospitalMarkers(this.checked)">
+        <span class="slider"></span>
+    </label>
+</div>
             <div style="margin-top: 40px; padding-top: 15px; border-top: 2px dashed var(--card-border);">
-                <p style="font-size:11px; color:#94a3b8; margin-bottom:10px; text-align:left;">Liquidation eliminates core airline structures, fleet hangars, and tracking data instantly.</p>
-                <button class="btn btn-danger" style="margin:0;" onclick="openResetScreen()">Liquidate Corporate Account</button>
+                <p style="font-size:11px; color:#94a3b8; margin-bottom:10px; text-align:left;">Resetting your airline sets you back to the start.</p>
+                <button class="btn btn-danger" style="margin:0;" onclick="openResetScreen()">Reset Account</button>
             </div>
         </div>
     </div>
@@ -508,7 +515,7 @@
     <!-- RESET SCREEN -->
     <div id="reset-screen" class="overlay-screen" style="display:none; z-index:11000;">
         <div class="modal-box" style="border-color: #ef4444; max-width:450px;">
-            <h3 style="color: #ef4444; margin-bottom: 10px;">⚠️ Confirm Full Corporate Liquidation?</h3>
+            <h3 style="color: #ef4444; margin-bottom: 10px;">⚠️ Confirm Reset?</h3>
             <p style="font-size:13px; color:#94a3b8; margin-bottom:20px;">This action completely deletes your airline, routes, capital assets, hangar inventory, and records.</p>
             <div style="display:flex; gap:10px;">
                 <button class="btn" style="background:#475569;" onclick="closeResetScreen()">Cancel</button>
@@ -562,19 +569,27 @@
                     <button class="btn" onclick="createRoute()">Open Flight Route</button>
                 </div>
                 <h4 style="margin-top:15px; margin-bottom:5px;">Active Route Matrices</h4>
-                <div id="active-routes-list"></div>
+              
+<div style="display: flex; gap: 8px; margin-bottom: 10px;">
+    <button class="btn" style="background:#ea580c; font-size:11px; margin:0;" onclick="refuelAllGrounded()">⛽ Refuel All (Grounded)</button>
+    <button class="btn" style="background:#0891b2; font-size:11px; margin:0;" onclick="repairAllGrounded()">🔧 Repair All (Grounded)</button>
+    <button class="btn" id="btn-ground-all" style="background:#f59e0b; font-size:11px; margin:0;" onclick="toggleGroundAll()">✋ Ground All</button>
+</div>
+              <div id="active-routes-list"></div>
             </div>
             <div id="hangar" class="tab-content">
                 <h3>Fleet Hangar</h3>
                 <p style="font-size:11px; color:#94a3b8; margin-bottom:10px; font-style:italic;">Sell idle assets for 25% value.</p>
                 <div id="hangar-list" style="margin-top:10px;"></div>
             </div>
+            <div id="mark"
+<div id="active-routes-list"></div>
             <div id="market" class="tab-content">
                 <!-- Market sub-tab bar -->
                 <div style="display:flex;gap:0;margin-bottom:12px;border-bottom:2px solid var(--card-border);">
                     <button id="msubtab-btn-passenger" class="tab-btn active" style="flex:1;border-bottom:3px solid var(--accent-color);color:var(--passeng-color);" onclick="switchMarketSubTab('passenger')">✈ Passenger</button>
                     <button id="msubtab-btn-cargo" class="tab-btn" style="flex:1;color:var(--cargo-color);" onclick="switchMarketSubTab('cargo')">📦 Cargo</button>
-                    <button id="msubtab-btn-legacy" class="tab-btn" style="flex:1;color:#a855f7;" onclick="switchMarketSubTab('legacy')">🏛 Legacy</button>
+                    <button id="msubtab-btn-legacy" class="tab-btn" style="flex:1;color:#a855f7;" onclick="switchMarketSubTab('legacy')">🕰️ Legacy</button>
                 </div>
                 <!-- Passenger sub-tab -->
                 <div id="msubtab-passenger" style="display:block;">
@@ -584,7 +599,7 @@
                 </div>
                 <!-- Cargo sub-tab -->
                 <div id="msubtab-cargo" style="display:none;">
-                    <h3 style="color:var(--cargo-color);margin-bottom:6px;">📦 Cargo Operations</h3>
+                    <h3 style="color:var(--cargo-color);margin-bottom:6px;">📦 Cargo Aircraft</h3>
                     <div id="cargo-locked-banner" class="rank-locked-banner" style="display:none;">
                         🔒 Cargo aircraft unlock at <strong>Rank 10</strong>.
                     </div>
@@ -640,6 +655,12 @@
         const STRATO_ICON_B64 = 'https://github.com/WormDude/Airline-Manager-81-3-64/blob/main/stratolaunch.png?raw=true';
         const WRIGHT_ICON_B64 = 'https://github.com/WormDude/Airline-Manager-81-3-64/blob/main/wright.png?raw=true';
         const VICKERS_ICON_B64 = 'https://github.com/WormDude/Airline-Manager-81-3-64/blob/main/vickers.png?raw=true';
+        const ORLYONOK_ICON_B64 = 'https://github.com/WormDude/Airline-Manager-81-3-64/blob/main/A90.png?raw=true';
+        const DREAMLIFTER_ICON_B64 = 'https://github.com/WormDude/Airline-Manager-81-3-64/blob/main/dreamlifter.png?raw=true';
+        const CLIPPER_ICON_B64 = 'https://github.com/WormDude/Airline-Manager-81-3-64/blob/main/clipper.png?raw=true';
+        const OLDDOUG_ICON_B64 = 'https://github.com/WormDude/Airline-Manager-81-3-64/blob/main/DC3.png?raw=true';
+        const ANTWOTWO_ICON_B64 = 'https://github.com/WormDude/Airline-Manager-81-3-64/blob/main/an22.png?raw=true';
+        const FIFTH_ENGINE_ICON_B64 = 'https://github.com/WormDude/Airline-Manager-81-3-64/blob/main/5enginedeliv.png?raw=true';
         const EARNINGS_MULTIPLIER = 0.22;
         const CARGO_EARNINGS_MULTIPLIER = 0.35;
  
@@ -650,7 +671,8 @@
                 airports: [
                     { name: "JFK International (JFK)", lat: 40.6413, lng: -73.7781, isHub: false, baseDemand: 98, type: "airport", isCoastal: true },
                     { name: "Albany Regional (ALB)", lat: 42.7483, lng: -73.8020, isHub: false, baseDemand: 52, type: "airport" },
-                    { name: "Manhattan West Heliport (JRA)", lat: 40.7544, lng: -74.0094, isHub: false, baseDemand: 65, type: "heliport", isCoastal: true }
+                    { name: "Manhattan West Heliport (JRA)", lat: 40.7544, lng: -74.0094, isHub: false, baseDemand: 65, type: "heliport", isCoastal: true },
+                    { name: "Meadowlands Hospital Medical Center Heliport (41NJ)", lat: 40.7903, lng: -74.0411, isHub: false, baseDemand: 14, type: "heliport", isCoastal: true }
                 ]
             },
             "California (US)": { unlocked: false, baseCost: 46, continent: "North America", nation: "USA", flag: "🇺🇸", isSplit: true,
@@ -659,7 +681,10 @@
                     { name: "Los Angeles (LAX)", lat: 33.9416, lng: -118.4085, isHub: false, baseDemand: 100, type: "airport", isCoastal: true },
                     { name: "San Francisco (SFO)", lat: 37.6213, lng: -122.3790, isHub: false, baseDemand: 92, type: "airport", isCoastal: true },
                     { name: "San Diego Intl (SAN)", lat: 32.7338, lng: -117.1933, isHub: false, baseDemand: 85, type: "airport", isCoastal: true },
-                    { name: "Catalina Island Heliport (CIB)", lat: 33.3451, lng: -118.3289, isHub: false, baseDemand: 40, type: "heliport", isCoastal: true }
+                    { name: "Catalina Island Heliport (CIB)", lat: 33.3451, lng: -118.3289, isHub: false, baseDemand: 40, type: "heliport", isCoastal: true },
+                    { name: "Maguire-California Hospital Helipad (CA23)", lat: 34.0372, lng: -118.2661, isHub: false, baseDemand: 15, type: "heliport", isCoastal: true },
+{ name: "Children's Hospital Oakland Heliport (7CL1)", lat: 37.8372, lng: -122.2647, isHub: false, baseDemand: 12, type: "heliport", isCoastal: true },
+                    { name: "Mojave Air & Space Port (MHV)", lat: 35.0589, lng: -118.1517, isHub: false, baseDemand: 45, type: "airport" }
                 ]
             },
             "Texas (US)": { unlocked: false, baseCost: 53, continent: "North America", nation: "USA", flag: "🇺🇸", isSplit: true,
@@ -669,7 +694,9 @@
                     { name: "George Bush Intercontinental (IAH)", lat: 29.9902, lng: -95.3368, isHub: false, baseDemand: 90, type: "airport", isCoastal: true },
                     { name: "Austin-Bergstrom (AUS)", lat: 30.1975, lng: -97.6664, isHub: false, baseDemand: 82, type: "airport" },
                     { name: "Houston Hobby (HOU)", lat: 29.6454, lng: -95.2789, isHub: false, baseDemand: 75, type: "airport", isCoastal: true },
-                    { name: "Scholes International (GLS)", lat: 29.2653, lng: -94.8603, isHub: false, baseDemand: 45, type: "airport", isCoastal: true } // Gulf Coast
+                    { name: "Scholes International (GLS)", lat: 29.2653, lng: -94.8603, isHub: false, baseDemand: 45, type: "airport", isCoastal: true },
+                    { name: "John Peter Smith Health Network Heliport (1XS3)", lat: 32.7239, lng: -97.3236, isHub: false, baseDemand: 14, type: "heliport" },
+{ name: "Medical Center Hospital Heliport (32XA)", lat: 31.8544, lng: -102.3703, isHub: false, baseDemand: 10, type: "heliport" }// Gulf Coast
                 ]
             },
             "Florida (US)": { unlocked: false, baseCost: 55, continent: "North America", nation: "USA", flag: "🇺🇸", isSplit: true,
@@ -678,16 +705,18 @@
                     { name: "Miami International (MIA)", lat: 25.7959, lng: -80.2870, isHub: false, baseDemand: 95, type: "airport", isCoastal: true },
                     { name: "Orlando International (MCO)", lat: 28.4312, lng: -81.3081, isHub: false, baseDemand: 90, type: "airport" },
                     { name: "Jacksonville International Airport (JAX)", lat: 30.4941, lng: -81.6878, isHub: false, baseDemand: 72, type: "airport", isCoastal: false },
-{ name: "Pensacola International Airport (PNS)", lat: 30.4733, lng: -87.1867, isHub: false, baseDemand: 48, type: "airport", isCoastal: true }
+{ name: "Pensacola International Airport (PNS)", lat: 30.4733, lng: -87.1867, isHub: false, baseDemand: 48, type: "airport", isCoastal: true },
+                  { name: "Palmetto General Hospital Heliport (1FA5)", lat: 25.8664, lng: -80.3208, isHub: false, baseDemand: 12, type: "heliport", isCoastal: true }
                 ]
             },
             "Ohio (US)": { unlocked: false, baseCost: 43, continent: "North America", nation: "USA", flag: "🇺🇸", isSplit: true,
-                polygon: [[41.69,-84.80],[41.75,-82.80],[42.32,-80.51],[40.61,-80.51],[39.32,-80.85],[38.45,-82.63],[39.10,-84.81],[41.69,-84.80]],
+                polygon: [[41.69,-84.80],[41.73, -83.3],[41.7, -82.5],[42.32,-80.51],[40.61,-80.51],[39.32,-80.85],[38.45,-82.63],[39.10,-84.81],[41.69,-84.80]],
                 airports: [
                     { name: "John Glenn Columbus (CMH)", lat: 39.9980, lng: -82.8919, isHub: false, baseDemand: 84, type: "airport" },
                     { name: "Cleveland Hopkins (CLE)", lat: 41.4117, lng: -81.8498, isHub: false, baseDemand: 80, type: "airport", isCoastal: true },
                     { name: "Cleveland Clinic Heliport (CCL)", lat: 41.5012, lng: -81.6211, isHub: false, baseDemand: 50, type: "heliport", isCoastal: true },
-                    { name: "Toledo Express (TOL)", lat: 41.5868, lng: -83.8078, isHub: false, baseDemand: 55, type: "airport" }
+                    { name: "Toledo Express (TOL)", lat: 41.5868, lng: -83.8078, isHub: false, baseDemand: 55, type: "airport" },
+                    { name: "McLaren St Luke's Hospital Heliport (3OI8)", lat: 41.5658, lng: -83.6739, isHub: false, baseDemand: 8, type: "heliport" }
                 ]
             },
             "Mexico": { unlocked: false, baseCost: 54, continent: "North America", nation: "Mexico", flag: "🇲🇽", isSplit: false,
@@ -697,7 +726,8 @@
                     { name: "Cancún Intl (CUN)", lat: 21.0365, lng: -86.8771, isHub: false, baseDemand: 90, type: "airport", isCoastal: true },
                     { name: "General Roberto Fierro Villalobos International Airport (CUU)", lat: 28.7028, lng: -105.9644, isHub: false, baseDemand: 54, type: "airport" },
 { name: "Loreto International Airport (LTO)", lat: 25.9892, lng: -111.3483, isHub: false, baseDemand: 28, type: "airport", isCoastal: true },
-{ name: "General Juan N. Álvarez International Airport (ACA)", lat: 16.7572, lng: -99.7539, isHub: false, baseDemand: 65, type: "airport", isCoastal: true }
+{ name: "General Juan N. Álvarez International Airport (ACA)", lat: 16.7572, lng: -99.7539, isHub: false, baseDemand: 65, type: "airport", isCoastal: true },
+                    { name: "Helipuerto Hospital General Ajusco Medio (HAH)", lat: 19.2789, lng: -99.2153, isHub: false, baseDemand: 10, type: "heliport" }
                 ]
             },
             "Cuba": { unlocked: false, baseCost: 40, continent: "North America", nation: "Cuba", flag: "🇨🇺", isSplit: false,
@@ -706,7 +736,9 @@
                     { name: "José Martí Intl (HAV)", lat: 22.9892, lng: -82.4091, isHub: false, baseDemand: 75, type: "airport", isCoastal: true },
                     { name: "Juan Gualberto (VRA)", lat: 23.0342, lng: -81.4358, isHub: false, baseDemand: 65, type: "airport", isCoastal: true },
                     { name: "Antonio Maceo International Airport (SCU)", lat: 19.9697, lng: -75.8364, isHub: false, baseDemand: 42, type: "airport", isCoastal: true },
-{ name: "Frank Pais International Airport (HOG)", lat: 20.7856, lng: -76.3150, isHub: false, baseDemand: 45, type: "airport", isCoastal: true }
+{ name: "Frank Pais International Airport (HOG)", lat: 20.7856, lng: -76.3150, isHub: false, baseDemand: 45, type: "airport", isCoastal: true },
+                    { name: "Mantua Airport (CU-0008)", lat: 22.2858, lng: -84.2253, isHub: false, baseDemand: 14, type: "airport" },
+{ name: "Alfredo Noa Díaz Airport (UMA)", lat: 20.3544, lng: -74.5042, isHub: false, baseDemand: 22, type: "airport", isCoastal: true }
                 ]
             },
             "Haiti": { unlocked: false, baseCost: 32, continent: "North America", nation: "Haiti", flag: "🇭🇹", isSplit: false,
@@ -715,16 +747,22 @@
                     { name: "Toussaint Louverture (PAP)", lat: 18.5800, lng: -72.2925, isHub: false, baseDemand: 55, type: "airport", isCoastal: true },
                     { name: "Cap-Haïtien Intl (CAP)", lat: 19.7331, lng: -72.1947, isHub: false, baseDemand: 40, type: "airport", isCoastal: true },
                     { name: "Anse-a-Galets Airport (HT-0002)", lat: 18.8358, lng: -72.8631, isHub: false, baseDemand: 12, type: "airport", isCoastal: true },
-{ name: "Port-de-Paix Airport (PAX)", lat: 19.9336, lng: -72.8147, isHub: false, baseDemand: 25, type: "airport", isCoastal: true }
+{ name: "Port-de-Paix Airport (PAX)", lat: 19.9336, lng: -72.8147, isHub: false, baseDemand: 25, type: "airport", isCoastal: true },
+                    { name: "St Vincent de Paul Health Center Helicopter Landing Zone (HT-0016)", lat: 18.2831, lng: -74.1167, isHub: false, baseDemand: 5, type: "heliport", isCoastal: true }
                 ]
             },
             "Ontario (CA)": { unlocked: false, baseCost: 50, continent: "North America", nation: "Canada", flag: "🇨🇦", isSplit: true,
-                polygon: [[51.15,-79.71],[49.00,-79.52],[46.30,-77.95],[45.45,-75.50],[45.00,-74.75],[44.20,-76.35],[43.60,-79.40],[42.90,-78.90],[42.50,-80.20],[42.00,-82.50],[42.30,-83.10],[43.00,-82.40],[46.00,-83.80],[46.50,-84.40],[48.00,-89.20],[49,-95.15],[53.15,-95.15],[56.85,-88.90],[55.20,-85.10],[52.20,-80.60],[51.15,-79.71]],
+                polygon: [
+                  [[51.15,-79.71],[49.00,-79.52],[46.30,-77.95],[45.45,-75.50],[45.00,-74.75],[44.20,-76.35],[43.60,-79.40],[42.90,-78.90],[42.50,-80.20],[42.00,-82.50],[42.30,-83.10],[43.00,-82.40],[46.00,-83.80],[46.50,-84.40],[48.00,-89.20],[49,-95.15],[53.15,-95.15],[56.85,-88.90],[55.20,-85.10],[52.20,-80.60],[51.15,-79.71]],
+                  [[41.8, -82.7],[41.8, -82.6],[41.7, -82.59],[41.7, -82.7]]
+                  ],
                 airports: [
                     { name: "Toronto Pearson (YYZ)", lat: 43.6777, lng: -79.6248, isHub: false, baseDemand: 95, type: "airport", isCoastal: true },
                     { name: "Ottawa International (YOW)", lat: 45.3225, lng: -75.6657, isHub: false, baseDemand: 74, type: "airport" },
                     { name: "Billy Bishop Toronto City (YTZ)", lat: 43.6275, lng: -79.3962, isHub: false, baseDemand: 74, type: "airport", isCoastal: true },
-{ name: "Thunder Bay International (YQT)", lat: 48.3719, lng: -89.3239, isHub: false, baseDemand: 58, type: "airport", isCoastal: true }
+{ name: "Thunder Bay International (YQT)", lat: 48.3719, lng: -89.3239, isHub: false, baseDemand: 58, type: "airport", isCoastal: true },
+                    { name: "Toronto (Hospital For Sick Children) Heliport (CNW8)", lat: 43.6547, lng: -79.3875, isHub: false, baseDemand: 16, type: "heliport", isCoastal: true },
+                    { name: "Pelee Island Airport (CYPT)", lat: 41.7797, lng: -82.6781, isHub: false, baseDemand: 15, type: "airport", isCoastal: true }
                 ]
             },
             "British Columbia (CA)": { unlocked: false, baseCost: 50, continent: "North America", nation: "Canada", flag: "🇨🇦", isSplit: true,
@@ -733,7 +771,8 @@
                     { name: "Vancouver International (YVR)", lat: 49.1967, lng: -123.1840, isHub: false, baseDemand: 94, type: "airport", isCoastal: true },
                     { name: "Victoria International (YYJ)", lat: 48.6469, lng: -123.4260, isHub: false, baseDemand: 75, type: "airport", isCoastal: true },
                     { name: "Kelowna International (YLW)", lat: 49.9561, lng: -119.3778, isHub: false, baseDemand: 64, type: "airport" },
-{ name: "Grouse Mountain Helipad", lat: 49.3794, lng: -123.0803, isHub: false, baseDemand: 30, type: "heliport" }
+{ name: "Grouse Mountain Helipad", lat: 49.3794, lng: -123.0803, isHub: false, baseDemand: 30, type: "heliport" },
+                    { name: "Kelowna General Hospital Helipad (CKH9)", lat: 49.8736, lng: -119.4892, isHub: false, baseDemand: 11, type: "heliport" }
                 ]
             },
             "Alberta (CA)": { unlocked: false, baseCost: 50, continent: "North America", nation: "Canada", flag: "🇨🇦", isSplit: true,
@@ -840,13 +879,14 @@
                 ]
             },
             "Brazil": { unlocked: false, baseCost: 56, continent: "South America", nation: "Brazil", flag: "🇧🇷", isSplit: false,
-                polygon: [[4.43,-51.52],[2.25,-60.85],[1.15,-67.00],[-7.40,-73.80],[-11.00,-71.10],[-10.40,-65.40],[-16.40,-57.40],[-22.50,-58.00],[-22.90,-53.50],[-27.35,-53.70],[-30.15,-57.50],[-33.74,-53.30],[-28.50,-48.80],[-22.90,-43.20],[-19,-38.20],[-13.00,-38.50],[-5.50,-35.60],[-2.50,-44.30],[1.30,-48.90],[4.43,-51.52],],
+                polygon: [[4.43,-51.52],[2.25,-60.85],[1.15,-67.00],[-7.40,-73.80],[-11.00,-71.10],[-10.40,-65.40],[-16.40,-57.40],[-22.50,-58.00],[-22.90,-53.50],[-27.35,-53.70],[-30.15,-57.50],[-33.74,-53.30],[-28.50,-48.80],[-22.90,-43.20],[-19,-38.20],[-13.00,-36.8],[-5.50,-35.60],[-2.50,-44.30],[1.30,-48.90],[4.43,-51.52],],
                 airports: [
                     { name: "Eurico de Aguiar Salles International Airport (VIX)", lat: -20.2581, lng: -40.2864, isHub: false, baseDemand: 48, type: "airport", isCoastal: true },
                     { name: "Galeão Intl (GIG)", lat: -22.8100, lng: -43.2506, isHub: false, baseDemand: 91, type: "airport", isCoastal: true },
                     { name: "São Paulo/Guarulhos International Airport (GRU)", lat: -23.4356, lng: -46.4731, isHub: false, baseDemand: 95, type: "airport" },
                     { name: "Presidente Juscelino Kubitschek International Airport (BSB)", lat: -15.8711, lng: -47.9186, isHub: false, baseDemand: 90, type: "airport" },
-{ name: "Atlas Brasil Cantanhede International Airport (BVB)", lat: 2.8414, lng: -60.6922, isHub: false, baseDemand: 35, type: "airport" }
+{ name: "Atlas Brasil Cantanhede International Airport (BVB)", lat: 2.8414, lng: -60.6922, isHub: false, baseDemand: 35, type: "airport" },
+                    { name: "Primavera Hospital Helipad (SJPV)", lat: -10.9419, lng: -37.0603, isHub: false, baseDemand: 8, type: "heliport", isCoastal: true }
                 ]
             },
             "England (UK)": { unlocked: false, baseCost: 52, continent: "Europe", nation: "United Kingdom", flag: "🇬🇧", isSplit: true,
@@ -855,7 +895,8 @@
                     { name: "London Heathrow (LHR)", lat: 51.4700, lng: -0.4543, isHub: false, baseDemand: 99, type: "airport", isCoastal: true },
                     { name: "London Gatwick (LGW)", lat: 51.1481, lng: -0.1903, isHub: false, baseDemand: 89, type: "airport" },
                     { name: "Manchester Airport (MAN)", lat: 53.3588, lng: -2.2749, isHub: false, baseDemand: 81, type: "airport" },
-                    { name: "London Heliport Battersea (EGLW)", lat: 51.4697, lng: -0.1783, isHub: false, baseDemand: 78, type: "heliport", isCoastal: true }
+                    { name: "London Heliport Battersea (EGLW)", lat: 51.4697, lng: -0.1783, isHub: false, baseDemand: 78, type: "heliport", isCoastal: true },
+                    { name: "The Royal London Hospital Helipad (GB-0343)", lat: 51.5192, lng: -0.0586, isHub: false, baseDemand: 15, type: "heliport" }
                 ]
             },
             "Scotland (UK)": { unlocked: false, baseCost: 49, continent: "Europe", nation: "United Kingdom", flag: "🇬🇧", isSplit: true,
@@ -863,14 +904,16 @@
                 airports: [
                     { name: "Edinburgh (EDI)", lat: 55.9508, lng: -3.3636, isHub: false, baseDemand: 85, type: "airport", isCoastal: true },
                     { name: "Glasgow (GLA)", lat: 55.8719, lng: -4.4331, isHub: false, baseDemand: 80, type: "airport" },
-                    { name: "Aberdeen International (ABZ)", lat: 57.2019, lng: -2.1978, isHub: false, baseDemand: 74, type: "airport", isCoastal: true } // North Sea Coast
+                    { name: "Aberdeen International (ABZ)", lat: 57.2019, lng: -2.1978, isHub: false, baseDemand: 74, type: "airport", isCoastal: true } ,
+                  { name: "Queen Elizabeth Hospital (GB-1287)", lat: 55.8624, lng: -4.3412, isHub: false, baseDemand: 14, type: "heliport" }
                 ]
             },
             "Ireland": { unlocked: false, baseCost: 49, continent: "Europe", nation: "Ireland", flag: "🇮🇪", isSplit: false,
                 polygon: [[51.4,-9.5],[51.4,-6.3],[53.3,-6.0],[54.1,-6.3],[55.2,-7.0],[55.4,-8.2],[54.2,-10.0],[51.4,-9.5]],
                 airports: [
                     { name: "Dublin Airport (DUB)", lat: 53.4264, lng: -6.2499, isHub: false, baseDemand: 88, type: "airport", isCoastal: true },
-                    { name: "Cork Airport (ORK)", lat: 51.8413, lng: -8.4911, isHub: false, baseDemand: 75, type: "airport", isCoastal: true }
+                    { name: "Cork Airport (ORK)", lat: 51.8413, lng: -8.4911, isHub: false, baseDemand: 75, type: "airport", isCoastal: true },
+                    { name: "Crumlin Children's Hospital Heliport (CHIC)", lat: 53.3242, lng: -6.3161, isHub: false, baseDemand: 13, type: "heliport", isCoastal: true }
                 ]
             },
             "Iceland": { unlocked: false, baseCost: 39, continent: "Europe", nation: "Iceland", flag: "🇮🇸", isSplit: false,
@@ -886,14 +929,16 @@
                 ],
                 airports: [
                     { name: "Madrid Barajas (MAD)", lat: 40.4983, lng: -3.5676, isHub: false, baseDemand: 96, type: "airport" },
-                    { name: "Barcelona El Prat (BCN)", lat: 41.2971, lng: 2.0785, isHub: false, baseDemand: 94, type: "airport", isCoastal: true }
+                    { name: "Barcelona El Prat (BCN)", lat: 41.2971, lng: 2.0785, isHub: false, baseDemand: 94, type: "airport", isCoastal: true },
+                    { name: "Hospital San Pau Heliport (LESP)", lat: 41.4128, lng: 2.1744, isHub: false, baseDemand: 12, type: "heliport", isCoastal: true }
                 ]
             },
             "Portugal": { unlocked: false, baseCost: 50, continent: "Europe", nation: "Portugal", flag: "🇵🇹", isSplit: false,
                 polygon: [[42.1,-9.2],[42.1,-6.2],[36.9,-7.4],[36.9,-9.5],[42.1,-9.2]],
                 airports: [
                     { name: "Lisbon Humberto Delgado (LIS)", lat: 38.7742, lng: -9.1342, isHub: false, baseDemand: 88, type: "airport", isCoastal: true },
-                    { name: "Porto Airport (OPO)", lat: 41.2481, lng: -8.6814, isHub: false, baseDemand: 80, type: "airport", isCoastal: true }
+                    { name: "Porto Airport (OPO)", lat: 41.2481, lng: -8.6814, isHub: false, baseDemand: 80, type: "airport", isCoastal: true },
+                    { name: "Cascais Hospital Heliport (LPHC)", lat: 38.7247, lng: -9.4189, isHub: false, baseDemand: 11, type: "heliport", isCoastal: true }
                 ]
             },
             "France": { unlocked: false, baseCost: 53, continent: "Europe", nation: "France", flag: "🇫🇷", isSplit: false,
@@ -908,14 +953,18 @@
                     { name: "Bastia-Poretta (BIA)", lat: 42.5528, lng: 9.4836, isHub: false, baseDemand: 58, type: "airport", isCoastal: true }, // Corsica Island
                     { name: "Figari Sud-Corse (FSC)", lat: 41.5006, lng: 9.0978, isHub: false, baseDemand: 42, type: "airport", isCoastal: true }, // Corsica Island
                     { name: "Ouessant Airport (OUI)", lat: 48.4581, lng: -5.0622, isHub: false, baseDemand: 18, type: "airport", isCoastal: true },  // Atlantic Island Coast
-                    { name: "Toulouse-Blagnac (TLS)", lat: 43.6291, lng: 1.3638, isHub: false, baseDemand: 88, type: "airport" } // Inland
+                    { name: "Toulouse-Blagnac (TLS)", lat: 43.6291, lng: 1.3638, isHub: false, baseDemand: 88, type: "airport" },
+                    { name: "Ajaccio Hospital Helipad (FR-0558)", lat: 41.9311, lng: 8.7619, isHub: false, baseDemand: 8, type: "heliport", isCoastal: true },
+{ name: "L'Archet Hospital Heliport (FR-0194)", lat: 43.6931, lng: 7.2283, isHub: false, baseDemand: 10, type: "heliport", isCoastal: true },
+                    { name: "Gonesse Hospital Heliport (FR-0965)", lat: 48.9847, lng: 2.4439, isHub: false, baseDemand: 12, type: "heliport" }
                 ]
             },
             "Italy": { unlocked: false, baseCost: 56, continent: "Europe", nation: "Italy", flag: "🇮🇹", isSplit: false,
                 polygon: [
                     [[46.6,13.0],[45.6,13.8],[44.8,12.7],[40.0,18.5],[39.9,17.5],[37.9,15.6],[39.5,16.0],[42.5,11.0],[43.70,7.50],[46.05,7.00],[45.8,9.0],[46.8,10.5],[47.0,11.8],[46.7,12.6]],
                     [[38.3,12.5],[38.3,15.6],[36.6,15.1],[37.6,12.4],[38.3,12.5]], // Sicily
-                    [[41.2,9.3],[40.9,9.8],[39.2,9.6],[38.9,8.9],[40.8,8.2],[41.2,9.3]] // Sardinia
+                    [[41.2,9.3],[40.9,9.8],[39.2,9.6],[38.9,8.9],[40.8,8.2],[41.2,9.3]], // Sardinia
+                    [[35.55, 12.5],[35.55, 12.66],[35.48, 12.66],[35.48, 12.46]]
                 ],
                 airports: [
                     { name: "Rome Fiumicino (FCO)", lat: 41.8003, lng: 12.2389, isHub: false, baseDemand: 95, type: "airport", isCoastal: true },
@@ -924,13 +973,25 @@
                     { name: "Cagliari Elmas (CAG)", lat: 39.2514, lng: 9.0542, isHub: false, baseDemand: 60, type: "airport", isCoastal: true },   // Sardinia Island
                     { name: "Catania-Fontanarossa (CTA)", lat: 37.4668, lng: 15.0664, isHub: false, baseDemand: 68, type: "airport", isCoastal: true }, // Sicily Island Coast
                     { name: "Falcone–Borsellino (PMO)", lat: 38.1760, lng: 13.0910, isHub: false, baseDemand: 64, type: "airport", isCoastal: true },  // Sicily Island Coast
+                    { name: "Bolzano Airport (BZO)", lat: 46.4606, lng: 11.3264, isHub: false, baseDemand: 40, type: "airport" },
+{ name: "Lampedusa Airport (LMP)", lat: 35.4981, lng: 12.6178, isHub: false, baseDemand: 48, type: "airport", isCoastal: true },
+                    { name: "Santi Giovanni & Paolo Civil Hospital Helipad (IT-0746)", lat: 45.4394, lng: 12.3425, isHub: false, baseDemand: 12, type: "heliport", isCoastal: true }
+                ]
+            },
+            "Vatican City": { unlocked: false, baseCost: 20, continent: "Europe", nation: "Vatican City", flag: "🇻🇦", isSplit: false,
+                polygon: 
+                    [[41.9070, 12.4458],[41.9074, 12.4588],[41.9005, 12.4587],[41.9001, 12.4453]],
+
+                airports: [
+                    { name: "Eliporto Internazionale della Città del Vaticano (VA-0001)", lat: 41.9022, lng: 12.4439, isHub: false, baseDemand: 15, type: "heliport" }
                 ]
             },
             "Greece": { unlocked: false, baseCost: 50, continent: "Europe", nation: "Greece", flag: "🇬🇷", isSplit: false,
                 polygon: [[41.0,20.8],[39.7,20.0],[38.0,21.0],[36.5,21.5],[36.0,23.0],[35.0,24.0],[35.0,26.5],[38.0,24.0],[41.0,26.0],[41.5,24.0],[40.8,22.0],[41.0,20.8]],
                 airports: [
                     { name: "Athens International (ATH)", lat: 37.9364, lng: 23.9445, isHub: false, baseDemand: 90, type: "airport", isCoastal: true },
-                    { name: "Thessaloniki Airport (SKG)", lat: 40.5197, lng: 22.9709, isHub: false, baseDemand: 78, type: "airport", isCoastal: true }
+                    { name: "Thessaloniki Airport (SKG)", lat: 40.5197, lng: 22.9709, isHub: false, baseDemand: 78, type: "airport", isCoastal: true },
+                    { name: "Grevena General Hospital Heliport (GR-0073)", lat: 40.0767, lng: 21.4342, isHub: false, baseDemand: 8, type: "heliport" }
                 ]
             },
             "Germany": { unlocked: false, baseCost: 56, continent: "Europe", nation: "Germany", flag: "🇩🇪", isSplit: false,
@@ -939,15 +1000,16 @@
                     { name: "Frankfurt (FRA)", lat: 50.0333, lng: 8.5706, isHub: false, baseDemand: 97, type: "airport" },
                     { name: "Munich (MUC)", lat: 48.3538, lng: 11.7861, isHub: false, baseDemand: 90, type: "airport" },
                     { name: "Hamburg (HAM)", lat: 53.6304, lng: 9.9882, isHub: false, baseDemand: 82, type: "airport", isCoastal: true },
-                    { name: "Berlin Brandenburg (BER)", lat: 52.3667, lng: 13.5033, isHub: false, baseDemand: 92, type: "airport", isCoastal: false }
-                    
+                    { name: "Berlin Brandenburg (BER)", lat: 52.3667, lng: 13.5033, isHub: false, baseDemand: 92, type: "airport", isCoastal: false },
+                    { name: "Vivantes Friedrichshain Clinic Heliport (DE-0462)", lat: 52.5264, lng: 13.4389, isHub: false, baseDemand: 15, type: "heliport" }
                 ]
             },
             "Switzerland": { unlocked: false, baseCost: 65, continent: "Europe", nation: "Switzerland", flag: "🇨🇭", isSplit: false,
                 polygon: [[47.8,8.5],[47.5,9.5],[47.27,9.53],[47.05,9.48],[46.8,10.5],[45.8,9.0],[46.2,6.0],[46.5,6.0],[47.5,7.5],[47.8,8.5]],
                 airports: [
                     { name: "Zurich (ZRH)", lat: 47.4647, lng: 8.5492, isHub: false, baseDemand: 92, type: "airport" },
-                    { name: "Geneva (GVA)", lat: 46.2381, lng: 6.1090, isHub: false, baseDemand: 85, type: "airport" }
+                    { name: "Geneva (GVA)", lat: 46.2381, lng: 6.1090, isHub: false, baseDemand: 85, type: "airport" },
+                    { name: "Zürich Triemli City Hospital Heliport (CH-0011)", lat: 47.3644, lng: 8.4975, isHub: false, baseDemand: 14, type: "heliport" }
                 ]
             },
             "Austria": { unlocked: false, baseCost: 60, continent: "Europe", nation: "Austria", flag: "🇦🇹", isSplit: false,
@@ -956,7 +1018,8 @@
                     { name: "Vienna International (VIE)", lat: 48.1103, lng: 16.5697, isHub: false, baseDemand: 88, type: "airport" },
                     { name: "Salzburg Airport (SZG)", lat: 47.7933, lng: 13.0043, isHub: false, baseDemand: 65, type: "airport" },
                     { name: "Wiener Neustadt West (LOXN)", lat: 47.8389, lng: 16.2222, isHub: false, baseDemand: 28, type: "airport" },
-                    { name: "Wiener Neustadt East (LOAN)", lat: 47.8444, lng: 16.2647, isHub: false, baseDemand: 26, type: "airport" }
+                    { name: "Wiener Neustadt East (LOAN)", lat: 47.8444, lng: 16.2647, isHub: false, baseDemand: 26, type: "airport" },
+                    { name: "Wiener Neustadt Hospital Heliport (LOAI)", lat: 47.8114, lng: 16.2372, isHub: false, baseDemand: 10, type: "heliport" }
                 ]
             },
             "Czech Republic": { unlocked: false, baseCost: 60, continent: "Europe", nation: "Czech Republic", flag: "🇨🇿", isSplit: false,
@@ -965,7 +1028,8 @@
                     { name: "Václav Havel Airport Prague (PRG)", lat: 50.1008, lng: 14.2600, isHub: false, baseDemand: 85, type: "airport" },
 { name: "České Budějovice South Bohemian Airport (JCL)", lat: 48.9464, lng: 14.4278, isHub: false, baseDemand: 20, type: "airport" },
 { name: "Leoš Janáček Airport Ostrava (OSR)", lat: 49.6961, lng: 18.1111, isHub: false, baseDemand: 38, type: "airport" },
-{ name: "Karlovy Vary Airport (KLV)", lat: 50.2031, lng: 12.9150, isHub: false, baseDemand: 18, type: "airport" }
+{ name: "Karlovy Vary Airport (KLV)", lat: 50.2031, lng: 12.9150, isHub: false, baseDemand: 18, type: "airport" },
+                    { name: "Brno University Hospital Bohunice Reserve Heliport (LKBN)", lat: 49.1747, lng: 16.5686, isHub: false, baseDemand: 13, type: "heliport" }
                 ]
             },
             "Luxembourg": { unlocked: false, baseCost: 55, continent: "Europe", nation: "Luxembourg", flag: "🇱🇺", isSplit: false,
@@ -978,7 +1042,7 @@
             "Andorra": { unlocked: false, baseCost: 50, continent: "Europe", nation: "Andorra", flag: "🇦🇩", isSplit: false,
                 polygon: [[42.65,1.4],[42.65,1.8],[42.4,1.8],[42.4,1.4],[42.65,1.4]],
                 airports: [
-                    { name: "Andorra la Vella Heliport", lat: 42.5000, lng: 1.5167, isHub: false, baseDemand: 45, type: "heliport" },
+                    { name: "Andorra la Vella (Our Lady of Meritxell Hospital) Heliport (AD-ALV)", lat: 42.5000, lng: 1.5167, isHub: false, baseDemand: 45, type: "heliport" },
                     { name: "Terra Guindaldes Heliport (AD-0001)", lat: 42.5539, lng: 1.5456, isHub: false, baseDemand: 6, type: "heliport" }
                 ]
             },
@@ -1000,7 +1064,8 @@
                 polygon: [[54.4,-4.8],[54.4,-4.2],[54.0,-4.2],[54.0,-4.8],[54.4,-4.8]],
                 airports: [
                     { name: "Isle of Man Airport (IOM)", lat: 54.0833, lng: -4.6239, isHub: false, baseDemand: 50, type: "airport", isCoastal: true },
-                    { name: "Mount Rule Farm Airstrip", lat: 54.1794, lng: -4.5361, isHub: false, baseDemand: 12, type: "airport", isCoastal: false } // Small Island
+                    { name: "Mount Rule Farm Airstrip", lat: 54.1794, lng: -4.5361, isHub: false, baseDemand: 12, type: "airport", isCoastal: false },
+                    { name: "Noble's Hospital Heliport (IM-0005)", lat: 54.1683, lng: -4.5097, isHub: false, baseDemand: 10, type: "heliport", isCoastal: true }
                 ]
             },
             "Jersey": { unlocked: false, baseCost: 42, continent: "Europe", nation: "Jersey", flag: "🇯🇪", isSplit: false,
@@ -1039,7 +1104,8 @@
                 airports: [
                     { name: "Warsaw Chopin (WAW)", lat: 52.1657, lng: 20.9671, isHub: false, baseDemand: 85, type: "airport" },
                     { name: "Kraków John Paul II (KRK)", lat: 50.0777, lng: 19.7848, isHub: false, baseDemand: 75, type: "airport" },
-                    { name: "Gdańsk Lech Wałęsa (GDN)", lat: 54.3776, lng: 18.4662, isHub: false, baseDemand: 68, type: "airport", isCoastal: true }
+                    { name: "Gdańsk Lech Wałęsa (GDN)", lat: 54.3776, lng: 18.4662, isHub: false, baseDemand: 68, type: "airport", isCoastal: true },
+                    { name: "Szczecin Hospital Heliport (H767)", lat: 53.4006, lng: 14.5161, isHub: false, baseDemand: 11, type: "heliport" }
                 ]
             },
             "Cyprus": { unlocked: false, baseCost: 35, continent: "Europe", nation: "Cyprus", flag: "🇨🇾", isSplit: false,
@@ -1060,7 +1126,8 @@
                 polygon: [[39.7,20.0],[40.0,19.3],[41.0,19.4],[42.0,19.3],[42.6,19.8],[42.6,20.6],[41.0,20.8],[39.7,20.0]],
                 airports: [
                     { name: "Tirana Intl (TIA)", lat: 41.4147, lng: 19.7205, isHub: false, baseDemand: 55, type: "airport" },
-                    { name: "Kukës Intl (KFZ)", lat: 42.0353, lng: 20.4158, isHub: false, baseDemand: 35, type: "airport" }
+                    { name: "Kukës Intl (KFZ)", lat: 42.0353, lng: 20.4158, isHub: false, baseDemand: 35, type: "airport" },
+                    { name: "Mother Teresa Hospital Heliport (AL-0004)", lat: 41.3364, lng: 19.8361, isHub: false, baseDemand: 9, type: "heliport" }
                 ]
             },
             "Monaco": { unlocked: false, baseCost: 65, continent: "Europe", nation: "Monaco", flag: "🇲🇨", isSplit: false,
@@ -1079,7 +1146,7 @@
             },
             "Russia": { unlocked: false, baseCost: 75, continent: "Europe", nation: "Russia", flag: "🇷🇺", isSplit: false,
                 polygon: [
-                    [[69.76, 31.4],[69, 29],[62.9, 31.58],[60,28],[56,28],[55.7, 31.26],[52.6, 34],[50,40],[49.26, 40.3],[45.59, 37.5],[45.5, 36.7],[45, 36.5],[43.38, 39.96],[43.6, 40.1],[43.25, 41.65],[43.26, 42.9],[42.5, 45.8],[42.17, 45.7],[41.2, 47.8],[41.89, 48.6],[46.1, 49.38],[48.4, 46.1],[51.77, 48.56],[51.49, 59.4],[54,60],[55.6, 68.89],[54.5, 76.89],[51.49, 80.6],[49.29, 87.6],[50.0,90.0],[52.0,100.0],[49.5,115],[52,120],[53,120],[48,134],[43,131],[42.57,130.6],[43,135],[46,140],[46,160],[65,180],[83,180],[83,170],[83,140],[83,50]],
+                    [[69.76, 31.4],[69, 29],[62.9, 31.58],[60,28],[56,28],[55.7, 31.26],[52.6, 34],[50,40],[49.26, 40.3],[45.59, 37.5],[45.5, 36.7],[45, 36.5],[43.38, 39.96],[43.6, 40.1],[43.25, 41.65],[43.26, 42.9],[42.5, 45.8],[42.17, 45.7],[41.2, 47.8],[41.89, 48.6],[46.1, 49.38],[48.4, 46.1],[51.77, 48.56],[51.49, 59.4],[54,60],[55.6, 68.89],[54.5, 76.89],[51.49, 80.6],[49.29, 87.6],[50.0,90.0],[52.0,100.0],[49.5,115],[52,120],[53,120],[54,122],[48,134],[43,131],[42.57,130.6],[43,135],[46,140],[46,160],[65,180],[83,180],[83,170],[83,140],[83,50]],
                     [[75.3,-180.8],[65.0,-180.0],[64,-170.7],[67,-167.8]], // russia west
                   [[55.0,23.0],[54.3,22.8],[54.6,19.7],[55.3,21.0]] // Kaliningrad
                 ],
@@ -1089,7 +1156,9 @@
                     { name: "Vladivostok (VVO)", lat: 43.3989, lng: 132.1480, isHub: false, baseDemand: 75, type: "airport", isCoastal: true },
                     { name: "Ratmanov (Big Diomede) Heliport (RU-0612)", lat: 65.7772, lng: -169.0625, isHub: false, baseDemand: 5, type: "heliport", isCoastal: true },
 { name: "Lavrentiya Airport (UHML)", lat: 65.5847, lng: -170.9936, isHub: false, baseDemand: 14, type: "airport", isCoastal: true },
-{ name: "Khrabrovo Airport (KGD)", lat: 54.8900, lng: 20.5926, isHub: false, baseDemand: 55, type: "airport", isCoastal: false }
+{ name: "Khrabrovo Airport (KGD)", lat: 54.8900, lng: 20.5926, isHub: false, baseDemand: 55, type: "airport", isCoastal: false },
+                    { name: "Nagurskoye Airfield (UODN)", lat: 80.8031, lng: 47.4117, isHub: false, baseDemand: 5, type: "airport", isCoastal: true },
+{ name: "Yuzhno-Sakhalinsk International Airport (UUS)", lat: 46.8883, lng: 142.7178, isHub: false, baseDemand: 62, type: "airport", isCoastal: true }
                 ]
             },
             "Japan": { unlocked: false, baseCost: 53, continent: "Asia", nation: "Japan", flag: "🇯🇵", isSplit: false,
@@ -1098,17 +1167,21 @@
                     { name: "Tokyo Haneda (HND)", lat: 35.5494, lng: 139.7798, isHub: false, baseDemand: 100, type: "airport", isCoastal: true },
                     { name: "Tokyo Narita (NRT)", lat: 35.7720, lng: 140.3929, isHub: false, baseDemand: 94, type: "airport", isCoastal: true },
                     { name: "Osaka Itami (ITM)", lat: 34.7855, lng: 135.4382, isHub: false, baseDemand: 86, type: "airport", isCoastal: true },
-                    { name: "Ark Hills Heliport Tokyo (ARK)", lat: 35.6672, lng: 139.7401, isHub: false, baseDemand: 80, type: "heliport", isCoastal: true}
-                ]
+                    { name: "Ark Hills Heliport Tokyo (ARK)", lat: 35.6672, lng: 139.7401, isHub: false, baseDemand: 80, type: "heliport", isCoastal: true},
+                    { name: "Ota Memorial Hospital Heliport (JP-2279)", lat: 36.2942, lng: 139.3564, isHub: false, baseDemand: 12, type: "heliport" }
+                ] 
             },
             "China": { unlocked: false, baseCost: 58, continent: "Asia", nation: "China", flag: "🇨🇳", isSplit: false,
-                polygon: [[53,120],[48,134],[43,131],[42,130],[39,124],[34,119],[30,122],[22,114],[20,110],[21,100],[24,97],[27.8,88.2],[31,78],[34, 80],[37.0,74.5],[40,74],[42.1, 80.5],[49.29, 87.6],[45,90],[42,105],[46,120],[49.5,115],[52,120],[53,120]],
+                polygon: [[54,122],[48,134],[43,131],[42,130],[39,124],[34,119],[30,122],[22,114],[18,110],[21,100],[24,97],[27.8,88.2],[31,78],[34, 80],[37.0,74.5],[40,74],[42.1, 80.5],[49.29, 87.6],[45,90],[42,105],[46,120],[49.5,115],[52,120],[53,120]],
                 airports: [
                     { name: "Beijing Capital (PEK)", lat: 40.0799, lng: 116.6031, isHub: false, baseDemand: 99, type: "airport" },
                     { name: "Shanghai Pudong (PVG)", lat: 31.1443, lng: 121.8083, isHub: false, baseDemand: 98, type: "airport", isCoastal: true },
                     { name: "Guangzhou Baiyun (CAN)", lat: 28.3983, lng: 113.2988, isHub: false, baseDemand: 95, type: "airport", isCoastal: true },
                     { name: "Seni Heliport (CN-0370)", lat: 31.4741, lng: 92.0543, isHub: false, baseDemand: 40, type: "heliport" },
-                    { name: "Xi'an Xianyang International Airport (XIY)", lat: 34.4472, lng: 108.7517, isHub: false, baseDemand: 92, type: "airport" }
+                    { name: "Xi'an Xianyang International Airport (XIY)", lat: 34.4472, lng: 108.7517, isHub: false, baseDemand: 92, type: "airport" },
+                    { name: "Taida International Cardiovascular Hospital Heliport (CN-0365)", lat: 39.0308, lng: 117.7125, isHub: false, baseDemand: 15, type: "heliport", isCoastal: true },
+                    { name: "Mohe Gulian Airport (OHE)", lat: 52.9169, lng: 122.4219, isHub: false, baseDemand: 30, type: "airport" },
+{ name: "Sanya Phoenix International Airport (SYX)", lat: 18.3028, lng: 109.4122, isHub: false, baseDemand: 85, type: "airport", isCoastal: true }
                 ]
             },
             "India": { unlocked: false, baseCost: 58, continent: "Asia", nation: "India", flag: "🇮🇳", isSplit: false,
@@ -1142,7 +1215,9 @@
                 airports: [
                     { name: "Kabul International Airport (KBL)", lat: 34.5658, lng: 69.2125, isHub: false, baseDemand: 68, type: "airport" },
 { name: "Herat International Airport (HEA)", lat: 34.2100, lng: 62.2283, isHub: false, baseDemand: 28, type: "airport" },
-{ name: "Ahmad Shah Baba International Airport (KDH)", lat: 31.5058, lng: 65.8478, isHub: false, baseDemand: 32, type: "airport" }
+{ name: "Ahmad Shah Baba International Airport (KDH)", lat: 31.5058, lng: 65.8478, isHub: false, baseDemand: 32, type: "airport" },
+                    { name: "Nimroz Airport (IMZ)", lat: 31.0022, lng: 61.8514, isHub: false, baseDemand: 18, type: "airport" },
+{ name: "Little Pamir Airport (OALP)", lat: 37.1683, lng: 74.3411, isHub: false, baseDemand: 4, type: "airport" }
                 ]
             },
             "Nepal": { unlocked: false, baseCost: 35, continent: "Asia", nation: "Nepal", flag: "🇳🇵", isSplit: false,
@@ -1191,7 +1266,8 @@
                 airports: [
                     { name: "Cairo International (CAI)", lat: 30.1219, lng: 31.4056, isHub: false, baseDemand: 95, type: "airport" },
                     { name: "Hurghada Airport (HRG)", lat: 27.1783, lng: 33.7994, isHub: false, baseDemand: 76, type: "airport", isCoastal: true },
-                    { name: "El Owainat East (GSQ)", lat: 22.5833, lng: 28.7000, isHub: false, baseDemand: 15, type: "airport" }
+                    { name: "El Owainat East (GSQ)", lat: 22.5833, lng: 28.7000, isHub: false, baseDemand: 15, type: "airport" },
+                    { name: "El Arish Military Hospital Helipad (EG-0011)", lat: 31.1192, lng: 33.7917, isHub: false, baseDemand: 6, type: "heliport", isCoastal: true }
                 ]
             },
             "Ethiopia": { unlocked: false, baseCost: 37, continent: "Africa", nation: "Ethiopia", flag: "🇪🇹", isSplit: false,
@@ -1234,16 +1310,18 @@
                 airports: [
                     { name: "Niamey Diori Hamani (NIM)", lat: 13.4815, lng: 2.1836, isHub: false, baseDemand: 50, type: "airport" },
                     { name: "Mano Dayak Intl (AJY)", lat: 16.9667, lng: 7.9904, isHub: false, baseDemand: 35, type: "airport" },
-                    { name: "Tahoua Airport (THZ)", lat: 14.8931, lng: 5.2636, isHub: false, baseDemand: 15, type: "airport" }
+                    { name: "Tahoua Airport (THZ)", lat: 14.8931, lng: 5.2636, isHub: false, baseDemand: 15, type: "airport" },
+                    { name: "Kourou Arkenné Airfield (NE-0002)", lat: 18.2611, lng: 11.9686, isHub: false, baseDemand: 6, type: "airport" }
                 ]
             },
             "South Africa": { unlocked: false, baseCost: 55, continent: "Africa", nation: "South Africa", flag: "🇿🇦", isSplit: false,
-                polygon: [[-22.1,29.4],[-24.0,31.8],[-26.8,32.9],[-32.2,28.8],[-34.2,22.1],[-34.8,20.0],[-28.6,16.4],[-25.7,20.0],[-22.1,29.4]],
+                polygon: [[-22.1,29.4],[-24.0,31.8],[-26.8,32.9],[-32.2,30.8],[-34.2,22.1],[-34.8,18.0],[-28.6,16.4],[-25.7,20.0],[-22.1,29.4]],
                 airports: [
                     { name: "O.R. Tambo (JNB)", lat: -26.1367, lng: 28.2461, isHub: false, baseDemand: 94, type: "airport" },
                     { name: "Cape Town Intl (CPT)", lat: -33.9748, lng: 18.6017, isHub: false, baseDemand: 91, type: "airport", isCoastal: true },
                     { name: "King Shaka Intl (DUR)", lat: -29.6144, lng: 31.1197, isHub: false, baseDemand: 80, type: "airport", isCoastal: true },
-                    { name: "Queenstown Airport (UTW)", lat: -31.9211, lng: 26.8825, isHub: false, baseDemand: 32, type: "airport" }
+                    { name: "Queenstown Airport (UTW)", lat: -31.9211, lng: 26.8825, isHub: false, baseDemand: 32, type: "airport" },
+                    { name: "False Bay Hospital Heliport (ZA-0356)", lat: -34.1378, lng: 18.4239, isHub: false, baseDemand: 8, type: "heliport", isCoastal: true }
                 ]
             },
             "Madagascar": { unlocked: false, baseCost: 45, continent: "Africa", nation: "Madagascar", flag: "🇲🇬", isSplit: false,
@@ -1265,7 +1343,8 @@
                 polygon: [[-40.6,144.6],[-40.6,148.4],[-43.6,148.4],[-43.6,144.6],[-40.6,144.6]],
                 airports: [
                     { name: "Hobart (HBA)", lat: -42.8361, lng: 147.5100, isHub: false, baseDemand: 65, type: "airport", isCoastal: true },
-                    { name: "Launceston (LST)", lat: -41.5453, lng: 147.2140, isHub: false, baseDemand: 50, type: "airport" }
+                    { name: "Launceston (LST)", lat: -41.5453, lng: 147.2140, isHub: false, baseDemand: 50, type: "airport" },
+                    { name: "Bathurst Harbour Airport (YBHB)", lat: -43.3497, lng: 146.1603, isHub: false, baseDemand: 8, type: "airport", isCoastal: true }
                 ]
             },
             "Australian Capital Territory (AU)": { unlocked: false, baseCost: 28, continent: "Oceania", nation: "Australia", flag: "🇦🇺", isSplit: true,
@@ -1304,10 +1383,13 @@
                 ]
             },
             "Queensland (AU)": { unlocked: false, baseCost: 48, continent: "Oceania", nation: "Australia", flag: "🇦🇺", isSplit: true,
-                polygon: [[-10.0,142.0],[-10.0,154.0],[-28.0,154.0],[-29.0,141.0],[-26.0,141.0],[-26.0,138.0],[-10.0,138.0],[-10.0,142.0]],
+                polygon: [
+[[-10.0,142.0],[-10.0,154.0],[-28.0,154.0],[-29.0,141.0],[-26.0,141.0],[-26.0,138.0],[-10.0,138.0],[-10.0,142.0]], [[-9.15,142],[-9.3,143],[-9.6,143],[-9.4,142]]
+                  ],
                 airports: [
                     { name: "Brisbane Airport (BNE)", lat: -27.3842, lng: 153.1170, isHub: false, baseDemand: 90, type: "airport", isCoastal: true },
-                    { name: "Cairns Airport (CNS)", lat: -16.8858, lng: 145.7550, isHub: false, baseDemand: 75, type: "airport", isCoastal: true }
+                    { name: "Cairns Airport (CNS)", lat: -16.8858, lng: 145.7550, isHub: false, baseDemand: 75, type: "airport", isCoastal: true },
+                    { name: "Boigu Island Airport (GIC)", lat: -9.2289, lng: 142.2189, isHub: false, baseDemand: 12, type: "airport", isCoastal: true }
                 ]
             },
             "South Georgia and the South Sandwich Islands": { unlocked: false, baseCost: 35, continent: "Antarctica", nation: "South Georgia", flag: "🇬🇸", isSplit: false,
@@ -1358,16 +1440,20 @@
             "Boeing 777F":              {  name: "Boeing 777F", category: "Cargo", price: 1100000, cargo: 103700, rangeNM: 4970, topSpeedKnots: 511, minRank: 12, iconSize: 34, img: "https://upload.wikimedia.org/wikipedia/commons/thumb/f/f4/N866FD%40PEK_%2820200420152652%29.jpg/1280px-N866FD%40PEK_%2820200420152652%29.jpg", type: "cargo-plane", isCargo: true },
             "Boeing 747-8F":            { name: "Boeing 747-8F",           category: "Cargo", price: 1350000, cargo: 137700,rangeNM: 4120, topSpeedKnots: 490, minRank: 12, iconSize: 36, img: "https://upload.wikimedia.org/wikipedia/commons/thumb/6/60/UPS_Boeing_747-8F_N611UP.jpg/1280px-UPS_Boeing_747-8F_N611UP.jpg", type: "cargo-plane", isCargo: true },
             "Antonov An-124 Ruslan":    { name: "Antonov An-124 Ruslan",   category: "Cargo", price: 2200000, cargo: 150000,rangeNM: 2000, topSpeedKnots: 465, minRank: 13, iconSize: 38, img: "https://upload.wikimedia.org/wikipedia/commons/b/b6/%D0%90%D0%BD%D1%82%D0%BE%D0%BD%D0%BE%D0%B2_%D0%90%D0%BD-124_9773054055093%2C_%D0%9C%D0%BE%D1%81%D0%BA%D0%B2%D0%B0_-_%D0%94%D0%BE%D0%BC%D0%BE%D0%B4%D0%B5%D0%B4%D0%BE%D0%B2%D0%BE_RP2297.jpg", type: "cargo-plane", isCargo: true },
+            "Antonov An-22":    { name: "Antonov An-22",   category: "Cargo", price: 720000, cargo: 80000,rangeNM: 2700, topSpeedKnots: 400, minRank: 12, iconSize: 38, img: "https://upload.wikimedia.org/wikipedia/commons/e/e1/Antonov_An-22A_Antei%2C_Russia_-_Air_Force_AN2203462.jpg", type: "cargo-plane", isCargo: true },
+            "Boeing 747-400 LCF Dreamlifter":    { name: "Boeing 747-400 LCF Dreamlifter",   category: "Cargo", price: 1550000, cargo: 113400,rangeNM: 4200, topSpeedKnots: 471, minRank: 13, iconSize: 38, img: "https://upload.wikimedia.org/wikipedia/commons/thumb/a/a6/Boeing%2C_N780BA%2C_B747-409%28LCF%29_Dreamlifter_-_PAE_%2819833251496%29.jpg/1280px-Boeing%2C_N780BA%2C_B747-409%28LCF%29_Dreamlifter_-_PAE_%2819833251496%29.jpg", type: "cargo-plane", isCargo: true },
             "Antonov An-225 Mriya":     { name: "Antonov An-225 Mriya",    category: "Cargo", price: 5500000, cargo: 250000,rangeNM: 2160, topSpeedKnots: 459, minRank: 14, iconSize: 42, img: "https://upload.wikimedia.org/wikipedia/commons/thumb/b/b5/Antonov_Design_Bureau_Antonov_An-225_Mriya_at_Leipzig_Halle_%28EDDP-LEJ%29.jpg/1280px-Antonov_Design_Bureau_Antonov_An-225_Mriya_at_Leipzig_Halle_%28EDDP-LEJ%29.jpg", type: "cargo-plane", isCargo: true }
         };
       
           const legacyAircraftCatalog = {
-    "Boeing 727-200":  { name: "Boeing 727-200",              category: "Legacy", price: 200000,  pax: 189, rangeNM: 1900, topSpeedKnots: 511, minRank: 15, iconSize: 28, img: "https://upload.wikimedia.org/wikipedia/commons/thumb/1/13/11gg_-_Northwest_Airlines_Boeing_727-251%3B_N203US%40FLL%3B30.01.1998_%288064695962%29.jpg/1280px-11gg_-_Northwest_Airlines_Boeing_727-251%3B_N203US%40FLL%3B30.01.1998_%288064695962%29.jpg", type: "legacy-plane", isCargo: false },
-    "Concorde":        { name: "Aérospatiale-BAC Concorde",    category: "Legacy", price: 1500000, pax: 100, rangeNM: 3900, topSpeedKnots: 1176, minRank: 15, iconSize: 42, img: "https://upload.wikimedia.org/wikipedia/commons/8/86/Concorde_first_visit_Heathrow_Fitzgerald.jpg", type: "legacy-plane", isCargo: false },
-    "Vickers VC10":    { name: "Vickers VC10",                 category: "Legacy", price: 450000,  pax: 151, rangeNM: 4100, topSpeedKnots: 505, minRank: 15, iconSize: 30, img: "https://upload.wikimedia.org/wikipedia/commons/e/e7/Ghana_Airways_VC-10_9G-ABO_LHR_1972-9-17.png", type: "legacy-plane", isCargo: false },
-    "McDonnell Douglas DC-10": { name: "McDonnell Douglas DC-10", category: "Legacy", price: 800000, pax: 380, rangeNM: 4350, topSpeedKnots: 490, minRank: 15, iconSize: 34, img: "https://upload.wikimedia.org/wikipedia/commons/d/d9/Continental_Airlines_DC-10.jpg", type: "legacy-plane", isCargo: false },
-    "McDonnell Douglas MD-11": { name: "McDonnell Douglas MD-11", category: "Legacy", price: 1200000, pax: 410, rangeNM: 6725, topSpeedKnots: 503, minRank: 15, iconSize: 34, img: "https://upload.wikimedia.org/wikipedia/commons/thumb/0/00/McDonnell_Douglas_MD-11P_KLM_PH-KCC.jpg/1280px-McDonnell_Douglas_MD-11P_KLM_PH-KCC.jpg", type: "legacy-plane", isCargo: false },
-     "Boeing 707": { name: "Boeing 707", category: "Legacy", price: 350000, pax: 194, rangeNM: 2900, topSpeedKnots: 394, minRank: 15, iconSize: 30, img: "https://upload.wikimedia.org/wikipedia/commons/0/06/Boeing_707-321B_Pan_Am_Freer.jpg", type: "legacy-plane", isCargo: false },
+    "Boeing 727-200":  { name: "Boeing 727-200",              category: "Legacy", price: 165,  pax: 189, rangeNM: 1900, topSpeedKnots: 511, minRank: 15, iconSize: 28, img: "https://upload.wikimedia.org/wikipedia/commons/thumb/1/13/11gg_-_Northwest_Airlines_Boeing_727-251%3B_N203US%40FLL%3B30.01.1998_%288064695962%29.jpg/1280px-11gg_-_Northwest_Airlines_Boeing_727-251%3B_N203US%40FLL%3B30.01.1998_%288064695962%29.jpg", type: "legacy-plane", isCargo: false },
+            "Boeing 314 Clipper":  { name: "Boeing 314 Clipper", category: "Legacy", price: 45,  pax: 68, rangeNM: 3202, topSpeedKnots: 180, minRank: 15, iconSize: 28, img: "https://upload.wikimedia.org/wikipedia/commons/6/6e/Boeing_314_Clipper-cropped.jpg", type: "legacy-plane", isCargo: false },
+            "Douglas DC-3":  { name: "Douglas DC-3", category: "Legacy", price: 15,  pax: 30, rangeNM: 1370, topSpeedKnots: 223, minRank: 15, iconSize: 28, img: "https://upload.wikimedia.org/wikipedia/commons/d/df/Douglas_DC-3%2C_SE-CFP.jpg", type: "legacy-plane", isCargo: false },
+    "Concorde":        { name: "Aérospatiale-BAC Concorde",    category: "Legacy", price: 750, pax: 100, rangeNM: 3900, topSpeedKnots: 1176, minRank: 15, iconSize: 42, img: "https://upload.wikimedia.org/wikipedia/commons/8/86/Concorde_first_visit_Heathrow_Fitzgerald.jpg", type: "legacy-plane", isCargo: false },
+    "Vickers VC10":    { name: "Vickers VC10",                 category: "Legacy", price: 150,  pax: 151, rangeNM: 4100, topSpeedKnots: 505, minRank: 15, iconSize: 30, img: "https://upload.wikimedia.org/wikipedia/commons/e/e7/Ghana_Airways_VC-10_9G-ABO_LHR_1972-9-17.png", type: "legacy-plane", isCargo: false },
+    "McDonnell Douglas DC-10": { name: "McDonnell Douglas DC-10", category: "Legacy", price: 300, pax: 380, rangeNM: 4350, topSpeedKnots: 490, minRank: 15, iconSize: 34, img: "https://upload.wikimedia.org/wikipedia/commons/d/d9/Continental_Airlines_DC-10.jpg", type: "legacy-plane", isCargo: false },
+    "McDonnell Douglas MD-11": { name: "McDonnell Douglas MD-11", category: "Legacy", price: 400, pax: 410, rangeNM: 6725, topSpeedKnots: 503, minRank: 15, iconSize: 34, img: "https://upload.wikimedia.org/wikipedia/commons/thumb/0/00/McDonnell_Douglas_MD-11P_KLM_PH-KCC.jpg/1280px-McDonnell_Douglas_MD-11P_KLM_PH-KCC.jpg", type: "legacy-plane", isCargo: false },
+     "Boeing 707": { name: "Boeing 707", category: "Legacy", price: 120, pax: 194, rangeNM: 2900, topSpeedKnots: 394, minRank: 15, iconSize: 30, img: "https://upload.wikimedia.org/wikipedia/commons/0/06/Boeing_707-321B_Pan_Am_Freer.jpg", type: "legacy-plane", isCargo: false },
 };
  
         // ===== SECRET AIRCRAFT (crate drops only) =====
@@ -1381,6 +1467,7 @@
             "Mil V-12":   { name: "Mil V-12",       category: "Secret", price: 5000000,  cargo: 44200, rangeNM: 270,  topSpeedKnots: 140, minRank: 1, iconSize: 42, img: "https://upload.wikimedia.org/wikipedia/commons/6/68/Mil_V-12_prototype.jpg", type: "helicopter", isCargo: true },
             "Scaled Composites Model 351 Stratolaunch":   { name: "Scaled Composites Model 351 Stratolaunch",       category: "Secret", price: 15000000,  cargo: 250000, rangeNM: 1000,  topSpeedKnots: 460, minRank: 1, iconSize: 44, img: "https://upload.wikimedia.org/wikipedia/commons/thumb/b/b6/230113-_Stratolaunch_Talon_Photo_Chase-091.jpg/1280px-230113-_Stratolaunch_Talon_Photo_Chase-091.jpg", type: "plane", isCargo: true },
             "Kaman K-MAX":   { name: "Kaman K-MAX",       category: "Secret", price: 800000,  cargo: 2342, rangeNM: 300,  topSpeedKnots: 80, minRank: 1, iconSize: 28, img: "https://upload.wikimedia.org/wikipedia/commons/thumb/5/50/Kaman_K-1200_Rotex.jpg/1280px-Kaman_K-1200_Rotex.jpg", type: "helicopter", isCargo: true },
+            "A-90 Orlyonok":   { name: "A-90 Orlyonok",       category: "Secret", price: 2500000,  cargo: 28000, rangeNM: 810,  topSpeedKnots: 220, minRank: 1, iconSize: 28, img: "https://upload.wikimedia.org/wikipedia/commons/thumb/8/89/A-90_Orlyonok_4.JPG/1280px-A-90_Orlyonok_4.JPG", type: "plane", isCargo: true },
         };
  
         // ===== ACHIEVEMENTS =====
@@ -1404,29 +1491,45 @@
             "token_collector":  { title: "Token Hoarder",            desc: "Accumulate 500 AeroTokens at once",                     unlocked: false, badge: "🎫", rewardDesc: "$20,000" },
             "crate_hunter":     { title: "Crate Hunter",             desc: "Claim 10 supply crates",                                unlocked: false, badge: "📫", rewardDesc: "+50 AeroTokens" },
             "boost_collector":  { title: "Speed Junkie",             desc: "Collect a speed boost from a crate",                    unlocked: false, badge: "⚡", rewardDesc: "+20 AeroTokens" },
-            "superstan":        { title: "SuperStan (CURRENTLY IMPOSSIBLE)",                desc: "Have routes to all -stan nations (Pakistan, Afghanistan, Kazakhstan, Kyrgyzstan, Uzbekistan, Tajikistan)", unlocked: false, badge: "🌍", rewardDesc: "$200,000 and +50 AeroTokens" },
             "lindbergh":        { title: "Charles Lindbergh",        desc: "Have an active route between New York City and Paris",   unlocked: false, badge: "🗽", rewardDesc: "$500,000 and +100 AeroTokens" },
             "continental_drifter": { title: "Continental Drifter",   desc: "Have routes to all 7 continents",                       unlocked: false, badge: "🌐", rewardDesc: "$750,000 and +150 AeroTokens" },
             "first_crash":         { title: "Oh No...",              desc: "Experience your first aircraft crash",                   unlocked: false, badge: "💥", rewardDesc: "+5 AeroTokens (small consolation)" },
             "down_under":       { title: "Down Under",               desc: "Unlock all Australian states and territories",          unlocked: false, badge: "🦘", rewardDesc: "$250,000 and +50 AeroTokens" },
-            "worldwide_mastermind": { title: "Worldwide Mastermind", desc: "Have an active route to every single airport and heliport", unlocked: false,badge: "🧠",rewardDesc: "$5,000,000 and +1,000 AeroTokens" },
-            "pro_aviation_collector": { title: "Pro Aviation Collector", desc: "Own at least one of every aircraft, including Mythics", unlocked: false, badge: "🛫",rewardDesc: "$2,000,000 and +500 AeroTokens"},
+            "worldwide_mastermind": { title: "Worldwide Mastermind", desc: "Have an active route to every single airport and heliport (hospitals excluded)", unlocked: false,badge: "🧠",rewardDesc: "$5,000,000 and +1,000 AeroTokens" },
             "syrup_enjoyer":    { title: "Syrup Enjoyer",            desc: "Unlock all available Canadian provinces",               unlocked: false, badge: "🍁", rewardDesc: "$100,000 and +25 AeroTokens" },
             "first_refuel":     { title: "Refueling...",             desc: "Refuel an aircraft for the first time",                 unlocked: false, badge: "⛽", rewardDesc: "+5 AeroTokens" },
             "first_repair":     { title: "Repairing...",             desc: "Repair an aircraft for the first time",                 unlocked: false, badge: "🔧", rewardDesc: "+5 AeroTokens" },
-            "bad_financial_decision": { title: "Bad Financial Decision", desc: "Open a route to the airport with the lowest global demand", unlocked: false, badge: "📉", rewardDesc: "+10 AeroTokens" }
+            "bad_financial_decision": { title: "Bad Financial Decision", desc: "Open a route to the airport with the lowest global demand", unlocked: false, badge: "📉", rewardDesc: "+10 AeroTokens" },
+            "purchasable_collector": { title: "Standard Fleet Operator", desc: "Own at least one of every purchasable passenger, cargo, and legacy aircraft", unlocked: false, badge: "🛫", rewardDesc: "$1,000,000 and +250 AeroTokens", rarity: "Epic" },
+    "mythic_collector": { title: "Mythic Aviator", desc: "Own at least one of every mythical secret aircraft", unlocked: false, badge: "🔥", rewardDesc: "$5,000,000 and +500 AeroTokens", rarity: "Mythic" },
+    "wright_flyer_collector": { title: "Wright Brothers", desc: "Collect the legendary Wright Flyer from a crate", unlocked: false, badge: "📜", rewardDesc: "$50,000 and +100 AeroTokens", rarity: "Legendary" },
+    "route_ca_ns": { title: "North to South - CA", desc: "Have a route from the northernmost Canadian airport to the southernmost", unlocked: false, badge: "🇨🇦", rewardDesc: "$50,000 and +20 AeroTokens", rarity: "Rare" },
+    "route_au_ns": { title: "North to South - AU", desc: "Have a route from the northernmost Australian airport to the southernmost", unlocked: false, badge: "🇦🇺", rewardDesc: "$50,000 and +20 AeroTokens", rarity: "Rare" },
+    "route_ru_ns": { title: "North to South - RU", desc: "Have a route from the northernmost Russian airport to the southernmost", unlocked: false, badge: "🇷🇺", rewardDesc: "$50,000 and +20 AeroTokens", rarity: "Rare" },
+    "route_ne_ns": { title: "North to South - NE", desc: "Have a route from the northernmost Nigerien airport to the southernmost", unlocked: false, badge: "🇳🇪", rewardDesc: "$50,000 and +20 AeroTokens", rarity: "Rare" },
+    "route_cu_we": { title: "West to East - CU", desc: "Have a route from the Westernmost Cuban airport to the Easternmost", unlocked: false, badge: "🇨🇺", rewardDesc: "$50,000 and +20 AeroTokens", rarity: "Rare" },
+    "route_cn_ns": { title: "North to South - CN", desc: "Have a route from the northernmost Chinese airport to the southernmost", unlocked: false, badge: "🇨🇳", rewardDesc: "$50,000 and +20 AeroTokens", rarity: "Rare" },
+    "route_af_we": { title: "West to East - AF", desc: "Have a route from the westernmost Afghan airport to the easternmost", unlocked: false, badge: "🇦🇫", rewardDesc: "$50,000 and +20 AeroTokens", rarity: "Rare" },
+    "route_it_ns": { title: "North to South - IT", desc: "Have a route from the northernmost Italian airport to the southernmost", unlocked: false, badge: "🇮🇹", rewardDesc: "$50,000 and +20 AeroTokens", rarity: "Rare" },
+            "first_common":     { title: "Common Collecting",             desc: "Get a common reward from a crate for the first time",         unlocked: false, badge: "🩶", rewardDesc: "+2 AeroTokens" },
+            "first_uncommon":     { title: "Uncommon Collecting",             desc: "Get an uncommon reward from a crate for the first time",    unlocked: false, badge: "💚", rewardDesc: "+5 AeroTokens" },
+            "first_rare":     { title: "Rare Collecting",             desc: "Get a rare reward from a crate for the first time",                 unlocked: false, badge: "💙", rewardDesc: "+10 AeroTokens" },
+            "first_epic":     { title: "Epic Collecting",             desc: "Get an epic reward from a crate for the first time",                 unlocked: false, badge: "💜", rewardDesc: "+20 AeroTokens" },
+            "first_legendary":     { title: "Legendary Collecting",             desc: "Get a legendary reward from a crate for the first time",   unlocked: false, badge: "💛", rewardDesc: "+35 AeroTokens" },
+            "first_mythic":     { title: "Mythic Collecting",             desc: "Get a mythical reward from a crate for the first time",   unlocked: false, badge: "❤️‍🔥", rewardDesc: "+75 AeroTokens" },
         };
  
         const DEFAULT_STATE = {
             cash: 0, tokens: 0, rank: 1, xp: 0, airlineName: "", primaryHub: "",
             hangar: {},
-            routes: [], distanceUnit: "NM", speedUnit: "KN", showRouteLines: true, multiplierX: 2500, tutorialActive: false, tutorialFastForward: false, interactiveStage: 0, lightTheme: false,
+            routes: [], distanceUnit: "NM", speedUnit: "KN", showRouteLines: true, showHospitals: true, multiplierX: 2500, tutorialActive: false, tutorialFastForward: false, interactiveStage: 0, lightTheme: false,
             speedBoostEndTime: 0, cratesClaimed: 0,
             aircraftStats: {},       // keyed by fleet id: { fuel: 100, condition: 100 }
             voluntarilyGrounded: {} // set of fleet ids that the player manually grounded
         };
  
         let gameState = {};
+        let globalGroundState = false;
         let map, baseMapLayer = null, regionLayers = {};
         let activeFlightMarkers = {};
         let currentActiveContract = null;
@@ -1484,6 +1587,7 @@
             { id: "Lockheed Martin SR-72",  label: "Lockheed Martin SR-72",  icon: "🔥", rarity: "mythic",    rarityLabel: "MYTHIC",   weight: 0.3,apply: (gs) => { gs.hangar["Lockheed Martin SR-72"] = (gs.hangar["Lockheed Martin SR-72"]||0)+1; } },
             { id: "Scaled Composites Model 351 Stratolaunch",  label: "Scaled Composites Model 351 Stratolaunch",  icon: "🔥", rarity: "mythic",    rarityLabel: "MYTHIC",   weight: 0.3,apply: (gs) => { gs.hangar["Scaled Composites Model 351 Stratolaunch"] = (gs.hangar["Scaled Composites Model 351 Stratolaunch"]||0)+1; } },
             { id: "Kaman K-MAX",  label: "Kaman K-MAX",  icon: "🔥", rarity: "mythic",    rarityLabel: "MYTHIC",   weight: 0.3,apply: (gs) => { gs.hangar["Kaman K-MAX"] = (gs.hangar["Kaman K-MAX"]||0)+1; } },
+            { id: "A-90 Orlyonok",  label: "A-90 Orlyonok",  icon: "🔥", rarity: "mythic",    rarityLabel: "MYTHIC",   weight: 0.3,apply: (gs) => { gs.hangar["A-90 Orlyonok"] = (gs.hangar["A-90 Orlyonok"]||0)+1; } },
         ];
  
         function unlockSecretAchievement(id) {
@@ -1584,26 +1688,157 @@
         }
  
         function toggleVoluntaryGround(routeId, fleetId) {
-            if (!gameState.voluntarilyGrounded) gameState.voluntarilyGrounded = {};
-            if (gameState.voluntarilyGrounded[fleetId]) {
-                // Unground — aircraft will take off after cooldown expires
-                delete gameState.voluntarilyGrounded[fleetId];
-                // Give it a full cooldown to simulate loading
-                setAircraftStat(fleetId, 'cooldownTicks', COOLDOWN_TICKS);
-            } else {
-                // Only allow grounding when at an airport/heliport (in cooldown on the ground)
-                const route = gameState.routes.find(r => r.id === routeId);
-                if (route) {
-                    const f = route.fleet.find(fl => fl.id === fleetId);
-                    if (f && !isInCooldown(fleetId)) {
-                        alert("Aircraft can only be grounded at airports or heliports. Wait for it to land first.");
-                        return;
+    if (!gameState.voluntarilyGrounded) gameState.voluntarilyGrounded = {};
+    if (!gameState.pendingGround) gameState.pendingGround = {};
+
+    if (gameState.voluntarilyGrounded[fleetId]) {
+        // Unground — aircraft will take off after cooldown expires
+        delete gameState.voluntarilyGrounded[fleetId];
+        setAircraftStat(fleetId, 'cooldownTicks', COOLDOWN_TICKS);
+    } else if (gameState.pendingGround[fleetId]) {
+        // Cancel the pending ground instruction
+        delete gameState.pendingGround[fleetId];
+    } else {
+        if (isInCooldown(fleetId)) {
+            // It's on the ground, ground it immediately
+            gameState.voluntarilyGrounded[fleetId] = true;
+        } else {
+            // It's flying, tag it to ground when it lands
+            gameState.pendingGround[fleetId] = true;
+        }
+    }
+    saveProgress(); updateUI();
+}
+        function toggleGroundAll() {
+    globalGroundState = !globalGroundState;
+    if (!gameState.voluntarilyGrounded) gameState.voluntarilyGrounded = {};
+    if (!gameState.pendingGround) gameState.pendingGround = {};
+
+    gameState.routes.forEach(route => {
+        if (route.fleet) {
+            route.fleet.forEach(f => {
+                if (globalGroundState) {
+                    if (isInCooldown(f.id)) gameState.voluntarilyGrounded[f.id] = true;
+                    else gameState.pendingGround[f.id] = true;
+                } else {
+                    delete gameState.voluntarilyGrounded[f.id];
+                    delete gameState.pendingGround[f.id];
+                    // If it was grounded and ready, trigger takeoff cooldown
+                    if (f.progress === 0 && !isInCooldown(f.id)) {
+                        setAircraftStat(f.id, 'cooldownTicks', COOLDOWN_TICKS);
                     }
                 }
-                gameState.voluntarilyGrounded[fleetId] = true;
-            }
-            saveProgress(); updateUI();
+            });
         }
+    });
+    saveProgress(); updateUI();
+}
+
+function refuelAllGrounded() {
+    const allCrafts = { ...aircraftCatalog, ...cargoCatalog, ...legacyAircraftCatalog, ...secretCatalog };
+    let totalNeededCost = 0;
+    let refueledCount = 0;
+
+    gameState.routes.forEach(route => {
+        if (route.fleet) {
+            route.fleet.forEach(f => {
+                const fuel = getAircraftStat(f.id, 'fuel');
+                const needed = 100 - fuel;
+                const isLanded = isInCooldown(f.id) || gameState.voluntarilyGrounded[f.id];
+
+                if (isLanded && needed > 0) {
+                    const basePrice = allCrafts[f.type]?.price || 100000;
+                    totalNeededCost += Math.ceil(needed * Math.max(1, basePrice * 0.0005));
+                }
+            });
+        }
+    });
+
+    if (totalNeededCost === 0) return alert("No grounded aircraft need refueling.");
+    if (gameState.cash < totalNeededCost) return alert(`Insufficient funds. Need $${totalNeededCost.toLocaleString()} to refuel all grounded aircraft.`);
+
+    gameState.cash -= totalNeededCost;
+
+    gameState.routes.forEach(route => {
+        if (route.fleet) {
+            route.fleet.forEach(f => {
+                const fuel = getAircraftStat(f.id, 'fuel');
+                if ((isInCooldown(f.id) || gameState.voluntarilyGrounded[f.id]) && (100 - fuel) > 0) {
+                    setAircraftStat(f.id, 'fuel', 100);
+                    refueledCount++;
+                    // Auto-resume maintenance flights
+                    if (gameState.voluntarilyGrounded[f.id] === "maintenance") {
+                        const craftSpec = allCrafts[f.type];
+                        if (getAircraftStat(f.id, 'condition') > (100 * (route.distanceNM / craftSpec.rangeNM) * 0.2)) {
+                            delete gameState.voluntarilyGrounded[f.id];
+                            setAircraftStat(f.id, 'cooldownTicks', COOLDOWN_TICKS);
+                        }
+                    }
+                }
+            });
+        }
+    });
+
+    if (!achievements.first_refuel.unlocked && refueledCount > 0) {
+        achievements.first_refuel.unlocked = true;
+        gameState.tokens += 5;
+    }
+    saveProgress(); updateUI();
+    triggerMilestonePopupNotification("Fleet Refueled!", `Refueled ${refueledCount} aircraft for $${totalNeededCost.toLocaleString()}`);
+}
+
+function repairAllGrounded() {
+    const allCrafts = { ...aircraftCatalog, ...cargoCatalog, ...legacyAircraftCatalog, ...secretCatalog };
+    let totalNeededCost = 0;
+    let repairedCount = 0;
+
+    gameState.routes.forEach(route => {
+        if (route.fleet) {
+            route.fleet.forEach(f => {
+                const cond = getAircraftStat(f.id, 'condition');
+                const needed = 100 - cond;
+                const isLanded = isInCooldown(f.id) || gameState.voluntarilyGrounded[f.id];
+
+                if (isLanded && needed > 0) {
+                    const basePrice = allCrafts[f.type]?.price || 100000;
+                    totalNeededCost += Math.ceil(needed * Math.max(1, basePrice * 0.0015));
+                }
+            });
+        }
+    });
+
+    if (totalNeededCost === 0) return alert("No grounded aircraft need repairs.");
+    if (gameState.cash < totalNeededCost) return alert(`Insufficient funds. Need $${totalNeededCost.toLocaleString()} to repair all grounded aircraft.`);
+
+    gameState.cash -= totalNeededCost;
+
+    gameState.routes.forEach(route => {
+        if (route.fleet) {
+            route.fleet.forEach(f => {
+                const cond = getAircraftStat(f.id, 'condition');
+                if ((isInCooldown(f.id) || gameState.voluntarilyGrounded[f.id]) && (100 - cond) > 0) {
+                    setAircraftStat(f.id, 'condition', 100);
+                    repairedCount++;
+                    // Auto-resume maintenance flights
+                    if (gameState.voluntarilyGrounded[f.id] === "maintenance") {
+                        const craftSpec = allCrafts[f.type];
+                        if (getAircraftStat(f.id, 'fuel') > (100 * (route.distanceNM / craftSpec.rangeNM))) {
+                            delete gameState.voluntarilyGrounded[f.id];
+                            setAircraftStat(f.id, 'cooldownTicks', COOLDOWN_TICKS);
+                        }
+                    }
+                }
+            });
+        }
+    });
+
+    if (!achievements.first_repair.unlocked && repairedCount > 0) {
+        achievements.first_repair.unlocked = true;
+        gameState.tokens += 5;
+    }
+    saveProgress(); updateUI();
+    triggerMilestonePopupNotification("Fleet Repaired!", `Repaired ${repairedCount} aircraft for $${totalNeededCost.toLocaleString()}`);
+}
  
         function showCrashModal(aircraftType, reason) {
             const box = document.getElementById('crash-box');
@@ -1634,7 +1869,8 @@
             if (!f) return;
             const inCooldown = isInCooldown(fleetId);
             const voluntGrnd = isVoluntarilyGrounded(fleetId);
-            if (!inCooldown && !voluntGrnd) { alert("Aircraft must be on the ground (in cooldown or grounded) to refuel!"); return; }
+            const isLanded = inCooldown || voluntGrnd || gameState.voluntarilyGrounded[fleetId] === "maintenance";
+if (!isLanded) { alert("Aircraft must be on the ground to refuel!"); return; }
             const fuel = getAircraftStat(fleetId, 'fuel');
             const needed = 100 - fuel;
             if (needed <= 0) { alert("Already full!"); return; }
@@ -1675,7 +1911,8 @@ const cost = Math.ceil(needed * dynamicRefuelCost);
             if (!f) return;
             const inCooldown = isInCooldown(fleetId);
             const voluntGrnd = isVoluntarilyGrounded(fleetId);
-            if (!inCooldown && !voluntGrnd) { alert("Aircraft must be on the ground (in cooldown or grounded) to repair!"); return; }
+            const isLanded = inCooldown || voluntGrnd || gameState.voluntarilyGrounded[fleetId] === "maintenance";
+if (!isLanded) { alert("Aircraft must be on the ground to repair!"); return; }
             const cond = getAircraftStat(fleetId, 'condition');
             const needed = 100 - cond;
             if (needed <= 0) { alert("Already in perfect condition!"); return; }
@@ -1915,6 +2152,27 @@ const cost = Math.ceil(needed * dynamicRepairCost);
             claimBtn.style.opacity = '0.5';
             const prize = pendingReelPrize;
             pendingReelPrize = null;
+            
+            const rarityAchievements = {
+    common:    { id: "first_common",    reward: 2  },
+    uncommon:  { id: "first_uncommon",  reward: 5  },
+    rare:      { id: "first_rare",      reward: 10 },
+    epic:      { id: "first_epic",      reward: 20 },
+    legendary: { id: "first_legendary", reward: 35 },
+    mythic:    { id: "first_mythic",    reward: 75 }
+};
+
+const rarityData = rarityAchievements[prize.rarity];
+
+if (rarityData && !achievements[rarityData.id].unlocked) {
+    achievements[rarityData.id].unlocked = true;
+    gameState.tokens += rarityData.reward;
+
+    triggerMilestonePopupNotification(
+        achievements[rarityData.id].title,
+        achievements[rarityData.id].rewardDesc
+    );
+}
  
             prize.apply(gameState);
  
@@ -2179,10 +2437,33 @@ const cost = Math.ceil(needed * dynamicRepairCost);
                         if (completedLegs % 2 !== 0) f.directionForward = !f.directionForward;
                         if (completedLegs > 0) {
                             if (route.isSpecialContract) {
-                                earnedCash += route.rewardCash;
-                                gameState.hangar[f.type] = (gameState.hangar[f.type] || 0) + 1;
-                                route.fleet.splice(i, 1);
-                                earnedXp += Math.round(route.distanceNM);
+                                if (route.contractLegs && route.contractLegs.length > 0) {
+                                    // Advance all completed legs offline (simplified: jump to last leg or complete)
+                                    let legIdx = (route.currentLegIndex || 0) + completedLegs;
+                                    if (legIdx >= route.contractLegs.length) {
+                                        // Contract completed offline
+                                        earnedCash += route.rewardCash;
+                                        gameState.hangar[f.type] = (gameState.hangar[f.type] || 0) + 1;
+                                        route.fleet.splice(i, 1);
+                                        earnedXp += Math.round(route.distanceNM);
+                                    } else {
+                                        // Advance to the leg we stopped at
+                                        const nextLeg = route.contractLegs[legIdx];
+                                        route.origLat = route.destLat; route.origLng = route.destLng;
+                                        route.destination = nextLeg.name || `Waypoint ${legIdx + 1}`;
+                                        route.destLat = nextLeg.lat; route.destLng = nextLeg.lng;
+                                        route.currentLegIndex = legIdx;
+                                        const newDist = Math.max(10, Math.round(L.latLng(route.origLat, route.origLng).distanceTo(L.latLng(route.destLat, route.destLng)) / 1852));
+                                        route.distanceNM = newDist;
+                                        if (ac) f.speed = (ac.topSpeedKnots / newDist) * SPEED_SCALE_FACTOR;
+                                        f.progress = 0; f.directionForward = true;
+                                    }
+                                } else {
+                                    earnedCash += route.rewardCash;
+                                    gameState.hangar[f.type] = (gameState.hangar[f.type] || 0) + 1;
+                                    route.fleet.splice(i, 1);
+                                    earnedXp += Math.round(route.distanceNM);
+                                }
                             } else {
                                 const isCargo = ac && ac.isCargo;
                                 const mult = isCargo ? CARGO_EARNINGS_MULTIPLIER : EARNINGS_MULTIPLIER;
@@ -2316,10 +2597,16 @@ const cost = Math.ceil(needed * dynamicRepairCost);
             gameState.showRouteLines = show;
             updateUI();
         }
+        function toggleHospitalMarkers(show) {
+    gameState.showHospitals = show;
+    renderMapGraphics();
+    updateUI();
+}
  
         function openSettingsScreen() { 
             document.getElementById('theme-toggle-checkbox').checked = !gameState.lightTheme;
             document.getElementById('route-line-checkbox').checked = gameState.showRouteLines;
+            document.getElementById('hospital-marker-checkbox').checked = gameState.showHospitals !== false;
             setDistanceUnit(gameState.distanceUnit || 'NM');
             setSpeedUnit(gameState.speedUnit || 'KN');
             document.getElementById('settings-screen').style.display = 'flex'; 
@@ -2334,7 +2621,9 @@ const cost = Math.ceil(needed * dynamicRepairCost);
                 regionLayers[name] = L.polygon(polyData, { color, weight: 2, fillOpacity: 0.08, dashArray: data.unlocked ? null : "4, 4" }).addTo(map);
                 if (data.unlocked) {
                     data.airports.forEach(ap => {
-                        const fill = ap.isHub ? '#eab308' : (ap.type === "heliport" ? '#a855f7' : '#06b6d4');
+                        const isHospital = ap.type === "heliport" && ['hospital','health','medical','clinic','infirmary'].some(t => ap.name.toLowerCase().includes(t));
+if (!gameState.showHospitals && isHospital) return; // Add this line
+                        const fill = ap.isHub ? '#eab308' : (isHospital ? '#ef4444' : (ap.type === "heliport" ? '#a855f7' : '#06b6d4'));
                         L.circleMarker([ap.lat, ap.lng], { radius: ap.isHub ? 7 : 5, color: '#ffffff', weight: 1, fillColor: fill, fillOpacity: 1 }).addTo(map)
                             .bindPopup(`<b>${ap.name}</b><br>Type: ${ap.type.toUpperCase()}<br>Base Demand: ${ap.baseDemand}%`);
                     });
@@ -2357,14 +2646,153 @@ const cost = Math.ceil(needed * dynamicRepairCost);
             return (Math.atan2(dy, dx) * (180 / Math.PI) + 90) % 360;
         }
  
+        // ===== CONTRACT HELPER FUNCTIONS =====
+
+        /** Returns a random {lat, lng} land point within ~rangeDeg degrees of a center point.
+         *  Avoids pure ocean by biasing toward the center if no land hint available. */
+        function getRandomLandPoint(centerLat, centerLng, rangeDeg) {
+            // Generate a random offset (rough land approximation — just random point in range)
+            const lat = centerLat + (Math.random() * 2 - 1) * rangeDeg;
+            const lng = centerLng + (Math.random() * 2 - 1) * rangeDeg;
+            return { lat: Math.max(-85, Math.min(85, lat)), lng: ((lng + 180) % 360) - 180 };
+        }
+        function validateContractLegs(hub, legs, aircraftRangeNM) {
+    let prevLat = hub.lat;
+    let prevLng = hub.lng;
+
+    for (const leg of legs) {
+        const distNM = Math.round(
+            L.latLng(prevLat, prevLng)
+             .distanceTo(L.latLng(leg.lat, leg.lng)) / 1852
+        );
+
+        if (distNM > aircraftRangeNM) {
+            return false;
+        }
+
+        prevLat = leg.lat;
+        prevLng = leg.lng;
+    }
+
+    return true;
+}
+
+        /** Finds the nearest unlocked airport with "hospital" or "heliport" in its name/type,
+         *  or any heliport, within maxRangeNM of a given lat/lng.
+         *  Returns an airport object or null. */
+        function findNearestHospital(fromLat, fromLng, maxRangeNM) {
+            let best = null, bestDist = Infinity;
+            for (const r of Object.values(regions)) {
+                if (!r.unlocked) continue;
+                for (const ap of r.airports) {
+                    // Prefer heliports (hospitals often have heliports) or names containing "hospital"
+                    if (ap.type !== 'heliport' && !['hospital','health','medical','clinic','infirmary'].some(t => ap.name.toLowerCase().includes(t))) continue;
+                    const dNM = Math.round(L.latLng(fromLat, fromLng).distanceTo(L.latLng(ap.lat, ap.lng)) / 1852);
+                    if (dNM <= maxRangeNM && dNM < bestDist) {
+                        bestDist = dNM; best = ap;
+                    }
+                }
+            }
+            return best;
+        }
+
+        /** Returns a random unlocked airport (not the excluded one). */
+        function findRandomUnlockedAirport(excludeName) {
+            let pool = [];
+            for (const r of Object.values(regions)) {
+                if (!r.unlocked) continue;
+                r.airports.forEach(ap => { if (ap.name !== excludeName && ap.type !== 'heliport') pool.push(ap); });
+            }
+            if (pool.length === 0) return null;
+            return pool[Math.floor(Math.random() * pool.length)];
+        }
+        function findRandomAirportInRange(originAirport, maxRangeNM, excludeName = null) {
+    let pool = [];
+
+    for (const r of Object.values(regions)) {
+        if (!r.unlocked) continue;
+
+        for (const ap of r.airports) {
+            if (ap.name === excludeName) continue;
+            if (ap.type === 'heliport') continue;
+
+            const distNM = Math.round(
+                L.latLng(originAirport.lat, originAirport.lng)
+                 .distanceTo(L.latLng(ap.lat, ap.lng)) / 1852
+            );
+
+            if (distNM <= maxRangeNM) {
+                pool.push(ap);
+            }
+        }
+    }
+
+    if (pool.length === 0) return null;
+    return pool[Math.floor(Math.random() * pool.length)];
+}
+
+        /** Build a multi-leg contract route and push it to gameState.routes.
+         *  legs: array of {lat, lng, name} waypoints — the aircraft flies each in order.
+         *  On the last leg arrival it pays rewardCash and returns the aircraft to hangar. */
+        function pushMultiLegContract(type, legs, rewardCash, contractLabel) {
+            const allCrafts = { ...aircraftCatalog, ...cargoCatalog, ...legacyAircraftCatalog, ...secretCatalog };
+            const hub = findAirportData(gameState.primaryHub);
+            if (!hub || legs.length === 0) return;
+            gameState.hangar[type]--;
+            const firstLeg = legs[0];
+            const distNM = Math.max(10, Math.round(L.latLng(hub.lat, hub.lng).distanceTo(L.latLng(firstLeg.lat, firstLeg.lng)) / 1852));
+            const speed = (allCrafts[type].topSpeedKnots / Math.max(10, distNM)) * SPEED_SCALE_FACTOR;
+            gameState.routes.push({
+                id: Date.now(),
+                origin: hub.name,
+                destination: firstLeg.name || 'Contract Waypoint 1',
+                origLat: hub.lat, origLng: hub.lng,
+                destLat: firstLeg.lat, destLng: firstLeg.lng,
+                distanceNM: distNM,
+                routeDemand: 100,
+                isSpecialContract: true,
+                rewardCash: rewardCash,
+                contractLabel: contractLabel || '',
+                contractLegs: legs,          // full waypoint list (index 0 = first destination)
+                currentLegIndex: 0,          // which leg we are currently flying toward
+                contractOriginHub: hub.name, // remember hub for SAR/medevac fallback
+                fleet: [{ id: Date.now() + Math.random(), type, progress: 0, directionForward: true, speed }]
+            });
+        }
+
         function rollContractChance() {
             if (document.getElementById('contract-modal').style.display === 'flex') return;
             if (Math.random() > 0.15) return;
-            const hub = findAirportData(gameState.primaryHub);
-            if (!hub) return;
+            let ownedHubs = [];
+for (const r of Object.values(regions)) {
+    if (r.unlocked) {
+        r.airports.forEach(a => { if (a.isHub) ownedHubs.push(a); });
+    }
+}
+if (ownedHubs.length === 0) return;
+const hub = ownedHubs[Math.floor(Math.random() * ownedHubs.length)];
             const allCrafts = { ...aircraftCatalog, ...cargoCatalog, ...legacyAircraftCatalog, ...secretCatalog };
- 
+
             let possibleContracts = [];
+          
+          function findValidContractDestination(originAirport, maxRangeNM, excludeName = null) {
+    let pool = [];
+    for (const r of Object.values(regions)) {
+        if (!r.unlocked) continue;
+        for (const ap of r.airports) {
+            if (ap.name === excludeName) continue;
+            if (ap.type === 'heliport') continue; 
+            const distNM = Math.round(L.latLng(originAirport.lat, originAirport.lng).distanceTo(L.latLng(ap.lat, ap.lng)) / 1852);
+            if (distNM <= maxRangeNM) {
+                pool.push(ap);
+            }
+        }
+    }
+    if (pool.length === 0) return null;
+    return pool[Math.floor(Math.random() * pool.length)];
+}
+
+            // ── EXISTING CONTRACTS ──────────────────────────────────────────────────────
             if ((gameState.hangar["Bell 407 Helicopter"] || 0) > 0) possibleContracts.push({ type: "Bell 407 Helicopter", title: "🚁 Urgent VIP Transport", desc: "A VIP transport is needed immediately from your hub.", reward: 40000, dist: 140 });
             if ((gameState.hangar["Lockheed SR-71 Blackbird"] || 0) > 0) possibleContracts.push({ type: "Lockheed SR-71 Blackbird", title: "✈️ Classified Reconnaissance", desc: "Military high-command requires an immediate Mach-3 flyover.", reward: 250000, dist: 2800 });
             if ((gameState.hangar["Messerschmitt Me 323 Gigant"] || 0) > 0) possibleContracts.push({ type: "Messerschmitt Me 323 Gigant", title: "📦 Heavy Cargo Haul", desc: "A massive industrial payload needs specialized airlift.", reward: 180000, dist: 500 });
@@ -2377,13 +2805,200 @@ const cost = Math.ceil(needed * dynamicRepairCost);
                     if (dNM <= 1000) possibleContracts.push({ type: "Lun-Class Ekranoplan", destAp: pick, title: "🌊 Naval Intercept", desc: `Transport maritime assets to ${pick.name.split(' (')[0]}.`, reward: 850000, dist: dNM });
                 }
             }
+
+            // ── BELL 407: Search & Rescue ────────────────────────────────────────────────
+            if ((gameState.hangar["Bell 407 Helicopter"] || 0) > 0) {
+                // Scene point within 150 NM of hub
+                const scene = getRandomLandPoint(hub.lat, hub.lng, 1.5);
+                // 5 search waypoints near the scene
+                const searchWaypoints = Array.from({length: 5}, (_, i) => {
+                    const p = getRandomLandPoint(scene.lat, scene.lng, 0.4);
+                    return { lat: p.lat, lng: p.lng, name: `SAR Search Point ${i+1}` };
+                });
+                // Final destination: nearest hospital within 200 NM of last waypoint, else hub
+                const lastWp = searchWaypoints[4];
+                const hospital = findNearestHospital(lastWp.lat, lastWp.lng, 200);
+                const finalDest = hospital
+                    ? { lat: hospital.lat, lng: hospital.lng, name: hospital.name }
+                    : { lat: hub.lat, lng: hub.lng, name: hub.name };
+                const legs = [
+                    { lat: scene.lat, lng: scene.lng, name: 'SAR Scene' },
+                    ...searchWaypoints,
+                    finalDest
+                ];
+                possibleContracts.push({
+                    type: "Bell 407 Helicopter",
+                    title: "🆘 Search & Rescue",
+                    desc: `Emergency SAR operation. Fly to the scene, conduct a 5-point search grid, then deliver the survivor to ${hospital ? hospital.name.split(' (')[0] : 'base'}.`,
+                    reward: 95000,
+                    multiLeg: true,
+                    legs: legs,
+                    label: "Search & Rescue"
+                });
+            }
+
+            // ── BELL 407: Medical Evacuation ─────────────────────────────────────────────
+            if ((gameState.hangar["Bell 407 Helicopter"] || 0) > 0) {
+                const pickupPt = getRandomLandPoint(hub.lat, hub.lng, 1.2);
+                const hospital = findNearestHospital(pickupPt.lat, pickupPt.lng, 250);
+                const finalDest = hospital
+                    ? { lat: hospital.lat, lng: hospital.lng, name: hospital.name }
+                    : { lat: hub.lat, lng: hub.lng, name: hub.name };
+                const legs = [
+                    { lat: pickupPt.lat, lng: pickupPt.lng, name: 'Medevac Pickup Site' },
+                    finalDest
+                ];
+                possibleContracts.push({
+                    type: "Bell 407 Helicopter",
+                    title: "🏥 Medical Evacuation",
+                    desc: `Urgent MEDEVAC. Fly to the patient location, then transport them to ${hospital ? hospital.name.split(' (')[0] : 'base'}.`,
+                    reward: 65000,
+                    multiLeg: true,
+                    legs: legs,
+                    label: "Medical Evacuation"
+                });
+            }
+
+            // ── SKYCRANE: Wild Fire Fighting ─────────────────────────────────────────────
+            if ((gameState.hangar["Sikorsky S-64 Skycrane"] || 0) > 0) {
+                const fireScene = getRandomLandPoint(hub.lat, hub.lng, 1.8);
+                const drops = Array.from({length: 3}, (_, i) => {
+                    const p = getRandomLandPoint(fireScene.lat, fireScene.lng, 0.3);
+                    return { lat: p.lat, lng: p.lng, name: `Fire Drop Point ${i+1}` };
+                });
+                const legs = [
+                    { lat: fireScene.lat, lng: fireScene.lng, name: 'Wildfire Zone' },
+                    ...drops,
+                    { lat: hub.lat, lng: hub.lng, name: hub.name }
+                ];
+                possibleContracts.push({
+                    type: "Sikorsky S-64 Skycrane",
+                    title: "🔥 Wild Fire Fighting",
+                    desc: "Deploy to the wildfire zone, make 5 retardant drops across the fire line, then return to base.",
+                    reward: 350000,
+                    multiLeg: true,
+                    legs: legs,
+                    label: "Wild Fire Fighting"
+                });
+            }
+
+            // ── SKYCRANE / K-MAX: Construction Lift ──────────────────────────────────────
+            if ((gameState.hangar["Sikorsky S-64 Skycrane"] || 0) > 0 || (gameState.hangar["Kaman K-MAX"] || 0) > 0) {
+                const constructType = (gameState.hangar["Sikorsky S-64 Skycrane"] || 0) > 0 ? "Sikorsky S-64 Skycrane" : "Kaman K-MAX";
+                const site = getRandomLandPoint(hub.lat, hub.lng, 1.5);
+                const legs = [
+                    { lat: site.lat, lng: site.lng, name: 'Construction Site' },
+                    { lat: hub.lat, lng: hub.lng, name: hub.name }
+                ];
+                possibleContracts.push({
+                    type: constructType,
+                    title: "🏗️ Construction Lift",
+                    desc: "Transport heavy construction materials to the build site, then return to base.",
+                    reward: 180000,
+                    multiLeg: true,
+                    legs: legs,
+                    label: "Construction Lift"
+                });
+            }
+
+            // ── AN-225: Rocket Parts Transport ───────────────────────────────────────────
+            if ((gameState.hangar["Antonov An-225 Mriya"] || 0) > 0) {
+                const destAp = findValidContractDestination(hub.name);
+                if (destAp) {
+                    const dNM = Math.max(200, Math.round(L.latLng(hub.lat, hub.lng).distanceTo(L.latLng(destAp.lat, destAp.lng)) / 1852));
+                    possibleContracts.push({
+                        type: "Antonov An-225 Mriya",
+                        title: "🚀 Rocket Parts Transport",
+                        desc: `Haul oversized rocket components from your hub to ${destAp.name.split(' (')[0]}.`,
+                        reward: 1200000,
+                        dist: dNM,
+                        destAp: destAp
+                    });
+                }
+            }
+
+            // ── AN-225 / 747-8F / AN-124: Wind Turbine Delivery ──────────────────────────
+            const windTurbineTypes = ["Antonov An-225 Mriya", "Boeing 747-8F", "Antonov An-124 Ruslan"];
+            const windTurbineAvail = windTurbineTypes.find(t => (gameState.hangar[t] || 0) > 0);
+            if (windTurbineAvail) {
+                const destAp = findValidContractDestination(hub.name);
+                if (destAp) {
+                    const dNM = Math.max(200, Math.round(L.latLng(hub.lat, hub.lng).distanceTo(L.latLng(destAp.lat, destAp.lng)) / 1852));
+                    possibleContracts.push({
+                        type: windTurbineAvail,
+                        title: "🌬️ Wind Turbine Delivery",
+                        desc: `Transport oversized wind turbine blades to ${destAp.name.split(' (')[0]}.`,
+                        reward: 900000,
+                        dist: dNM,
+                        destAp: destAp
+                    });
+                }
+            }
+
+            // ── AN-225 / 747-8F / AN-124: Humanitarian Aid ───────────────────────────────
+            const aidTypes = ["Antonov An-225 Mriya", "Boeing 747-8F", "Antonov An-124 Ruslan"];
+            const aidAvail = aidTypes.find(t => (gameState.hangar[t] || 0) > 0);
+            if (aidAvail) {
+                const destAp = findValidContractDestination(hub.name);
+                if (destAp) {
+                    const dNM = Math.max(200, Math.round(L.latLng(hub.lat, hub.lng).distanceTo(L.latLng(destAp.lat, destAp.lng)) / 1852));
+                    possibleContracts.push({
+                        type: aidAvail,
+                        title: "🤝 Humanitarian Aid",
+                        desc: `Deliver emergency relief supplies to ${destAp.name.split(' (')[0]}.`,
+                        reward: 750000,
+                        dist: dNM,
+                        destAp: destAp
+                    });
+                }
+            }
+
+            // ── 747-8: 5th Engine Transport ──────────────────────────────────────────────
+            if ((gameState.hangar["Boeing 747-8"] || 0) > 0) {
+                const aircraftRange = aircraftCatalog["Boeing 747-8"].rangeNM;
+
+const destAp = findValidContractDestination(
+    hub,
+    aircraftRange,
+    hub.name
+);
+                if (destAp) {
+                    const dNM = Math.max(200, Math.round(L.latLng(hub.lat, hub.lng).distanceTo(L.latLng(destAp.lat, destAp.lng)) / 1852));
+                    possibleContracts.push({
+                        type: "Boeing 747-8",
+                        title: "✈️ 5th Engine Transport",
+                        desc: `Mount a spare engine on the wing pylon and deliver it to ${destAp.name.split(' (')[0]}.`,
+                        reward: 480000,
+                        dist: dNM,
+                        destAp: destAp
+                    });
+                }
+            }
+
+            // ── CONCORDE: VIP Flight ─────────────────────────────────────────────────────
+            if ((gameState.hangar["Aérospatiale-BAC Concorde"] || 0) > 0 || (gameState.hangar["Concorde"] || 0) > 0) {
+                const concordeType = (gameState.hangar["Aérospatiale-BAC Concorde"] || 0) > 0 ? "Aérospatiale-BAC Concorde" : "Concorde";
+                const destAp = findValidContractDestination(hub.name);
+                if (destAp) {
+                    const dNM = Math.max(500, Math.round(L.latLng(hub.lat, hub.lng).distanceTo(L.latLng(destAp.lat, destAp.lng)) / 1852));
+                    possibleContracts.push({
+                        type: concordeType,
+                        title: "👑 VIP Flight",
+                        desc: `A high-profile VIP requires supersonic charter service to ${destAp.name.split(' (')[0]}.`,
+                        reward: 1800000,
+                        dist: dNM,
+                        destAp: destAp
+                    });
+                }
+            }
+
             if (possibleContracts.length === 0) return;
- 
+
             currentActiveContract = possibleContracts[Math.floor(Math.random() * possibleContracts.length)];
             let rarityText = "COMMON", rarityColor = "#94a3b8";
-            if (currentActiveContract.reward >= 600000)      { rarityText = "LEGENDARY"; rarityColor = "#eab308"; }
-            else if (currentActiveContract.reward >= 300000) { rarityText = "EPIC";      rarityColor = "#a855f7"; }
-            else if (currentActiveContract.reward >= 150000) { rarityText = "RARE";      rarityColor = "#06b6d4"; }
+            if (currentActiveContract.reward >= 1500000)     { rarityText = "LEGENDARY"; rarityColor = "#eab308"; }
+            else if (currentActiveContract.reward >= 600000) { rarityText = "EPIC";      rarityColor = "#a855f7"; }
+            else if (currentActiveContract.reward >= 300000) { rarityText = "RARE";      rarityColor = "#06b6d4"; }
             else if (currentActiveContract.reward >= 50000)  { rarityText = "UNCOMMON";  rarityColor = "#10b981"; }
             const rarSpan = document.getElementById('contract-rarity');
             rarSpan.innerText = `[${rarityText} BOUNTY]`; rarSpan.style.color = rarityColor; rarSpan.style.border = `1px solid ${rarityColor}`;
@@ -2397,15 +3012,29 @@ const cost = Math.ceil(needed * dynamicRepairCost);
             if (!currentActiveContract || (gameState.hangar[currentActiveContract.type] || 0) <= 0) return;
             const type = currentActiveContract.type;
             const allCrafts = { ...aircraftCatalog, ...cargoCatalog, ...legacyAircraftCatalog, ...secretCatalog };
-            gameState.hangar[type]--;
             const hub = findAirportData(gameState.primaryHub);
-            const distNM = currentActiveContract.dist;
-            const contractSpeed = (allCrafts[type].topSpeedKnots / distNM) * SPEED_SCALE_FACTOR;
-            let destLat = hub.lat + (Math.random() * 5 - 2.5);
-            let destLng = hub.lng + (Math.random() * 5 - 2.5);
-            let destName = "Classified Coordinate";
-            if (currentActiveContract.destAp) { destLat = currentActiveContract.destAp.lat; destLng = currentActiveContract.destAp.lng; destName = currentActiveContract.destAp.name; }
-            gameState.routes.push({ id: Date.now(), origin: hub.name, destination: destName, origLat: hub.lat, origLng: hub.lng, destLat, destLng, distanceNM: distNM, routeDemand: 100, isSpecialContract: true, rewardCash: currentActiveContract.reward, fleet: [{ id: Date.now(), type, progress: 0, directionForward: true, speed: contractSpeed }] });
+
+            if (currentActiveContract.multiLeg && currentActiveContract.legs) {
+                // Multi-leg contract: use pushMultiLegContract helper
+                pushMultiLegContract(type, currentActiveContract.legs, currentActiveContract.reward, currentActiveContract.label || currentActiveContract.title);
+            } else {
+                // Single-leg contract (existing behavior)
+                gameState.hangar[type]--;
+                const distNM = currentActiveContract.dist;
+                const contractSpeed = (allCrafts[type].topSpeedKnots / Math.max(10, distNM)) * SPEED_SCALE_FACTOR;
+                let destLat = hub.lat + (Math.random() * 5 - 2.5);
+                let destLng = hub.lng + (Math.random() * 5 - 2.5);
+                let destName = "Classified Coordinate";
+                if (currentActiveContract.destAp) { destLat = currentActiveContract.destAp.lat; destLng = currentActiveContract.destAp.lng; destName = currentActiveContract.destAp.name; }
+                gameState.routes.push({
+                    id: Date.now(), origin: hub.name, destination: destName,
+                    origLat: hub.lat, origLng: hub.lng, destLat, destLng,
+                    distanceNM: distNM, routeDemand: 100,
+                    isSpecialContract: true, rewardCash: currentActiveContract.reward,
+                    fleet: [{ id: Date.now(), type, progress: 0, directionForward: true, speed: contractSpeed }]
+                });
+            }
+
             document.getElementById('contract-modal').style.display = 'none';
             currentActiveContract = null; saveProgress(); updateUI();
         }
@@ -2557,6 +3186,8 @@ const cost = Math.ceil(needed * dynamicRepairCost);
                             htmlContent = `<img src="${VICKERS_ICON_B64}" style="transform:rotate(${bearing}deg); width:28px; height:28px; cursor:pointer; filter: drop-shadow(0 0 2px #000) ${dimFilter};">`;
                         } else if (f.type === "Airbus A380") {
                             htmlContent = `<img src="${QUEEN_ICON_B64}" style="transform:rotate(${bearing}deg); width:28px; height:28px; cursor:pointer; filter: drop-shadow(0 0 2px #000) ${dimFilter};">`;
+                        } else if (f.type === "Boeing 747-8" && route.contractLabel && route.contractLabel.includes('5th Engine')) {
+                            htmlContent = `<img src="${FIFTH_ENGINE_ICON_B64}" style="transform:rotate(${bearing}deg); width:28px; height:28px; cursor:pointer; filter: drop-shadow(0 0 2px #000) ${dimFilter};">`;
                         } else if (f.type === "Boeing 747-8") {
                             htmlContent = `<img src="${KING_ICON_B64}" style="transform:rotate(${bearing}deg); width:28px; height:28px; cursor:pointer; filter: drop-shadow(0 0 2px #000) ${dimFilter};">`;
                         } else if (f.type === "Antonov An-124 Ruslan") {
@@ -2577,6 +3208,16 @@ const cost = Math.ceil(needed * dynamicRepairCost);
                             htmlContent = `<img src="${WRIGHT_ICON_B64}" style="transform:rotate(${bearing}deg); width:28px; height:28px; cursor:pointer; filter: drop-shadow(0 0 2px #000) ${dimFilter};">`;
                         } else if (f.type === "Lockheed Martin SR-72") {
                             htmlContent = `<img src="${SPEEDSTER_ICON_B64}" style="transform:rotate(${bearing}deg); width:28px; height:28px; cursor:pointer; filter: drop-shadow(0 0 2px #000) ${dimFilter};">`;
+                        } else if (f.type === "Douglas DC-3") {
+                            htmlContent = `<img src="${OLDDOUG_ICON_B64}" style="transform:rotate(${bearing}deg); width:28px; height:28px; cursor:pointer; filter: drop-shadow(0 0 2px #000) ${dimFilter};">`;
+                        } else if (f.type === "Boeing 314 Clipper") {
+                            htmlContent = `<img src="${CLIPPER_ICON_B64}" style="transform:rotate(${bearing}deg); width:28px; height:28px; cursor:pointer; filter: drop-shadow(0 0 2px #000) ${dimFilter};">`;
+                        } else if (f.type === "Boeing 747-400 LCF Dreamlifter") {
+                            htmlContent = `<img src="${DREAMLIFTER_ICON_B64}" style="transform:rotate(${bearing}deg); width:28px; height:28px; cursor:pointer; filter: drop-shadow(0 0 2px #000) ${dimFilter};">`;
+                        } else if (f.type === "Antonov An-22") {
+                            htmlContent = `<img src="${ANTWOTWO_ICON_B64}" style="transform:rotate(${bearing}deg); width:28px; height:28px; cursor:pointer; filter: drop-shadow(0 0 2px #000) ${dimFilter};">`;
+                        } else if (f.type === "A-90 Orlyonok") {
+                            htmlContent = `<img src="${ORLYONOK_ICON_B64}" style="transform:rotate(${bearing}deg); width:28px; height:28px; cursor:pointer; filter: drop-shadow(0 0 2px #000) ${dimFilter};">`;
                         } else {
                             let glyph = isHeli ? `<img src="${HELICOPTER_ICON_B64}` : (isCargo ? '📦' : '✈');
                             let color = isHeli ? '#c084fc' : (isCargo ? '#f97316' : '#eab308');
@@ -2594,7 +3235,7 @@ const cost = Math.ceil(needed * dynamicRepairCost);
                         }
  
                         const isLegacy = craftSpec && craftSpec.type === 'legacy-plane';
-                        const typeLabel = isCargo ? '📦 CARGO' : (isHeli ? '🚁 HELICOPTER' : (isLegacy ? '🏛 LEGACY' : '✈ PASSENGER'));
+                        const typeLabel = isCargo ? '📦 CARGO' : (isHeli ? '🚁 HELICOPTER' : (isLegacy ? '🕰️ LEGACY' : '✈ PASSENGER'));
                         const capacityLabel = isCargo
                             ? `<span style="color:#f97316;">📦 ${craftSpec.cargo?.toLocaleString()}kg cargo</span>`
                             : `<span style="color:#06b6d4;">👥 ${craftSpec?.pax || 0} PAX</span>`;
@@ -2618,18 +3259,53 @@ const cost = Math.ceil(needed * dynamicRepairCost);
  
                         // === LEG COMPLETION ===
                         if (!isGrounded && f.progress >= 100) {
-                            let legsFinished = Math.floor(f.progress / 100);
-                            f.progress = f.progress % 100;
-                            if (legsFinished % 2 !== 0) f.directionForward = !f.directionForward;
- 
-                            // Start ground cooldown
-                            setAircraftStat(f.id, 'cooldownTicks', COOLDOWN_TICKS);
+    let legsFinished = Math.floor(f.progress / 100);
+    f.progress = f.progress % 100;
+    if (legsFinished % 2 !== 0) f.directionForward = !f.directionForward;
+    setAircraftStat(f.id, 'cooldownTicks', COOLDOWN_TICKS);
+
+    // ADD THIS NEW BLOCK: Transfer pending ground to actual ground upon landing
+    if (gameState.pendingGround && gameState.pendingGround[f.id]) {
+        gameState.voluntarilyGrounded[f.id] = true;
+        delete gameState.pendingGround[f.id];
+    }
  
                             if (route.isSpecialContract) {
-                                gameState.cash += route.rewardCash;
-                                gameState.hangar[f.type] = (gameState.hangar[f.type] || 0) + 1;
-                                route.fleet.splice(i, 1);
-                                gameState.xp += Math.round(route.distanceNM);
+                                // Multi-leg contract: advance to next waypoint
+                                if (route.contractLegs && route.contractLegs.length > 0) {
+                                    const nextLegIndex = (route.currentLegIndex || 0) + 1;
+                                    if (nextLegIndex < route.contractLegs.length) {
+                                        // Move to next leg
+                                        const nextLeg = route.contractLegs[nextLegIndex];
+                                        route.origin = route.destination;
+                                        route.origLat = route.destLat;
+                                        route.origLng = route.destLng;
+                                        route.destination = nextLeg.name || `Waypoint ${nextLegIndex + 1}`;
+                                        route.destLat = nextLeg.lat;
+                                        route.destLng = nextLeg.lng;
+                                        route.currentLegIndex = nextLegIndex;
+                                        const allCraftsInner = { ...aircraftCatalog, ...cargoCatalog, ...legacyAircraftCatalog, ...secretCatalog };
+                                        const newDist = Math.max(10, Math.round(L.latLng(route.origLat, route.origLng).distanceTo(L.latLng(route.destLat, route.destLng)) / 1852));
+                                        route.distanceNM = newDist;
+                                        f.speed = (allCraftsInner[f.type].topSpeedKnots / newDist) * SPEED_SCALE_FACTOR;
+                                        f.directionForward = true;
+                                        f.progress = 0;
+                                        triggerMilestonePopupNotification(`📍 ${route.contractLabel || 'Contract'}`, `Waypoint ${nextLegIndex}/${route.contractLegs.length} reached — flying to next point`);
+                                    } else {
+                                        // All legs done — pay out and return aircraft
+                                        gameState.cash += route.rewardCash;
+                                        gameState.hangar[f.type] = (gameState.hangar[f.type] || 0) + 1;
+                                        route.fleet.splice(i, 1);
+                                        gameState.xp += Math.round(route.distanceNM);
+                                        triggerMilestonePopupNotification(`✅ ${route.contractLabel || 'Contract'} Complete`, `+$${route.rewardCash.toLocaleString()}`);
+                                    }
+                                } else {
+                                    // Single-leg special contract (original behavior)
+                                    gameState.cash += route.rewardCash;
+                                    gameState.hangar[f.type] = (gameState.hangar[f.type] || 0) + 1;
+                                    route.fleet.splice(i, 1);
+                                    gameState.xp += Math.round(route.distanceNM);
+                                }
                             } else {
                                 const mult = isCargo ? CARGO_EARNINGS_MULTIPLIER : EARNINGS_MULTIPLIER;
                                 const unit = isCargo ? (craftSpec?.cargo || 0) : (craftSpec?.pax || 0);
@@ -2733,6 +3409,10 @@ updateUI();
 
             if (type === "Lun-Class Ekranoplan" && (!origAp?.isCoastal || !destAp?.isCoastal)) { alert("The Lun-Class Ekranoplan can only operate between coastal airports!");
             return; }
+            if (type === "A-90 Orlyonok" && (!origAp?.isCoastal || !destAp?.isCoastal)) { alert("The A-90 Orlyonok can only operate between coastal airports!");
+            return; }
+            if (type === "Boeing 314 Clipper" && (!origAp?.isCoastal || !destAp?.isCoastal)) { alert("The Boeing 314 Clipper can only operate between coastal airports!");
+            return; }
             // ... (rest of the function remains the same)
             if (type === "Hughes H-4 Hercules" && (!origAp?.isCoastal || !destAp?.isCoastal)) { alert("The Hughes H-4 Hercules can only operate between coastal airports!"); return; }
             if ((gameState.hangar[type] || 0) <= 0 || allCrafts[type].rangeNM < route.distanceNM) { alert("Invalid selection or insufficient range."); return; }
@@ -2767,7 +3447,7 @@ updateUI();
             else if (catalogType === 'legacy') allCatalog = legacyAircraftCatalog;
             else allCatalog = aircraftCatalog;
             const spec = allCatalog[type] || legacyAircraftCatalog[type] || aircraftCatalog[type] || cargoCatalog[type];
-            const typeLabel = spec.type === 'helicopter' ? '🚁' : (spec.isCargo ? '📦' : (spec.type === 'legacy-plane' ? '🏛' : '✈'));
+            const typeLabel = spec.type === 'helicopter' ? '🚁' : (spec.isCargo ? '📦' : (spec.type === 'legacy-plane' ? '🕰️' : '✈'));
             document.getElementById('market-modal-title').innerText = `${spec.name} ${typeLabel}`;
             document.getElementById('market-modal-img').style.backgroundImage = `url('${spec.img}')`;
             const unitLabel = spec.isCargo ? `Cargo Capacity: ${spec.cargo?.toLocaleString()}kg` : `Payload: ${spec.pax} Seats`;
@@ -2776,9 +3456,18 @@ updateUI();
                 <div class="flex-row"><span>${unitLabel.split(':')[0]}:</span><span style="color:var(--text-color);font-weight:bold;">${unitLabel.split(': ')[1]}</span></div>
                 <div class="flex-row"><span>Range:</span><span>${convertDistance(spec.rangeNM)}</span></div>
                 <div class="flex-row"><span>Speed:</span><span style="color:var(--token-color);font-weight:bold;">${convertSpeed(spec.topSpeedKnots)}</span></div>
-                <div class="flex-row"><span>Cost per Unit:</span><span style="color:${gameState.cash>=spec.price?'var(--money-color)':'#ef4444'};font-weight:bold;">$${spec.price.toLocaleString()}</span></div>
+                <div class="flex-row">
+    <span>Cost per Unit:</span>
+    <span style="font-weight:bold;">
+        ${
+            spec.type === "legacy-plane"
+            ? `✈ ${spec.price.toLocaleString()}`
+            : `$${spec.price.toLocaleString()}`
+        }
+    </span>
+</div>
                 ${spec.isCargo ? `<div style="font-size:10px;color:var(--cargo-color);margin-top:6px;font-weight:bold;">📦 CARGO: Earns per KG per NM — high value routes!</div>` : ''}
-                ${spec.type === 'legacy-plane' ? `<div style="font-size:10px;color:#a855f7;margin-top:6px;font-weight:bold;">🏛 LEGACY: Iconic retired airliner!</div>` : ''}`;
+                ${spec.type === 'legacy-plane' ? `<div style="font-size:10px;color:#a855f7;margin-top:6px;font-weight:bold;">🕰️ LEGACY: Iconic retired airliner!</div>` : ''}`;
             document.getElementById('market-modal-qty').value = 1;
             const btn = document.getElementById('market-modal-buy-btn');
             if (gameState.rank < spec.minRank) { btn.disabled = true; btn.innerText = "Rank Too Low"; }
@@ -2788,33 +3477,44 @@ updateUI();
         function closeMarketModal() { document.getElementById('market-modal').style.display = 'none'; selectedBulkAircraft = null; }
  
         function executeBulkBuy() {
-            if (!selectedBulkAircraft) return;
-            const allCrafts = { ...aircraftCatalog, ...cargoCatalog, ...legacyAircraftCatalog, ...secretCatalog };
-            const spec = allCrafts[selectedBulkAircraft];
-            let qty = parseInt(document.getElementById('market-modal-qty').value) || 1;
-            if (qty < 1) qty = 1;
-            const totalCost = spec.price * qty;
-            if (gameState.cash < totalCost) { alert("Insufficient funds."); return; }
-            gameState.cash -= totalCost;
-            if (!gameState.hangar[selectedBulkAircraft]) gameState.hangar[selectedBulkAircraft] = 0;
-            gameState.hangar[selectedBulkAircraft] += qty;
-            if (spec.type === 'helicopter' && !achievements.spinning_around.unlocked) {
-                achievements.spinning_around.unlocked = true;
-                gameState.cash += 10000; gameState.tokens += 10;
-                triggerMilestonePopupNotification(achievements.spinning_around.title, achievements.spinning_around.rewardDesc);
-            }
-            if (gameState.tutorialActive && gameState.interactiveStage === 1) { gameState.interactiveStage = 2; renderCurrentTutorialStep(); }
-            closeMarketModal(); checkMilestones(); saveProgress(); updateUI();
+    if (!selectedBulkAircraft) return;
+
+    const allCrafts = { ...aircraftCatalog, ...cargoCatalog, ...legacyAircraftCatalog, ...secretCatalog };
+    const spec = allCrafts[selectedBulkAircraft];
+
+    let qty = parseInt(document.getElementById('market-modal-qty').value) || 1;
+    if (qty < 1) qty = 1;
+
+    const totalCost = spec.price * qty;
+
+    const isLegacy = spec.type === "legacy-plane";
+
+    if (isLegacy) {
+        if (gameState.tokens < totalCost) {
+            alert("Insufficient AeroTokens.");
+            return;
         }
- 
-        function sellAircraft(type) {
-            const allCrafts = { ...aircraftCatalog, ...cargoCatalog, ...legacyAircraftCatalog, ...secretCatalog };
-            if ((gameState.hangar[type] || 0) > 0) {
-                gameState.hangar[type]--;
-                gameState.cash += Math.floor(allCrafts[type].price * 0.25);
-                saveProgress(); updateUI();
-            }
+        gameState.tokens -= totalCost;
+    } else {
+        if (gameState.cash < totalCost) {
+            alert("Insufficient funds.");
+            return;
         }
+        gameState.cash -= totalCost;
+    }
+
+    if (!gameState.hangar[selectedBulkAircraft]) {
+        gameState.hangar[selectedBulkAircraft] = 0;
+    }
+
+    gameState.hangar[selectedBulkAircraft] += qty;
+
+    closeMarketModal();
+    checkMilestones();
+    saveProgress();
+    updateUI();
+}
+        
  
         function getShortestDistanceToHubs(regionData) {
             let shortest = Infinity, targetHubs = [];
@@ -2846,27 +3546,46 @@ updateUI();
         }
  
         function buildDirectoryTree() {
-            const container = document.getElementById('directory-tree');
-            container.innerHTML = '';
-            let activeAirports = new Set();
-            // Turn airport green if ANY route exists to/from it (not just when aircraft are flying)
-            gameState.routes.forEach(r => { activeAirports.add(r.origin); activeAirports.add(r.destination); });
-            for (const cont in regions) {
-                const r = regions[cont];
-                if (r.unlocked) {
-                    const el = document.createElement('div'); el.className = 'card';
-                    let flagHtml = typeof r.flag === 'string' && r.flag.startsWith('http') ? `<img src="${r.flag}" class="flag-icon"> ` : r.flag + ' ';
-                    let apHtml = r.airports.map(ap => {
-                        const isActive = activeAirports.has(ap.name);
-                        const color = isActive ? 'var(--money-color)' : '#64748b';
-                        const dot = isActive ? '<span style="display:inline-block;width:7px;height:7px;border-radius:50%;background:var(--money-color);margin-right:5px;vertical-align:middle;"></span>' : '<span style="display:inline-block;width:7px;height:7px;border-radius:50%;background:#475569;margin-right:5px;vertical-align:middle;"></span>';
-                        return `<div style="margin-left:10px;font-size:12px;color:${color};padding:2px 0;display:flex;align-items:center;">${dot}${ap.type === 'heliport' ? '🚁' : '🛫'} ${ap.name}</div>`;
-                    }).join('');
-                    el.innerHTML = `<h4 style="margin-bottom:5px;">${flagHtml}${r.nation} - ${cont}</h4>${apHtml}`;
-                    container.appendChild(el);
-                }
-            }
+    const container = document.getElementById('directory-tree');
+    let activeAirports = new Set();
+    let totalAirports = 0;
+    
+    for (const cont in regions) {
+        if (regions[cont].unlocked) totalAirports += regions[cont].airports.length;
+    }
+    
+    gameState.routes.forEach(r => { activeAirports.add(r.origin); activeAirports.add(r.destination); });
+    
+    const pct = totalAirports === 0 ? 0 : Math.round((activeAirports.size / totalAirports) * 100);
+    
+    let htmlStr = `
+        <div style="margin-bottom: 15px; background: rgba(0,0,0,0.2); padding: 10px; border-radius: 8px;">
+            <div style="display:flex; justify-content:space-between; font-size:12px; margin-bottom:4px;">
+                <span>Connected Airports: ${activeAirports.size} / ${totalAirports}</span>
+                <span style="color:var(--money-color); font-weight:bold;">${pct}%</span>
+            </div>
+            <div class="stat-bar-outer" style="height:8px; background:rgba(0,0,0,0.4); border-radius:4px;">
+                <div style="height:100%; width:${pct}%; background:var(--money-color); border-radius:4px;"></div>
+            </div>
+        </div>
+    `;
+
+    for (const cont in regions) {
+        const r = regions[cont];
+        if (r.unlocked) {
+            let flagHtml = typeof r.flag === 'string' && r.flag.startsWith('http') ? `<img src="${r.flag}" class="flag-icon"> ` : r.flag + ' ';
+            let apHtml = r.airports.map(ap => {
+                const isActive = activeAirports.has(ap.name);
+                const color = isActive ? 'var(--money-color)' : '#64748b';
+                const dot = isActive ? '<span style="display:inline-block;width:7px;height:7px;border-radius:50%;background:var(--money-color);margin-right:5px;vertical-align:middle;"></span>' : '<span style="display:inline-block;width:7px;height:7px;border-radius:50%;background:#475569;margin-right:5px;vertical-align:middle;"></span>';
+                return `<div style="margin-left:10px;font-size:12px;color:${color};padding:2px 0;display:flex;align-items:center;">${dot}${ap.type === 'heliport' ? '🚁' : '🛫'} ${ap.name}</div>`;
+            }).join('');
+            htmlStr += `<div class="card"><h4 style="margin-bottom:5px;">${flagHtml}${r.nation} - ${cont}</h4>${apHtml}</div>`;
         }
+    }
+    container.innerHTML = htmlStr;
+}
+
  
         function allNationRegionsUnlocked(nation) {
             const keys = Object.keys(regions).filter(k => regions[k].nation === nation);
@@ -2959,20 +3678,7 @@ updateUI();
                 triggerMilestonePopupNotification(achievements.syrup_enjoyer.title, achievements.syrup_enjoyer.rewardDesc);
             }
  
-            // Pro Aviation Collector: Own at least one of everything
-            if (!achievements.pro_aviation_collector.unlocked) {
-                const allCrafts = { ...aircraftCatalog, ...cargoCatalog, ...legacyAircraftCatalog, ...secretCatalog };
-                const allCraftNames = Object.keys(allCrafts);
-                
-                const ownedCrafts = new Set(Object.keys(gameState.hangar).filter(k => gameState.hangar[k] > 0));
-                gameState.routes.forEach(r => { if (r.fleet) r.fleet.forEach(f => ownedCrafts.add(f.type)); });
-                
-                if (allCraftNames.every(c => ownedCrafts.has(c))) {
-                    achievements.pro_aviation_collector.unlocked = true;
-                    gameState.cash += 2000000; gameState.tokens += 500;
-                    triggerMilestonePopupNotification(achievements.pro_aviation_collector.title, achievements.pro_aviation_collector.rewardDesc);
-                }
-            }
+
  
             // Continental Drifter: Check all 7 continents actively routed
             if (!achievements.continental_drifter.unlocked) {
@@ -2992,11 +3698,12 @@ updateUI();
                 }
             }
  
-            // Worldwide Mastermind: Route to every single airport/heliport
+            // Worldwide Mastermind: Route to every single airport/heliport (hospitals excluded)
             if (!achievements.worldwide_mastermind.unlocked) {
+                const isHospitalAp = (ap) => ap.type === "heliport" && ['hospital','health','medical','clinic','infirmary'].some(t => ap.name.toLowerCase().includes(t));
                 let allAirports = [];
                 for (const r of Object.values(regions)) {
-                    r.airports.forEach(a => allAirports.push(a.name));
+                    r.airports.forEach(a => { if (!isHospitalAp(a)) allAirports.push(a.name); });
                 }
                 const routedAirports = new Set();
                 gameState.routes.forEach(r => {
@@ -3050,22 +3757,7 @@ updateUI();
                 triggerMilestonePopupNotification(achievements.route_master.title, achievements.route_master.rewardDesc);
             }
  
-            // SuperStan: routes to all stan 
-            if (!achievements.superstan.unlocked) {
-                const stanNations = ['Pakistan','Afghanistan','Kazakhstan','Kyrgyzstan','Uzbekistan','Tajikistan'];
-                const routedNations = new Set();
-                gameState.routes.forEach(r => {
-                    [r.origin, r.destination].forEach(apName => {
-                        for (const [rk, rd] of Object.entries(regions)) {
-                            if (rd.airports.some(a => a.name === apName)) routedNations.add(rd.nation);
-                        }
-                    });
-                });
-                if (stanNations.every(n => routedNations.has(n))) {
-                    achievements.superstan.unlocked = true; gameState.cash += 200000; gameState.tokens += 50;
-                    triggerMilestonePopupNotification(achievements.superstan.title, achievements.superstan.rewardDesc);
-                }
-            }
+
  
             // Charles Lindbergh: route between a NYC airport and a Paris airport
             if (!achievements.lindbergh.unlocked) {
@@ -3099,6 +3791,42 @@ updateUI();
                     triggerMilestonePopupNotification(achievements.continental_drifter.title, achievements.continental_drifter.rewardDesc);
                 }
             }
+                const ownedCrafts = new Set(Object.keys(gameState.hangar).filter(k => gameState.hangar[k] > 0));
+gameState.routes.forEach(r => { if (r.fleet) r.fleet.forEach(f => ownedCrafts.add(f.type)); });
+
+const purchasable = [...Object.keys(aircraftCatalog), ...Object.keys(cargoCatalog), ...Object.keys(legacyAircraftCatalog)];
+if (!achievements.purchasable_collector.unlocked && purchasable.every(c => ownedCrafts.has(c))) {
+    achievements.purchasable_collector.unlocked = true;
+    gameState.cash += 1000000; gameState.tokens += 250;
+    triggerMilestonePopupNotification(achievements.purchasable_collector.title, achievements.purchasable_collector.rewardDesc);
+}
+
+const mythic = Object.keys(secretCatalog).filter(k => k !== "Wright Flyer");
+if (!achievements.mythic_collector.unlocked && mythic.every(c => ownedCrafts.has(c))) {
+    achievements.mythic_collector.unlocked = true;
+    gameState.cash += 2500000; gameState.tokens += 500;
+    triggerMilestonePopupNotification(achievements.mythic_collector.title, achievements.mythic_collector.rewardDesc);
+}
+
+if (!achievements.wright_flyer_collector.unlocked && ownedCrafts.has("Wright Flyer")) {
+    achievements.wright_flyer_collector.unlocked = true;
+    gameState.cash += 50000; gameState.tokens += 100;
+    triggerMilestonePopupNotification(achievements.wright_flyer_collector.title, achievements.wright_flyer_collector.rewardDesc);
+}
+
+const routeExists = (ap1, ap2) => gameState.routes.some(r => 
+    (r.origin.includes(ap1) && r.destination.includes(ap2)) || 
+    (r.origin.includes(ap2) && r.destination.includes(ap1))
+);
+
+if (!achievements.route_ca_ns.unlocked && routeExists("Alert Airport", "Pelee Island Airport")) { achievements.route_ca_ns.unlocked = true; gameState.cash += 50000; gameState.tokens += 20; triggerMilestonePopupNotification(achievements.route_ca_ns.title, achievements.route_ca_ns.rewardDesc); }
+if (!achievements.route_au_ns.unlocked && routeExists("Boigu Island Airport", "Bathurst Harbour Airport")) { achievements.route_au_ns.unlocked = true; gameState.cash += 50000; gameState.tokens += 20; triggerMilestonePopupNotification(achievements.route_au_ns.title, achievements.route_au_ns.rewardDesc); }
+if (!achievements.route_ru_ns.unlocked && routeExists("Nagurskoye Airfield", "Vladivostok")) { achievements.route_ru_ns.unlocked = true; gameState.cash += 50000; gameState.tokens += 20; triggerMilestonePopupNotification(achievements.route_ru_ns.title, achievements.route_ru_ns.rewardDesc); }
+if (!achievements.route_ne_ns.unlocked && routeExists("Kourou Arkenné Airfield", "Niamey Diori Hamani")) { achievements.route_ne_ns.unlocked = true; gameState.cash += 50000; gameState.tokens += 20; triggerMilestonePopupNotification(achievements.route_ne_ns.title, achievements.route_ne_ns.rewardDesc); }
+if (!achievements.route_cu_we.unlocked && routeExists("Mantua Airport", "Alfredo Noa Díaz Airport")) { achievements.route_cu_we.unlocked = true; gameState.cash += 50000; gameState.tokens += 20; triggerMilestonePopupNotification(achievements.route_cu_we.title, achievements.route_cu_we.rewardDesc); }
+if (!achievements.route_cn_ns.unlocked && routeExists("Mohe Gulian Airport", "Sanya Phoenix International Airport")) { achievements.route_cn_ns.unlocked = true; gameState.cash += 50000; gameState.tokens += 20; triggerMilestonePopupNotification(achievements.route_cn_ns.title, achievements.route_cn_ns.rewardDesc); }
+if (!achievements.route_af_we.unlocked && routeExists("Nimroz Airport", "Little Pamir Airport")) { achievements.route_af_we.unlocked = true; gameState.cash += 50000; gameState.tokens += 20; triggerMilestonePopupNotification(achievements.route_af_we.title, achievements.route_af_we.rewardDesc); }
+if (!achievements.route_it_ns.unlocked && routeExists("Bolzano Airport", "Lampedusa Airport")) { achievements.route_it_ns.unlocked = true; gameState.cash += 50000; gameState.tokens += 20; triggerMilestonePopupNotification(achievements.route_it_ns.title, achievements.route_it_ns.rewardDesc); }
         }
  
         function updateUI() {
@@ -3124,6 +3852,17 @@ updateUI();
             if (prevOrig) origSelect.value = prevOrig;
             if (prevDest) destSelect.value = prevDest;
             updateDestinationsDemand();
+          
+            const groundAllBtn = document.getElementById('btn-ground-all');
+if (groundAllBtn) {
+    if (globalGroundState) {
+        groundAllBtn.innerText = '▶ Unground All';
+        groundAllBtn.style.background = '#10b981';
+    } else {
+        groundAllBtn.innerText = '✋ Ground All';
+        groundAllBtn.style.background = '#f59e0b';
+    }
+}
  
             // Active routes
             const rContainer = document.getElementById('active-routes-list'); rContainer.innerHTML = '';
@@ -3143,36 +3882,44 @@ updateUI();
                         }
                     }
                     let fleetHtml = '';
-                    if (route.fleet && route.fleet.length > 0) {
-                        fleetHtml = route.fleet.map(f => {
-                            const spec = allCrafts[f.type];
-                            const isCargo = spec && spec.isCargo;
-                            const fuelPct = Math.round(getAircraftStat(f.id, 'fuel'));
-                            const condPct = Math.round(getAircraftStat(f.id, 'condition'));
-                            const isLanded = f.progress < 5 || f.progress > 95;
-                            const maintenance = gameState.voluntarilyGrounded[f.id] === "maintenance";
-                            const manualGrounded = gameState.voluntarilyGrounded[f.id] === true;
-                            const groundedBadge = maintenance ? '<span class="grounded-badge" style="background:rgba(239,68,68,0.2);color:#ef4444;border-color:#ef4444;">MAINTENANCE REQ</span>' : (manualGrounded ? '<span class="grounded-badge" style="background:rgba(245,158,11,0.2);color:#f59e0b;border-color:#f59e0b;">GROUNDED</span>' : '');
-                            const borderStyle = maintenance ? '1px solid #ef4444' : (manualGrounded ? '1px solid #f59e0b' : '1px solid transparent');
- 
-                            const refuelCost = Math.ceil((100-fuelPct)*REFUEL_COST_PER_PCT);
-                            const repairCost = Math.ceil((100-condPct)*REPAIR_COST_PER_PCT);
-                            const canRefuel = isLanded && fuelPct < 100;
-                            const canRepair = isLanded && condPct < 100;
-return `<div style="background:rgba(0,0,0,0.2);padding:6px;border-radius:4px;margin-bottom:4px;border:${borderStyle};">
-                                <div class="flex-row" style="margin-bottom:4px;"><span style="color:${isCargo?'var(--cargo-color)':'inherit'}">${isCargo?'📦':''}${f.type}${groundedBadge}</span><button onclick="removeAircraftFromRoute(${route.id},${f.id})" style="background:none;border:none;color:#ef4444;cursor:pointer;font-size:10px;">Remove</button></div>
-                                <div style="font-size:10px;color:#94a3b8;margin-bottom:2px;">⛽ Fuel: <b style="color:${fuelPct<25?'#ef4444':fuelPct<50?'#f97316':'#10b981'}">${fuelPct}%</b></div>
-                                <div class="stat-bar-outer"><div class="fuel-bar-inner ${fuelPct<25?'fuel-low':''}" style="width:${fuelPct}%"></div></div>
-                                <div style="font-size:10px;color:#94a3b8;margin-bottom:2px;margin-top:4px;">🔧 Condition: <b style="color:${condPct<25?'#ef4444':condPct<50?'#eab308':'#06b6d4'}">${condPct}%</b></div>
-                                <div class="stat-bar-outer"><div class="cond-bar-inner ${condPct<25?'cond-low':''}" style="width:${condPct}%"></div></div>
-                                <div style="display:flex;gap:4px;margin-top:5px;">
-                                    <button class="btn" style="margin:0;padding:3px 6px;font-size:10px;background:${canRefuel?'#f97316':'#475569'};width:auto;" ${canRefuel?'':'disabled'} onclick="refuelAircraft(${route.id},${f.id})" title="${canRefuel?'Refuel to 100% — $'+refuelCost.toLocaleString():isLanded?'Full tank':'Must be landed'}">⛽ Refuel $${refuelCost.toLocaleString()}</button>
-                                    <button class="btn" style="margin:0;padding:3px 6px;font-size:10px;background:${canRepair?'#06b6d4':'#475569'};width:auto;" ${canRepair?'':'disabled'} onclick="repairAircraft(${route.id},${f.id})" title="${canRepair?'Repair to 100% — $'+repairCost.toLocaleString():isLanded?'No damage':'Must be landed'}">🔧 Repair $${repairCost.toLocaleString()}</button>
-                                    <button class="btn" style="margin:0;padding:3px 6px;font-size:10px;background:${(manualGrounded||maintenance)?'#10b981':isLanded?'#f59e0b':'#475569'};width:auto;" ${!(manualGrounded||maintenance)&&!isLanded?'disabled':''} onclick="toggleVoluntaryGround(${route.id},${f.id})" title="${(manualGrounded||maintenance)?'Resume flights':'Ground at airport'}">${(manualGrounded||maintenance)?'▶ Resume':'✋ Ground'}</button>
-                                </div>
-                            </div>`;
-                        }).join('');
-                    }
+if (route.fleet && route.fleet.length > 0) {
+    fleetHtml = route.fleet.map(f => {
+        const inCooldown = isInCooldown(f.id);
+        const fuelPct = Math.floor(getAircraftStat(f.id, 'fuel'));
+        const condPct = Math.floor(getAircraftStat(f.id, 'condition'));
+        const isCargo = cargoCatalog[f.type] ? true : false;
+
+        // --- PASTE PART B LOGIC STARTING HERE ---
+        const maintenance = gameState.voluntarilyGrounded[f.id] === "maintenance";
+        const manualGrounded = gameState.voluntarilyGrounded[f.id] === true;
+        const pendingGrd = gameState.pendingGround && gameState.pendingGround[f.id] === true;
+
+        const groundedBadge = maintenance ? '<span class="grounded-badge" style="background:rgba(239,68,68,0.2);color:#ef4444;border-color:#ef4444;">MAINTENANCE REQ</span>' :
+            (manualGrounded ? '<span class="grounded-badge" style="background:rgba(245,158,11,0.2);color:#f59e0b;border-color:#f59e0b;">GROUNDED</span>' :
+            (pendingGrd ? '<span class="grounded-badge" style="background:rgba(245,158,11,0.2);color:#f59e0b;border-color:#f59e0b;">GROUNDING NEXT</span>' : ''));
+
+        const borderStyle = maintenance ? '1px solid #ef4444' : (manualGrounded ? '1px solid #f59e0b' : (pendingGrd ? '1px dashed #f59e0b' : '1px solid transparent'));
+
+        const isLanded = inCooldown || manualGrounded || maintenance;
+        const canRefuel = isLanded && fuelPct < 100;
+        const canRepair = isLanded && condPct < 100;
+
+        return `<div style="background:rgba(0,0,0,0.2);padding:6px;border-radius:4px;margin-bottom:4px;border:${borderStyle};">
+            <div class="flex-row" style="margin-bottom:4px;"><span style="color:${isCargo?'var(--cargo-color)':'inherit'}">${isCargo?'📦':''}${f.type}${groundedBadge}</span><button onclick="removeAircraftFromRoute(${route.id},${f.id})" style="background:none;border:none;color:#ef4444;cursor:pointer;font-size:10px;">Remove</button></div>
+            <div style="font-size:10px;color:#94a3b8;margin-bottom:2px;">⛽ Fuel: <b style="color:${fuelPct<25?'#ef4444':fuelPct<50?'#f97316':'#10b981'}">${fuelPct}%</b></div>
+            <div class="stat-bar-outer"><div class="fuel-bar-inner ${fuelPct<25?'fuel-low':''}" style="width:${fuelPct}%"></div></div>
+            <div style="font-size:10px;color:#94a3b8;margin-bottom:2px;margin-top:4px;">🔧 Condition: <b style="color:${condPct<25?'#ef4444':condPct<50?'#eab308':'#06b6d4'}">${condPct}%</b></div>
+            <div class="stat-bar-outer"><div class="cond-bar-inner ${condPct<25?'cond-low':''}" style="width:${condPct}%"></div></div>
+            <div style="display:flex;gap:4px;margin-top:5px;">
+                <button class="btn" style="margin:0;padding:3px 6px;font-size:10px;background:${canRefuel?'#f97316':'#475569'};width:auto;" ${canRefuel?'':'disabled'} onclick="refuelAircraft(${route.id},${f.id})" title="${canRefuel?'Refuel to 100%':isLanded?'Full tank':'Must be landed'}">⛽ Refuel</button>
+                <button class="btn" style="margin:0;padding:3px 6px;font-size:10px;background:${canRepair?'#06b6d4':'#475569'};width:auto;" ${canRepair?'':'disabled'} onclick="repairAircraft(${route.id},${f.id})" title="${canRepair?'Repair to 100%':isLanded?'No damage':'Must be landed'}">🔧 Repair</button>
+                <button class="btn" style="margin:0;padding:3px 6px;font-size:10px;background:${(manualGrounded||maintenance)?'#10b981':(pendingGrd?'#ef4444':'#f59e0b')};width:auto;" onclick="toggleVoluntaryGround(${route.id},${f.id})" title="${(manualGrounded||maintenance)?'Resume flights':(pendingGrd?'Cancel grounding':'Ground at next landing')}">${(manualGrounded||maintenance)?'▶ Resume':(pendingGrd?'❌ Cancel Grnd':'✋ Ground')}</button>
+            </div>
+        </div>`;
+        // --- END OF PART B ---
+
+    }).join('');
+}
                     card.innerHTML = `
                         <div style="display:flex;justify-content:space-between;align-items:center;">
                             <span style="font-weight:bold;font-size:13px;color:var(--token-color)">${route.origin.split(' (')[0]} ➔ ${route.destination.split(' (')[0]}</span>
@@ -3181,7 +3928,7 @@ return `<div style="background:rgba(0,0,0,0.2);padding:6px;border-radius:4px;mar
                         <div class="flex-row"><span>Distance:</span><span>${convertDistance(route.distanceNM)}</span></div>
                         ${(()=>{ const da=findAirportData(route.destination); return da&&!da.isHub&&!route.isSpecialContract?`<button class="btn" style="margin:4px 0 0;padding:4px 8px;font-size:11px;background:rgba(234,179,8,0.15);border:1px solid var(--achievement-color);color:var(--achievement-color);width:auto;" onclick="openBuyHubModal('${route.destination.replace(/'/g,"\\'")}')">🏢 Buy as Hub</button>`:''; })()}
                         <div style="margin-top:8px;">${fleetHtml}</div>
-                        ${route.isSpecialContract ? '<p style="font-size:10px;color:#ef4444;margin-top:4px;font-style:italic;">🔒 Contract Mission — Return to base for payout</p>' : `
+                        ${route.isSpecialContract ? ('<p style="font-size:10px;color:#ef4444;margin-top:4px;font-style:italic;">🔒 ' + (route.contractLabel ? route.contractLabel + ' — ' : '') + 'Contract Mission' + (route.contractLegs ? ' (Leg ' + ((route.currentLegIndex||0)+1) + '/' + route.contractLegs.length + ')' : ' — Return to base for payout') + '</p>') : `
                             <div style="display:flex;gap:5px;margin-top:6px;">
                                 <select id="add-ac-${route.id}" style="background:var(--input-bg);color:var(--text-color);border:1px solid var(--input-border);padding:4px;font-size:12px;border-radius:4px;flex:1;">${opts}</select>
                                 <button class="btn" style="width:auto;margin:0;padding:4px 8px;" onclick="assignAircraftToRoute(${route.id},document.getElementById('add-ac-${route.id}').value)">Add</button>
@@ -3274,9 +4021,11 @@ return `<div style="background:rgba(0,0,0,0.2);padding:6px;border-radius:4px;mar
                     item.onclick = () => openMarketModal(id, false, 'legacy');
                     item.innerHTML = `
                         <div class="market-item-img" style="background-image:url('${plane.img}')"></div>
-                        <div style="font-size:11px;font-weight:bold;margin-bottom:2px;color:#a855f7;">🏛 ${plane.name}</div>
+                        <div style="font-size:11px;font-weight:bold;margin-bottom:2px;color:#a855f7;">🕰️ ${plane.name}</div>
                         <div style="font-size:10px;color:#94a3b8;margin-bottom:3px;">${plane.pax} Seats</div>
-                        <div style="font-size:11px;color:${gameState.cash>=plane.price?'var(--money-color)':'#ef4444'};">$${plane.price.toLocaleString()}</div>`;
+                        <div style="font-size:11px;color:${gameState.tokens>=plane.price?'#06B6D4':'#ef4444'};">
+    ✈ ${plane.price.toLocaleString()}
+</div>`;
                     legacyGrid.appendChild(item);
                 });
             }
@@ -3371,4 +4120,3 @@ return `<div style="background:rgba(0,0,0,0.2);padding:6px;border-radius:4px;mar
     </script>
 </body>
 </html>
-
