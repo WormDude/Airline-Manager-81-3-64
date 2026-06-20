@@ -3094,8 +3094,6 @@ if (rarityData && !achievements[rarityData.id].unlocked) {
             lastTickTime = Date.now();
             setInterval(gameSimulationTick, 100);
             setInterval(rollContractChance, 65000);
-          setInterval(saveProgress, 10000);
-window.addEventListener('beforeunload', saveProgress);
  
              // Crate spawning: every 3-7 minutes a crate falls
             function scheduleCrate() {
