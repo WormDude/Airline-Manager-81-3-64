@@ -2842,7 +2842,15 @@ if (rarityData && !achievements[rarityData.id].unlocked) {
         }
  
         function loadProgress() {
-            const parsed = JSON.parse(localStorage.getItem('am81_savegame_pro'));
+    const raw = localStorage.getItem('am81_savegame_pro');
+
+    if (!raw) return false;
+
+    const parsed = JSON.parse(raw);
+
+    if (!parsed || !parsed.gameState) return false;
+
+    gameState = parsed.gameState;
             gameState = parsed.gameState;
             if (!gameState.multiplierX || gameState.multiplierX < 2500) gameState.multiplierX = 2500;
             if (!gameState.rank) { gameState.rank = 1; gameState.xp = 0; }
@@ -3069,6 +3077,8 @@ if (
             lastTickTime = Date.now();
             setInterval(gameSimulationTick, 100);
             setInterval(rollContractChance, 65000);
+          setInterval(saveProgress, 10000);
+window.addEventListener('beforeunload', saveProgress);
  
              // Crate spawning: every 3-7 minutes a crate falls
             function scheduleCrate() {
