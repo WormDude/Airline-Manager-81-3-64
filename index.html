@@ -4062,7 +4062,7 @@ if (!isTabFocused || !isLiveTick) {
             // Auto-scrap special contract routes once fleet is empty
             const beforeLen = gameState.routes.length;
             gameState.routes = gameState.routes.filter(r => !r.isSpecialContract || (r.fleet && r.fleet.length > 0));
-            if (gameState.routes.length !== beforeLen || uiDirty) { saveProgress(); updateUI(); }
+            if (gameState.routes.length !== beforeLen || uiDirty) { saveProgress(); throttledUpdateUI(); }
         }
  
         function triggerMilestonePopupNotification(title, reward) {
