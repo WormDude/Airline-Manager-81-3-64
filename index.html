@@ -1913,12 +1913,6 @@
         };
         let uiUpdatePending = false;
 function updateUI() {
-    if (uiUpdatePending) return;
-    uiUpdatePending = true;
-    requestAnimationFrame(() => {
-        uiUpdatePending = false;
-        _updateUI(); // rename original updateUI body to _updateUI
-    });
 }
         let gameState = {};
         let globalGroundState = false;
@@ -4322,6 +4316,14 @@ updateUI();
     }
 
     gameState.hangar[selectedBulkAircraft] += qty;
+          // Spinning Around achievement
+    const allCraftsCheck = { ...aircraftCatalog, ...cargoCatalog, ...legacyAircraftCatalog, ...secretCatalog };
+    if (!achievements.spinning_around.unlocked && allCraftsCheck[selectedBulkAircraft]?.type === 'helicopter') {
+        achievements.spinning_around.unlocked = true;
+        gameState.cash += 10000;
+        gameState.tokens += 10;
+        triggerMilestonePopupNotification(achievements.spinning_around.title, achievements.spinning_around.rewardDesc);
+    }
 
     closeMarketModal();
     if (gameState.tutorialActive && gameState.interactiveStage === 1) {
