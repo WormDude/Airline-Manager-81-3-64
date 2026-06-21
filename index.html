@@ -783,7 +783,7 @@
         const GIGANT_ICON_B64 = 'https://github.com/WormDude/Airline-Manager-81-3-64/blob/main/me323.png?raw=true';
         const EARNINGS_MULTIPLIER = 0.22;
         const CARGO_EARNINGS_MULTIPLIER = 0.35;
-        const BACKGROUND_EARNINGS_RATIO = 0.10;
+        const BACKGROUND_EARNINGS_RATIO = 0.22;
 
         function applyCashForTick(amount, isLive) {
             return Math.round(amount * (isLive ? 1 : BACKGROUND_EARNINGS_RATIO));
@@ -2845,6 +2845,7 @@ if (rarityData && !achievements[rarityData.id].unlocked) {
         function closeSettingsScreen() { document.getElementById('settings-screen').style.display = 'none'; }
  
         function saveProgress() {
+            gameState.routes = gameState.routes.filter(r => !r.isSpecialContract || (r.fleet && r.fleet.length > 0));
             const raw = {
                 gameState: gameState,
                 lastSaveTime: Date.now(),
@@ -4240,7 +4241,7 @@ updateUI();
         }
  
         function scrapRouteLine(routeId) {
-            const idx = gameState.routes.findIndex(r => r.id === routeId);
+            const idx = gameState.routes.findIndex(r => String(r.id) === String(routeId));
             if (idx === -1) return;
             const r = gameState.routes[idx];
             if (r.fleet) r.fleet.forEach(f => { gameState.hangar[f.type] = (gameState.hangar[f.type] || 0) + 1; });
@@ -4729,7 +4730,7 @@ if (route.fleet && route.fleet.length > 0) {
 
         const borderStyle = maintenance ? '1px solid #ef4444' : (manualGrounded ? '1px solid #f59e0b' : (pendingGrd ? '1px dashed #f59e0b' : '1px solid transparent'));
 
-        const isLanded = inCooldown || manualGrounded || maintenance || f.progress < 2;
+        const isLanded = inCooldown || manualGrounded || maintenance;
 const canRefuel = isLanded && fuelPct < 100;
 const canRepair = isLanded && condPct < 100;
 
@@ -4742,7 +4743,7 @@ const canRepair = isLanded && condPct < 100;
             <div style="display:flex;gap:4px;margin-top:5px;">
                 <button class="btn" style="margin:0;padding:3px 6px;font-size:10px;background:${canRefuel?'#f97316':'#475569'};width:auto;" ${canRefuel?'':'disabled'} onclick="refuelAircraft('${route.id}','${f.id}')" title="${canRefuel?'Refuel to 100%':isLanded?'Full tank':'Must be landed'}">⛽ Refuel</button>
                 <button class="btn" style="margin:0;padding:3px 6px;font-size:10px;background:${canRepair?'#06b6d4':'#475569'};width:auto;" ${canRepair?'':'disabled'} onclick="repairAircraft('${route.id}','${f.id}')" title="${canRepair?'Repair to 100%':isLanded?'No damage':'Must be landed'}">🔧 Repair</button>
-                <button class="btn" style="margin:0;padding:3px 6px;font-size:10px;background:${(manualGrounded||maintenance)?'#10b981':(pendingGrd?'#ef4444':'#f59e0b')};width:auto;" onclick="toggleVoluntaryGround('${route.id}','${f.id}')" title="${(manualGrounded||maintenance)?'Resume flights':(pendingGrd?'Cancel grounding':'Ground at next landing')}">${(manualGrounded||maintenance)?'▶ Resume':(pendingGrd?'❌ Cancel Grnd':'✋ Ground')}</button>
+                <button class="btn" style="margin:0;padding:3px 6px;font-size:10px;background:${(manualGrounded||maintenance)?'#10b981':(pendingGrd?'#ef4444':'#f59e0b')};width:auto;" onclick="toggleVoluntaryGround('${route.id}','${f.id}')" title="${(manualGrounded||maintenance)?'Resume flights':(pendingGrd?'Cancel grounding':'Ground at next landing')}">${(manualGrounded||maintenance)?'▶ Resume':(pendingGrd?'❌ Cancel Ground':'✋ Ground')}</button>
             </div>
         </div>`;
         // --- END OF PART B ---
