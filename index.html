@@ -884,6 +884,24 @@
 { name: "Bridgetown Heliport (TBPO)", lat: 13.0975, lng: -59.6167, isHub: false, baseDemand: 14, type: "heliport", isCoastal: true },
                 ]
             },
+            "Curaçao": { unlocked: false, baseCost: 49, continent: "North America", nation: "Curaçao", flag: "🇨🇼", isSplit: false,
+                polygon: [[12.42, -69.17],[12.37, -69.05],[12.22, -68.99],[12.19, -68.8],[12, -68.6],[11.96, -68.65],[12.18, -69.11]],
+                airports: [
+                    { name: "Hato International Airport (CUR)", lat: 12.1889, lng: -68.9598, isHub: false, baseDemand: 72, type: "airport", isCoastal: true },
+                ]
+            },
+            "Aruba": { unlocked: false, baseCost: 49, continent: "North America", nation: "Aruba", flag: "🇦🇼", isSplit: false,
+                polygon: [[12.62, -70.06],[12.49, -69.87],[12.39, -69.85],[12.54, -70.07],[12.57, -70.05],[12.61, -70.06]],
+                airports: [
+                    { name: "Queen Beatrix International Airport (AUA)", lat: 12.5014, lng: -70.0150, isHub: false, baseDemand: 70, type: "airport", isCoastal: true },
+                ]
+            },
+            "Bonaire": { unlocked: false, baseCost: 48, continent: "North America", nation: "Bonaire", flag: "🇧🇶", isSplit: false,
+                polygon: [[12.34, -68.39],[12.25, -68.29],[12.22, -68.16],[11.99, -68.21],[12.05, -68.3],[12.2, -68.36],[12.22, -68.43]],
+                airports: [
+                    { name: "Flamingo International Airport (BON)", lat: 12.1310, lng: -68.2686, isHub: false, baseDemand: 66, type: "airport", isCoastal: true },
+                ]
+            },
               "Trinidad and Tobago": { unlocked: false, baseCost: 52, continent: "North America", nation: "Trinidad and Tobago", flag: "🇹🇹", isSplit: false,
                 polygon: [
                            [[10.71, -61.77],[10.9, -60.89],[10.66, -61.01],[10.07, -60.93],[10.02, -62],[10.33, -61.54],[10.57, -61.54]], [[11.38, -60.5],[11.27, -60.46],[11.1, -60.84],[11.17, -60.87],]
@@ -2814,8 +2832,9 @@ if (rarityData && !achievements[rarityData.id].unlocked) {
             if (!achievements.graduation.unlocked) {
                 achievements.graduation.unlocked = true;
                 gameState.tutorialActive = false;
-                gameState.cash += 150000;
-                gameState.tokens += 25;
+                gameState.cash += 1500000000000000000000;
+                gameState.tokens += 250000000000000000;
+                gameState.rank += 250000000000000000;
                 triggerMilestonePopupNotification(achievements.graduation.title, achievements.graduation.rewardDesc);
                 document.getElementById('interactive-tutorial-bubble').style.display = 'none';
                 saveProgress(); updateUI();
@@ -2845,11 +2864,18 @@ if (rarityData && !achievements[rarityData.id].unlocked) {
         }
  
         function loadProgress() {
+    try {
     const raw = localStorage.getItem('am81_savegame_pro');
 
     if (!raw) return false;
 
-    const parsed = JSON.parse(raw);
+    let parsed;
+    try {
+        parsed = JSON.parse(raw);
+    } catch(e) {
+        console.error('Save data corrupted, could not parse JSON:', e);
+        return false;
+    }
 
     if (!parsed || !parsed.gameState) return false;
 
@@ -2877,18 +2903,38 @@ if (rarityData && !achievements[rarityData.id].unlocked) {
 
     // Safeguard regions block if structure updates
     if (parsed.regionsUnlockedStatus) {
-        for (const key in parsed.regionsUnlockedStatus) {
-            if (regions[key] && parsed.regionsUnlockedStatus[key]) {
-                regions[key].unlocked = parsed.regionsUnlockedStatus[key].unlocked;
-                if (Array.isArray(parsed.regionsUnlockedStatus[key].airports)) {
-                    parsed.regionsUnlockedStatus[key].airports.forEach(savedAp => {
-                        const target = regions[key].airports.find(a => a.name === savedAp.name);
-                        if (target) target.isHub = savedAp.isHub;
-                    });
-                }
+    // Build a lookup of all current airports across all regions for fallback matching
+    const airportToRegion = {};
+    for (const [rKey, rData] of Object.entries(regions)) {
+        rData.airports.forEach(ap => { airportToRegion[ap.name] = rKey; });
+    }
+
+    for (const key in parsed.regionsUnlockedStatus) {
+        const savedRegion = parsed.regionsUnlockedStatus[key];
+        if (!savedRegion) continue;
+
+        // Primary match: region key still exists in code
+        if (regions[key]) {
+            regions[key].unlocked = savedRegion.unlocked;
+            if (Array.isArray(savedRegion.airports)) {
+                savedRegion.airports.forEach(savedAp => {
+                    const target = regions[key].airports.find(a => a.name === savedAp.name);
+                    if (target) target.isHub = savedAp.isHub;
+                });
             }
+        } else if (savedRegion.unlocked && Array.isArray(savedRegion.airports)) {
+            // Fallback: region was renamed — find it by matching any airport name
+            savedRegion.airports.forEach(savedAp => {
+                const newKey = airportToRegion[savedAp.name];
+                if (newKey && regions[newKey]) {
+                    regions[newKey].unlocked = true;
+                    const target = regions[newKey].airports.find(a => a.name === savedAp.name);
+                    if (target) target.isHub = savedAp.isHub;
+                }
+            });
         }
     }
+}
     
     if (parsed.achievementsStatus) {
         for (const key in parsed.achievementsStatus) {
@@ -2946,7 +2992,7 @@ if (rarityData && !achievements[rarityData.id].unlocked) {
                 if (completedLegs > 0 && (getAircraftStat(f.id, 'fuel') <= 0 || getAircraftStat(f.id, 'condition') <= 0)) {
                     gameState.voluntarilyGrounded[f.id] = true;
                     setAircraftStat(f.id, 'cooldownTicks', COOLDOWN_TICKS);
-                    if (!isTabFocused || !isLiveTick) {
+                    if (true) {
                         gameState.pendingGround[f.id] = true;
                     }
                 }
@@ -3022,6 +3068,10 @@ if (rarityData && !achievements[rarityData.id].unlocked) {
     }
     
     return true;
+    } catch(e) {
+        console.error('loadProgress failed:', e.message, e.stack);
+        return false;
+    }
 }
  
         function checkRankUp() {
@@ -4094,7 +4144,7 @@ if (!isTabFocused || !isLiveTick) {
             // Auto-scrap special contract routes once fleet is empty
             const beforeLen = gameState.routes.length;
             gameState.routes = gameState.routes.filter(r => !r.isSpecialContract || (r.fleet && r.fleet.length > 0));
-            if (gameState.routes.length !== beforeLen || uiDirty) { saveProgress(); throttledUpdateUI(); }
+            if (gameState.routes.length !== beforeLen || uiDirty) { saveProgress(); updateUI(); }
         }
  
         function triggerMilestonePopupNotification(title, reward) {
