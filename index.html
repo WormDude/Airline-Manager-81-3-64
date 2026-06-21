@@ -792,7 +792,7 @@
         // ===== REGIONS DATA =====
         const regions = {
             "New York (US)": { unlocked: false, baseCost: 43, continent: "North America", nation: "USA", flag: "🇺🇸", isSplit: true,
-                polygon: [[45.01,-73.35],[45.01,-74.91],[44.96,-74.98],[44.23,-76.15],[43.62,-76.22],[43.51,-76.92],[43.64,-77.78],[43.34,-79.16],[42.99,-78.93],[42.45,-79.76],[42.00,-79.76],[42.00,-74.69],[41.36,-74.69],[40.99,-73.91],[40.50,-74.26],[40.64,-73.78],[41.15,-72.01],[41.00,-71.85],[41.25,-73.30],[42.05,-73.50],[42.75,-73.27],[44.40,-73.36],[45.01,-73.35]],
+                polygon: [[45.01,-73.35],[45.01,-74.91],[44.96,-74.98],[44.23,-76.15],[43.62,-76.22],[43.51,-76.92],[43.64,-77.78],[43.34,-79.16],[42.99,-78.93],[42.45,-79.76],[42.00,-79.76],[42.00,-74.69],[41.36,-74.69],[40.99,-73.91],[40.50,-74.26],[40.50,-73.78],[41.00,-71.85],[41.15,-72.01],[41.25,-73.30],[42.05,-73.50],[42.75,-73.27],[44.40,-73.36],[45.01,-73.35]],
                 airports: [
                     { name: "JFK International (JFK)", lat: 40.6413, lng: -73.7781, isHub: false, baseDemand: 98, type: "airport", isCoastal: true },
                     { name: "Albany Regional (ALB)", lat: 42.7483, lng: -73.8020, isHub: false, baseDemand: 52, type: "airport" },
@@ -801,7 +801,7 @@
                 ]
             },
             "California (US)": { unlocked: false, baseCost: 46, continent: "North America", nation: "USA", flag: "🇺🇸", isSplit: true,
-                polygon: [[42.00,-124.41],[42.00,-120.00],[39.00,-120.00],[34.35,-114.14],[32.74,-114.14],[32.53,-117.12],[33.32,-117.78],[34.45,-120.65],[35.50,-121.20],[36.50,-121.95],[37.75,-122.55],[38.58,-123.32],[40.40,-124.41],[42.00,-124.41]],
+                polygon: [[42.00,-124.41],[42.00,-120.00],[39.00,-120.00],[35, -114.6],[34.35,-114.14],[33.37, -114.7],[32.9, -114.47],[32.71, -114.71],[32.53,-117.12],[33.32,-117.78],[34.45,-120.65],[35.50,-121.20],[36.50,-121.95],[37.75,-122.55],[38.58,-123.32],[40.40,-124.41],[42.00,-124.41]],
                 airports: [
                     { name: "Los Angeles (LAX)", lat: 33.9416, lng: -118.4085, isHub: false, baseDemand: 100, type: "airport", isCoastal: true },
                     { name: "San Francisco (SFO)", lat: 37.6213, lng: -122.3790, isHub: false, baseDemand: 92, type: "airport", isCoastal: true },
@@ -813,7 +813,7 @@
                 ]
             },
             "Texas (US)": { unlocked: false, baseCost: 53, continent: "North America", nation: "USA", flag: "🇺🇸", isSplit: true,
-                polygon: [[36.5,-103.0],[36.5,-100.0],[34.5,-100.0],[34.0,-94.0],[31.5,-93.8],[29.5,-93.8],[25.8,-97.2],[29.0,-100.5],[29.3,-103.0],[31.8,-106.5],[32.0,-103.0],[36.5,-103.0]],
+                polygon: [[36.5,-103.0],[36.5,-100.0],[34.5,-100.0],[33.55, -94.04],[31.5,-93.8],[29.5,-93.8],[25.8,-97.2],[29.0,-100.5],[29.3,-103.0],[32, -106.6],[32.0,-103.0],[36.5,-103.0]],
                 airports: [
                     { name: "Dallas/Fort Worth (DFW)", lat: 32.8998, lng: -97.0403, isHub: false, baseDemand: 95, type: "airport" },
                     { name: "George Bush Intercontinental (IAH)", lat: 29.9902, lng: -95.3368, isHub: false, baseDemand: 90, type: "airport", isCoastal: true },
@@ -822,6 +822,118 @@
                     { name: "Scholes International (GLS)", lat: 29.2653, lng: -94.8603, isHub: false, baseDemand: 45, type: "airport", isCoastal: true },
                     { name: "John Peter Smith Health Network Heliport (1XS3)", lat: 32.7239, lng: -97.3236, isHub: false, baseDemand: 14, type: "heliport" },
 { name: "Medical Center Hospital Heliport (32XA)", lat: 31.8544, lng: -102.3703, isHub: false, baseDemand: 10, type: "heliport" }// Gulf Coast
+                ]
+            },
+            "Oklahoma (US)": { unlocked: false, baseCost: 57, continent: "North America", nation: "USA", flag: "🇺🇸", isSplit: true,
+                polygon: [[36.5,-103.0],[36.5,-100.0],[34.5,-100.0],[33.63, -94.48],[35.39, -94.43],[36.49, -94.61],[37, -94.6],[37, -103]],
+                airports: [
+                    { name: "OKC Will Rogers World Airport (OKC)", lat: 35.3931, lng: -97.6007, isHub: false, baseDemand: 78, type: "airport" },
+
+{ name: "Tulsa International Airport (TUL)", lat: 36.1984, lng: -95.8881, isHub: false, baseDemand: 72, type: "airport" },
+
+{ name: "Guymon Municipal Airport (GUY)", lat: 36.6851, lng: -101.5076, isHub: false, baseDemand: 22, type: "airport" },
+
+{ name: "Lawton Fort Sill Regional Airport (LAW)", lat: 34.5677, lng: -98.4166, isHub: false, baseDemand: 40, type: "airport" },
+
+{ name: "Durant Regional Airport - Eaker Field (DUA)", lat: 33.9422, lng: -96.3945, isHub: false, baseDemand: 26, type: "airport" },
+
+{ name: "Integris Southwest Medical Center Heliport (50OK)", lat: 35.4945, lng: -97.5193, isHub: false, baseDemand: 10, type: "heliport" },
+                ]
+            },
+            "New Mexico (US)": { unlocked: false, baseCost: 53, continent: "North America", nation: "USA", flag: "🇺🇸", isSplit: true,
+                polygon: [[37, -103],[37, -109],[31.33, -109],[31.33, -108.2],[31.78, -108.2],[31.78, -106.62],[32, -106.6],[32, -106.6],[32.0,-103.0],],
+                airports: [
+                    { name: "Albuquerque International Sunport (ABQ)", lat: 35.0402, lng: -106.6090, isHub: false, baseDemand: 84, type: "airport" },
+
+{ name: "University of New Mexico Hospital Heliport (NM11)", lat: 35.0845, lng: -106.6198, isHub: false, baseDemand: 12, type: "heliport" },
+
+{ name: "Santa Fe Municipal Airport (SAF)", lat: 35.6171, lng: -106.0894, isHub: false, baseDemand: 52, type: "airport" },
+
+{ name: "Las Cruces International Airport (LRU)", lat: 32.2894, lng: -106.9217, isHub: false, baseDemand: 40, type: "airport" },
+
+{ name: "Clovis Municipal Airport (CVN)", lat: 34.4251, lng: -103.0793, isHub: false, baseDemand: 30, type: "airport" },
+                ]
+            },
+            "Colorado (US)": { unlocked: false, baseCost: 58, continent: "North America", nation: "USA", flag: "🇺🇸", isSplit: true,
+                polygon: [[37, -102],[37, -109],[41, -109],[41, -102],],
+                airports: [
+                    { name: "City of Colorado Springs Municipal Airport (COS)", lat: 38.8058, lng: -104.7008, isHub: false, baseDemand: 68, type: "airport" },
+
+{ name: "St Francis Hospital Heliport (CO23)", lat: 38.8717, lng: -104.7606, isHub: false, baseDemand: 12, type: "heliport" },
+
+{ name: "Denver International Airport (DEN)", lat: 39.8561, lng: -104.6737, isHub: false, baseDemand: 100, type: "airport" },
+
+{ name: "Grand Junction Regional Airport (GJT)", lat: 39.1224, lng: -108.5267, isHub: false, baseDemand: 44, type: "airport" },
+
+{ name: "Aspen-Pitkin County Airport (Sardy Field) (ASE)", lat: 39.2232, lng: -106.8690, isHub: false, baseDemand: 58, type: "airport" },
+
+{ name: "St Mary's Hospital & Medical Center Heliport (29CO)", lat: 39.0780, lng: -108.5610, isHub: false, baseDemand: 10, type: "heliport" },
+                ]
+            },
+            "Wyoming (US)": { unlocked: false, baseCost: 47, continent: "North America", nation: "USA", flag: "🇺🇸", isSplit: true,
+                polygon: [[45, -104],[45, -111],[41, -111],[41, -104],],
+                airports: [
+                    { name: "Yellowstone Regional Airport (COD)", lat: 44.5202, lng: -109.0240, isHub: false, baseDemand: 42, type: "airport" },
+
+{ name: "Jackson Hole Airport (JAC)", lat: 43.6073, lng: -110.7377, isHub: false, baseDemand: 72, type: "airport" },
+
+{ name: "Cheyenne Regional Jerry Olson Field (CYS)", lat: 41.1557, lng: -104.8118, isHub: false, baseDemand: 36, type: "airport" },
+
+{ name: "Cheyenne Regional Medical Center West Campus Heliport (US-4126)", lat: 41.1400, lng: -104.8200, isHub: false, baseDemand: 10, type: "heliport" },
+
+{ name: "Southwest Wyoming Regional Airport (RKS)", lat: 41.5942, lng: -109.0652, isHub: false, baseDemand: 28, type: "airport" },
+
+{ name: "Central Wyoming Regional Airport (RIW)", lat: 43.0642, lng: -108.4597, isHub: false, baseDemand: 30, type: "airport" },
+                ]
+            },
+            "Utah (US)": { unlocked: false, baseCost: 56, continent: "North America", nation: "USA", flag: "🇺🇸", isSplit: true,
+                polygon: [[42, -114],[42, -111],[41, -111],[41, -109],[37, -109],[37, -114],],
+                airports: [
+                    { name: "Salt Lake City International Airport (SLC)", lat: 40.7899, lng: -111.9791, isHub: false, baseDemand: 96, type: "airport" },
+
+{ name: "LDS Hospital Heliport (UT55)", lat: 40.7778, lng: -111.8756, isHub: false, baseDemand: 12, type: "heliport" },
+
+{ name: "Vernal Regional Airport (VEL)", lat: 40.4409, lng: -109.5108, isHub: false, baseDemand: 30, type: "airport" },
+
+{ name: "Logan-Cache Airport (LGU)", lat: 41.7912, lng: -111.8510, isHub: false, baseDemand: 34, type: "airport" },
+
+{ name: "Bryce Canyon Airport (BCE)", lat: 37.7064, lng: -112.1450, isHub: false, baseDemand: 26, type: "airport" },
+
+{ name: "Cedar City Regional Airport (CDC)", lat: 37.7010, lng: -113.0989, isHub: false, baseDemand: 38, type: "airport" },
+                ]
+            },
+            "Nevada (US)": { unlocked: false, baseCost: 60, continent: "North America", nation: "USA", flag: "🇺🇸", isSplit: true,
+                polygon: [[42, -114],[37, -114],[37, -114],[36.02, -114.14],[36.02, -114.26],[36.14, -114.37],[36.09, -114.74],[35, -114.6],[35, -114.6],[39.00,-120.00],[42, -120],],
+                airports: [
+                    { name: "Harry Reid International Airport (LAS)", lat: 36.0840, lng: -115.1537, isHub: false, baseDemand: 98, type: "airport" },
+
+{ name: "Spring Valley Hospital Heliport (2VE2)", lat: 36.1100, lng: -115.2450, isHub: false, baseDemand: 10, type: "heliport" },
+
+{ name: "Reno Tahoe International Airport (RNO)", lat: 39.4991, lng: -119.7681, isHub: false, baseDemand: 72, type: "airport" },
+
+{ name: "Homey (Area 51) Airport (KXTA)", lat: 37.2350, lng: -115.8111, isHub: false, baseDemand: 0, type: "airport" },
+
+{ name: "North Las Vegas Airport (VGT)", lat: 36.2110, lng: -115.1950, isHub: false, baseDemand: 46, type: "airport" },
+
+{ name: "Carson Airport (CSN)", lat: 39.1920, lng: -119.7340, isHub: false, baseDemand: 30, type: "airport" },
+
+{ name: "Carson-Tahoe Hospital Heliport (NV60)", lat: 39.1600, lng: -119.7800, isHub: false, baseDemand: 9, type: "heliport" },
+                ]
+            },
+            "Arizona (US)": { unlocked: false, baseCost: 56, continent: "North America", nation: "USA", flag: "🇺🇸", isSplit: true,
+                polygon: [[37, -109],[37, -114],[36.02, -114.14],[36.02, -114.26],[36.14, -114.37],[36.09, -114.74],[35, -114.6],[34.35,-114.14],[33.37, -114.7],[32.9, -114.47],[32.71, -114.71],[32.7,-115.1],[31.33, -111.07],[31.33, -109],],
+                airports: [
+                    { name: "Phoenix Sky Harbor International Airport (PHX)", lat: 33.4342, lng: -112.0116, isHub: false, baseDemand: 100, type: "airport" },
+
+{ name: "Tucson International Airport (TUS)", lat: 32.1161, lng: -110.9410, isHub: false, baseDemand: 62, type: "airport" },
+
+{ name: "University Medical Center Hospital Heliport (5AZ4)", lat: 32.2319, lng: -110.9498, isHub: false, baseDemand: 12, type: "heliport" },
+
+{ name: "Show Low Regional Airport (SOW)", lat: 34.2656, lng: -110.0056, isHub: false, baseDemand: 24, type: "airport" },
+
+{ name: "Flagstaff Pulliam Airport (FLG)", lat: 35.1385, lng: -111.6712, isHub: false, baseDemand: 44, type: "airport" },
+
+{ name: "Flagstaff Medical Center Heliport (3AZ0)", lat: 35.1981, lng: -111.6515, isHub: false, baseDemand: 10, type: "heliport" },
                 ]
             },
             "Florida (US)": { unlocked: false, baseCost: 55, continent: "North America", nation: "USA", flag: "🇺🇸", isSplit: true,
@@ -841,11 +953,17 @@
                     { name: "Cleveland Hopkins (CLE)", lat: 41.4117, lng: -81.8498, isHub: false, baseDemand: 80, type: "airport", isCoastal: true },
                     { name: "Cleveland Clinic Heliport (CCL)", lat: 41.5012, lng: -81.6211, isHub: false, baseDemand: 50, type: "heliport", isCoastal: true },
                     { name: "Toledo Express (TOL)", lat: 41.5868, lng: -83.8078, isHub: false, baseDemand: 55, type: "airport" },
-                    { name: "McLaren St Luke's Hospital Heliport (3OI8)", lat: 41.5658, lng: -83.6739, isHub: false, baseDemand: 8, type: "heliport" }
+                    { name: "McLaren St Luke's Hospital Heliport (3OI8)", lat: 41.5658, lng: -83.6739, isHub: false, baseDemand: 8, type: "heliport" },
+                    { name: "Zanesville Municipal Airport (ZZV)", lat: 39.9444, lng: -81.8921, isHub: false, baseDemand: 28, type: "airport" },
+
+{ name: "Erie-Ottawa International Airport (KPCW)", lat: 41.5167, lng: -82.8694, isHub: false, baseDemand: 24, type: "airport" },
+
+{ name: "Findlay Airport (FDY)", lat: 41.0135, lng: -83.6687, isHub: false, baseDemand: 26, type: "airport" },
+                  { name: "Akron Fulton International Airport (AKC)", lat: 41.0375, lng: -81.4669, isHub: false, baseDemand: 42, type: "airport" },
                 ]
             },
             "Mexico": { unlocked: false, baseCost: 54, continent: "North America", nation: "Mexico", flag: "🇲🇽", isSplit: false,
-                polygon: [[32.5,-117.1],[32.7,-115.1],[31.3,-108.2],[31.8,-106.5],[29.3,-103.0],[29.0,-100.5],[25.8,-97.2],[21.0,-97.3],[19.0,-95.3],[19.0,-91.3],[21.5,-90.0],[21.5,-87.0],[18.2,-88.1],[14.6,-92.2],[16.2,-95.0],[15.0,-98.3],[18.0,-105.3],[23.0,-106.3],[31.0,-114.0],[22.5,-109.1],[22.5,-110.1]],
+                polygon: [[32.5,-117.1],[32.7,-115.1],[31.33, -111.07],[31.33, -108.2],[31.78, -108.2],[31.78, -106.62],[32, -106.6],[29.3,-103.0],[29.0,-100.5],[25.8,-97.2],[21.0,-97.3],[19.0,-95.3],[19.0,-91.3],[21.5,-90.0],[21.5,-87.0],[18.2,-88.1],[14.6,-92.2],[16.2,-95.0],[15.0,-98.3],[18.0,-105.3],[23.0,-106.3],[31.0,-114.0],[22.5,-109.1],[22.5,-110.1]],
                 airports: [
                     { name: "Mexico City Intl (MEX)", lat: 19.4363, lng: -99.0721, isHub: false, baseDemand: 96, type: "airport" },
                     { name: "Cancún Intl (CUN)", lat: 21.0365, lng: -86.8771, isHub: false, baseDemand: 90, type: "airport", isCoastal: true },
@@ -874,6 +992,16 @@
                     { name: "Anse-a-Galets Airport (HT-0002)", lat: 18.8358, lng: -72.8631, isHub: false, baseDemand: 12, type: "airport", isCoastal: true },
 { name: "Port-de-Paix Airport (PAX)", lat: 19.9336, lng: -72.8147, isHub: false, baseDemand: 25, type: "airport", isCoastal: true },
                     { name: "St Vincent de Paul Health Center Helicopter Landing Zone (HT-0016)", lat: 18.2831, lng: -74.1167, isHub: false, baseDemand: 5, type: "heliport", isCoastal: true }
+                ]
+            },
+            "Jamaica": { unlocked: false, baseCost: 51, continent: "North America", nation: "Jamaica", flag: "🇯🇲", isSplit: false,
+                polygon: [[18.44, -78.4],[18.63, -77.88],[18.3, -76.26],[17.88, -76.01],[17.62, -77.24],[18.14, -78.52]],
+                airports: [
+                    { name: "Sangster International Airport (MBJ)", lat: 18.5037, lng: -77.9134, isHub: false, baseDemand: 82, type: "airport", isCoastal: true },
+
+{ name: "Norman Manley International Airport (KIN)", lat: 17.9357, lng: -76.7875, isHub: false, baseDemand: 78, type: "airport", isCoastal: true },
+
+{ name: "Ian Fleming International Airport (OCJ)", lat: 18.4042, lng: -76.9696, isHub: false, baseDemand: 44, type: "airport", isCoastal: true },
                 ]
             },
             "Barbados": { unlocked: false, baseCost: 50, continent: "North America", nation: "Barbados", flag: "🇧🇧", isSplit: false,
@@ -1283,6 +1411,18 @@
                     { name: "Wiener Neustadt West (LOXN)", lat: 47.8389, lng: 16.2222, isHub: false, baseDemand: 28, type: "airport" },
                     { name: "Wiener Neustadt East (LOAN)", lat: 47.8444, lng: 16.2647, isHub: false, baseDemand: 26, type: "airport" },
                     { name: "Wiener Neustadt Hospital Heliport (LOAI)", lat: 47.8114, lng: 16.2372, isHub: false, baseDemand: 10, type: "heliport" }
+                ]
+            },
+            "Slovenia": { unlocked: false, baseCost: 53, continent: "Europe", nation: "Slovenia", flag: "🇸🇮", isSplit: false,
+                  polygon: [[46.8,16.0],[46.87, 16.29],[46.59, 16.46],[46.14, 15.59],[45.84, 15.66],[45.72, 15.25],[45.48, 15.38],[45.46, 14.81],[45.67, 14.56],[45.48, 14.38],[45.47, 13.58],[45.6,13.8],[46.6,13.0],],
+                airports: [
+                    { name: "Ljubljana Jože Pučnik Airport (LJU)", lat: 46.2248, lng: 14.4561, isHub: false, baseDemand: 74, type: "airport" },
+
+{ name: "Maribor Edvard Rusjan Airport (MBX)", lat: 46.4799, lng: 15.6861, isHub: false, baseDemand: 28, type: "airport" },
+
+{ name: "Portorož Airport (POW)", lat: 45.4720, lng: 13.6149, isHub: false, baseDemand: 34, type: "airport", isCoastal: true },
+
+{ name: "Ljubljana University Hospital Heliport (SI-0028)", lat: 46.0521, lng: 14.5144, isHub: false, baseDemand: 10, type: "heliport" },
                 ]
             },
             "Czech Republic": { unlocked: false, baseCost: 60, continent: "Europe", nation: "Czech Republic", flag: "🇨🇿", isSplit: false,
@@ -1912,8 +2052,7 @@
             pendingGround: {}
         };
         let uiUpdatePending = false;
-function updateUI() {
-}
+        let _lastUiRender = 0;
         let gameState = {};
         let globalGroundState = false;
         let hangarCategoryFilter = "";
@@ -3928,7 +4067,7 @@ if (!isLiveTick && (newFuel <= 0 || newCond <= 0)) {
                             setAircraftStat(f.id, 'condition', Math.max(0, newCond));
  
                             f.progress += progressAdded;
-                            uiDirty = true;
+                            // Don't mark dirty just for position — markers update directly
                         }
  
                         const dLat = route.destLat - route.origLat, dLng = route.destLng - route.origLng;
@@ -4659,6 +4798,9 @@ if (!achievements.route_it_ns.unlocked && routeExists("Bolzano Airport", "Lamped
         }
  
         function updateUI() {
+            const _now = Date.now();
+            if (_now - _lastUiRender < 500) return;
+            _lastUiRender = _now;
             if (gameState.cash === undefined) return;
             document.getElementById('cash-display').innerText = gameState.cash.toLocaleString();
             document.getElementById('tokens-display').innerText = gameState.tokens.toLocaleString();
