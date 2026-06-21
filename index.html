@@ -2650,11 +2650,11 @@ if (rarityData && !achievements[rarityData.id].unlocked) {
             if (localStorage.getItem('am81_savegame_pro')) {
                 loadProgress();
                 document.getElementById('setup-screen').style.display = 'none';
+                initSimulationEngine();
             } else {
                 gameState = JSON.parse(JSON.stringify(DEFAULT_STATE));
                 document.getElementById('setup-screen').style.display = 'flex';
             }
-            initSimulationEngine();
         };
  
         function populateSetupNations() {
@@ -2776,14 +2776,17 @@ if (rarityData && !achievements[rarityData.id].unlocked) {
             saveProgress();
             if (map) map.remove();
             initSimulationEngine();
-            startInteractiveTutorial();
         }
  
         function startInteractiveTutorial() { if (gameState.tutorialActive) renderCurrentTutorialStep(); }
  
         function renderCurrentTutorialStep() {
             document.querySelectorAll('.tutorial-highlight').forEach(el => el.classList.remove('tutorial-highlight'));
-            if (!gameState.tutorialActive) { document.getElementById('interactive-tutorial-bubble').style.display = 'none'; return; }
+            if (!gameState.tutorialActive || achievements.graduation.unlocked) { 
+                gameState.tutorialActive = false;
+                document.getElementById('interactive-tutorial-bubble').style.display = 'none'; 
+                return; 
+            }
             document.getElementById('interactive-tutorial-bubble').style.display = 'flex';
             document.getElementById('t-bubble-btn').style.display = 'none';
  
@@ -3014,6 +3017,10 @@ if (rarityData && !achievements[rarityData.id].unlocked) {
     document.body.classList.toggle('light-theme', !!gameState.lightTheme);
     if (typeof checkMilestones === "function") checkMilestones();
     
+    if (parsed.achievementsStatus && parsed.achievementsStatus['graduation']) {
+        gameState.tutorialActive = false;
+    }
+    
     return true;
 }
  
@@ -3090,7 +3097,7 @@ if (rarityData && !achievements[rarityData.id].unlocked) {
             indicator.innerHTML = '📦 A Supply crate is falling!';
             mapEl.appendChild(indicator);
  
-            if (gameState.tutorialActive) renderCurrentTutorialStep();
+            if (gameState.tutorialActive && !achievements.graduation.unlocked) renderCurrentTutorialStep();
             lastTickTime = Date.now();
             setInterval(gameSimulationTick, 100);
             setInterval(rollContractChance, 65000);
