@@ -3209,9 +3209,8 @@ if (rarityData && !achievements[rarityData.id].unlocked) {
             if (!achievements.graduation.unlocked) {
                 achievements.graduation.unlocked = true;
                 gameState.tutorialActive = false;
-                gameState.cash += 150000000;
-                gameState.tokens += 25000000;
-                gameState.rank += 2000000;
+                gameState.cash += 150000;
+                gameState.tokens += 25;
                 
                 triggerMilestonePopupNotification(achievements.graduation.title, achievements.graduation.rewardDesc);
                 document.getElementById('interactive-tutorial-bubble').style.display = 'none';
