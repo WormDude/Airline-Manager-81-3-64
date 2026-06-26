@@ -50,18 +50,6 @@
         @keyframes eventPopIn { 0%{transform:scale(0.7);opacity:0;} 100%{transform:scale(1);opacity:1;} }
         .event-timer-bar { height:4px; background:rgba(0,0,0,0.3); border-radius:2px; margin-top:6px; overflow:hidden; }
         .event-timer-fill { height:100%; border-radius:2px; transition:width 1s linear; }
-        /* ---- TICKET PRICING ---- */
-        .ticket-tier-bar { display:flex; gap:3px; margin-top:5px; }
-        .ticket-tier-btn { flex:1; padding:3px 2px; font-size:9px; font-weight:700; border:1px solid transparent; border-radius:4px; cursor:pointer; text-align:center; transition:all 0.15s; }
-        .ticket-tier-btn.active { transform:scale(1.08); }
-        .ticket-tier-btn.tier-budget   { background:rgba(148,163,184,0.15); color:#94a3b8; border-color:#475569; }
-        .ticket-tier-btn.tier-budget.active   { background:#475569; color:#fff; border-color:#94a3b8; }
-        .ticket-tier-btn.tier-standard { background:rgba(99,102,241,0.12); color:#818cf8; border-color:#6366f1; }
-        .ticket-tier-btn.tier-standard.active { background:#6366f1; color:#fff; }
-        .ticket-tier-btn.tier-premium  { background:rgba(245,158,11,0.12); color:#fbbf24; border-color:#f59e0b; }
-        .ticket-tier-btn.tier-premium.active  { background:#f59e0b; color:#000; }
-        .ticket-tier-btn.tier-luxury   { background:rgba(168,85,247,0.12); color:#c084fc; border-color:#a855f7; }
-        .ticket-tier-btn.tier-luxury.active   { background:#a855f7; color:#fff; }
         * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', system-ui, sans-serif; }
         body { background-color: var(--bg-color); color: var(--text-color); display: flex; flex-direction: column; height: 100vh; overflow: hidden; transition: background-color 0.3s, color 0.3s; }
         .overlay-screen { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(11,15,25,0.95); z-index: 10000; display: flex; flex-direction: column; justify-content: center; align-items: center; padding: 20px; }
@@ -2413,11 +2401,12 @@ z-index:99999;
             "fleet_commander":  { title: "Fleet Commander",          desc: "Own 50 aircraft across all types",                      unlocked: false, badge: "🎖️", rewardDesc: "$1,000,000 and +200 AeroTokens", rarity: "Legendary" },
             "refuel_veteran":   { title: "Fuel Hoarder",             desc: "Refuel aircraft 50 times total",                        unlocked: false, badge: "🛢️", rewardDesc: "$50,000 and +25 AeroTokens", rarity: "Rare" },
             "crash_veteran":    { title: "Crash Test Dummy",         desc: "Experience 5 aircraft crashes",                         unlocked: false, badge: "💀", rewardDesc: "+15 AeroTokens (it's something)", rarity: "Rare" },
-            "secret_collector": { title: "Secret Collector",          desc: "Own all secret aircraft ", unlocked: false, badge: "🛸", rewardDesc: "$10,000,000 and +2,000 AeroTokens", rarity: "Mythic" },
+            "secret_collector": { title: "Area 51 Escapee",          desc: "Own all secret aircraft (Avrocar, SR-71, SR-72, Stratolaunch, Kaman K-MAX, Mil V-12, Sikorsky Skycrane)", unlocked: false, badge: "👽", rewardDesc: "$10,000,000 and +2,000 AeroTokens", rarity: "Mythic" },
             "crate_addict":     { title: "Crate Addict",             desc: "Open 50 supply crates",                                 unlocked: false, badge: "📦", rewardDesc: "$100,000 and +100 AeroTokens", rarity: "Epic" },
             "old_faithful":     { title: "Old Faithful",             desc: "Fly a legacy aircraft on a route for 10 minutes",       unlocked: false, badge: "🕰️", rewardDesc: "$75,000 and +30 AeroTokens", rarity: "Rare" },
             "transcontinental": { title: "Transcontinental",         desc: "Have a route longer than 5,000 NM",                     unlocked: false, badge: "🗺️", rewardDesc: "$100,000 and +30 AeroTokens", rarity: "Rare" },
             "monopoly":         { title: "Monopoly",                 desc: "Establish 10 hubs across your airline network", unlocked: false, badge: "🎩", rewardDesc: "$500,000 and +150 AeroTokens", rarity: "Epic" },
+            "hub_every_airport":{ title: "Everywhere At Once",        desc: "Make every airport and heliport a hub",          unlocked: false, badge: "🌐", rewardDesc: "$10,000,000 and +5,000 AeroTokens", rarity: "Mythic" },
         };
         const DEFAULT_STATE = {
             cash: 0, tokens: 0, rank: 1, xp: 0, airlineName: "", primaryHub: "",
@@ -3657,7 +3646,7 @@ if (rarityData && !achievements[rarityData.id].unlocked) {
                         const mult = isCargo ? CARGO_EARNINGS_MULTIPLIER : EARNINGS_MULTIPLIER;
                         const fUnit = isCargo ? (ac.cargo || 0) : ((ac.pax || 0));
                         const evMods = (typeof getEventModsForRoute === 'function') ? getEventModsForRoute(route) : { earningsMod:0, demandMod:0 };
-                        const ticketMods = (typeof getRouteTicketMods === 'function') ? getRouteTicketMods(route) : { paxMod:1, earningsMod:1 };
+                        const ticketMods = { paxMod:1, earningsMod:1 };
                         const effectivePaxMod = isCargo ? 1 : ticketMods.paxMod;
                         const effectiveEarnMod = ticketMods.earningsMod * (1 + evMods.earningsMod);
                         const effectiveDemandMod = Math.max(0, routeDemandMod + evMods.demandMod);
@@ -3833,7 +3822,7 @@ if (rarityData && !achievements[rarityData.id].unlocked) {
         function setDistanceUnit(unit) {
             gameState.distanceUnit = unit;
             document.querySelectorAll('#unit-nm, #unit-mi, #unit-km').forEach(b => b.classList.remove('active'));
-            document.getElementById(`unit-${unit.toLowerCase()}`).classList.add('active');
+            const _uel = document.getElementById(`unit-${unit.toLowerCase()}`); if (_uel) _uel.classList.add('active');
             updateUI();
         }
  
@@ -3841,7 +3830,7 @@ if (rarityData && !achievements[rarityData.id].unlocked) {
             if (!gameState.speedUnit) gameState.speedUnit = 'KN';
             gameState.speedUnit = unit;
             document.querySelectorAll('#speed-kn, #speed-mph, #speed-kmh').forEach(b => b.classList.remove('active'));
-            document.getElementById(`speed-${unit.toLowerCase()}`).classList.add('active');
+            const _sel = document.getElementById(`speed-${unit.toLowerCase()}`); if (_sel) _sel.classList.add('active');
             updateUI();
         }
  
@@ -3871,8 +3860,8 @@ if (rarityData && !achievements[rarityData.id].unlocked) {
         }
         function setRunwayUnit(unit) {
             gameState.runwayUnit = unit;
-            document.getElementById('runway-ft-btn').classList.toggle('active', unit === 'ft');
-            document.getElementById('runway-m-btn').classList.toggle('active', unit === 'm');
+            const rft = document.getElementById('runway-ft-btn'); if (rft) rft.classList.toggle('active', unit === 'ft');
+            const rm = document.getElementById('runway-m-btn'); if (rm) rm.classList.toggle('active', unit === 'm');
             saveProgress();
             renderMapGraphics();
             updateUI();
@@ -3886,16 +3875,16 @@ if (rarityData && !achievements[rarityData.id].unlocked) {
         }
         function setMapPointScale(value) {
             gameState.mapPointScale = parseFloat(value) || 1;
-            ['05','10','15','20'].forEach(v => document.getElementById(`map-scale-${v}`).classList.remove('active'));
-            document.getElementById(`map-scale-${Math.round(gameState.mapPointScale * 10).toString().padStart(2, '0')}`).classList.add('active');
+            ['05','10','15','20'].forEach(v => { const e = document.getElementById(`map-scale-${v}`); if (e) e.classList.remove('active'); });
+            const _msel = document.getElementById(`map-scale-${Math.round(gameState.mapPointScale * 10).toString().padStart(2, '0')}`); if (_msel) _msel.classList.add('active');
             saveProgress();
             renderMapGraphics();
             updateUI();
         }
         function setAircraftIconScale(value) {
             gameState.aircraftIconScale = parseFloat(value) || 1;
-            ['05','10','15','20'].forEach(v => document.getElementById(`aircraft-scale-${v}`).classList.remove('active'));
-            document.getElementById(`aircraft-scale-${Math.round(gameState.aircraftIconScale * 10).toString().padStart(2, '0')}`).classList.add('active');
+            ['05','10','15','20'].forEach(v => { const e = document.getElementById(`aircraft-scale-${v}`); if (e) e.classList.remove('active'); });
+            const _asel = document.getElementById(`aircraft-scale-${Math.round(gameState.aircraftIconScale * 10).toString().padStart(2, '0')}`); if (_asel) _asel.classList.add('active');
             saveProgress();
             renderMapGraphics();
             updateUI();
@@ -4806,7 +4795,7 @@ if (!isTabFocused || !isLiveTick) {
                                 // Condition penalty: below 50% earns less
                                 const condMod = Math.max(0.2, condPct / 100);
                                 const evMods = (typeof getEventModsForRoute === 'function') ? getEventModsForRoute(route) : { earningsMod:0, demandMod:0 };
-                                const ticketMods = (typeof getRouteTicketMods === 'function') ? getRouteTicketMods(route) : { paxMod:1, earningsMod:1 };
+                                const ticketMods = { paxMod:1, earningsMod:1 };
                                 const effectivePaxMod = isCargo ? 1 : ticketMods.paxMod;
                                 const effectiveEarnMod = ticketMods.earningsMod * (1 + evMods.earningsMod);
                                 const effectiveDemandMod = Math.max(0, routeDemandMod + evMods.demandMod);
@@ -5315,7 +5304,7 @@ if (requiredRunway) {
     const isCargo2 = spec.isCargo || spec.type === 'cargo-plane';
     const isHeli2 = spec.type === 'helicopter';
     const typeIcon = isHeli2 ? '🚁' : isCargo2 ? '📦' : '✈️';
-    triggerMilestonePopupNotification(`${typeIcon} ${qty > 1 ? qty + '× ' : ''}${spec.name}`, `Added to hangar`);
+    triggerMilestonePopupNotification(`${typeIcon} ${qty > 1 ? qty + '× ' : ''}${spec.name}`, `${rar.charAt(0).toUpperCase()+rar.slice(1)} · Added to hangar`);
     const allCraftsCheck = { ...aircraftCatalog, ...cargoCatalog, ...legacyAircraftCatalog, ...secretCatalog };
     if (!achievements.spinning_around.unlocked && allCraftsCheck[selectedBulkAircraft]?.type === 'helicopter') {
         achievements.spinning_around.unlocked = true;
@@ -5428,6 +5417,9 @@ if (requiredRunway) {
             ? `<img src="${data.flag}" style="width:20px;height:15px;border-radius:2px;object-fit:cover;vertical-align:middle;margin-right:5px;">`
             : `<span style="margin-right:4px;font-size:16px;">${data.flag}</span>`;
 
+        // Strip trailing country code suffix like " (US)", " (AU)" from the display name
+        const displayName = name.replace(/\s*\([A-Z]{2,3}\)\s*$/, '').trim();
+
         const apCount   = data.airports.length;
         const heliCount = data.airports.filter(a => a.type === 'heliport').length;
         const hubCount  = data.airports.filter(a => a.isHub).length;
@@ -5438,7 +5430,7 @@ if (requiredRunway) {
             const barColor = pct === 100 ? '#10b981' : pct > 50 ? '#eab308' : 'var(--accent-color)';
             html += `<div class="card" style="margin-bottom:7px;padding:11px;">
                 <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:6px;">
-                    <div style="display:flex;align-items:center;font-size:13px;font-weight:bold;">${flagHtml}${name}</div>
+                    <div style="display:flex;align-items:center;font-size:13px;font-weight:bold;">${flagHtml}<span>${displayName}</span><span style="font-size:10px;color:#64748b;font-weight:400;margin-left:6px;">| ${data.nation}</span></div>
                     <span style="font-size:10px;padding:2px 7px;border-radius:99px;background:#10b98122;color:#10b981;font-weight:700;">✅ UNLOCKED</span>
                 </div>
                 <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:5px;margin-bottom:7px;">
@@ -5468,7 +5460,7 @@ if (requiredRunway) {
             const tokColor  = gameState.tokens >= tokenCost ? 'var(--token-color)' : '#ef4444';
             html += `<div class="card" style="margin-bottom:7px;padding:11px;${canAfford ? 'border-color:var(--accent-color);' : ''}">
                 <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px;">
-                    <div style="display:flex;align-items:center;font-size:13px;font-weight:bold;">${flagHtml}${name}</div>
+                    <div style="display:flex;align-items:center;font-size:13px;font-weight:bold;">${flagHtml}<span>${displayName}</span><span style="font-size:10px;color:#64748b;font-weight:400;margin-left:6px;">| ${data.nation}</span></div>
                     <span style="font-size:10px;padding:2px 7px;border-radius:99px;background:rgba(239,68,68,0.15);color:#ef4444;font-weight:700;">🔒 LOCKED</span>
                 </div>
                 <div style="display:grid;grid-template-columns:1fr 1fr;gap:5px;margin-bottom:9px;">
@@ -5933,7 +5925,7 @@ if (!achievements.route_it_ns.unlocked && routeExists("Bolzano Airport", "Lamped
 
             // Secret Collector: own all 7 secret aircraft
             if (!achievements.secret_collector.unlocked) {
-                const secretNames = ["Avro Canada VZ-9 Avrocar","Lockheed SR-71 Blackbird","Lockheed Martin SR-72","Scaled Composites Model 351 Stratolaunch","Kaman K-MAX","Mil V-12","Lun-Class Ekranoplan","Hughes H-4 Hercules","Messerschmitt Me 323 Gigant","Wright Flyer","A-90 Orlyonok","Bartini Beriev VVA-14","Cessna 172 Skyhawk"];
+                const secretNames = ["Avro Canada VZ-9 Avrocar","Lockheed SR-71 Blackbird","Lockheed Martin SR-72","Scaled Composites Model 351 Stratolaunch","Kaman K-MAX","Mil V-12","Sikorsky Skycrane"];
                 const owned2 = new Set(Object.keys(gameState.hangar).filter(k => gameState.hangar[k] > 0));
                 gameState.routes.forEach(r => { if (r.fleet) r.fleet.forEach(f => owned2.add(f.type)); });
                 if (secretNames.every(n => owned2.has(n))) {
@@ -5961,6 +5953,18 @@ if (!achievements.route_it_ns.unlocked && routeExists("Bolzano Airport", "Lamped
                 if (totalHubs >= 10) {
                     achievements.monopoly.unlocked = true; gameState.cash += 500000; gameState.tokens += 150;
                     triggerMilestonePopupNotification(achievements.monopoly.title, achievements.monopoly.rewardDesc);
+                }
+            }
+
+            // Everywhere At Once: every unlocked airport/heliport is a hub
+            if (!achievements.hub_every_airport.unlocked) {
+                const unlockedAirports = Object.values(regions)
+                    .filter(r => r.unlocked)
+                    .flatMap(r => r.airports);
+                if (unlockedAirports.length > 0 && unlockedAirports.every(a => a.isHub)) {
+                    achievements.hub_every_airport.unlocked = true;
+                    gameState.cash += 10000000; gameState.tokens += 5000;
+                    triggerMilestonePopupNotification(achievements.hub_every_airport.title, achievements.hub_every_airport.rewardDesc);
                 }
             }
         }
@@ -6029,7 +6033,7 @@ if (groundAllBtn) {
                         ? `<span style="font-size:9px;margin-left:4px;color:${evMods.earningsMod>0||evMods.demandMod>0?'#10b981':'#ef4444'};">⚡ Event</span>` : '';
                     const curTierKey = route.ticketTier || 'standard';
                     const curTierInfo = { emoji: '🎫' };
-                    const tierBadge = !isContract ? `<span style="font-size:9px;margin-left:4px;color:#64748b;">🎫 $${(route.ticketPrice || BASE_TICKET_PRICE).toLocaleString()}</span>` : '';
+                    const tierBadge = '';
                     let opts = `<option value="">— Add Aircraft —</option>`;
                     for (const [type, count] of Object.entries(gameState.hangar)) {
                         if (count > 0) {
@@ -6064,12 +6068,12 @@ if (groundAllBtn) {
                             const craftSpec2 = allCraftsForFleet[f.type];
                             let paxLine = '';
                             if (!isCargoF && craftSpec2 && craftSpec2.pax) {
-                                const { paxMod } = getRouteTicketMods(route);
+                                const paxMod = 1;
                                 const evMods2 = (typeof getEventModsForRoute === 'function') ? getEventModsForRoute(route) : { demandMod: 0 };
                                 const effectiveDemand = Math.min(1, Math.max(0.05, ((route.routeDemand || 50) / 100 + evMods2.demandMod) * paxMod));
                                 const pax = Math.round(craftSpec2.pax * effectiveDemand);
                                 const paxColor = pax >= craftSpec2.pax * 0.8 ? '#10b981' : pax >= craftSpec2.pax * 0.4 ? '#eab308' : '#94a3b8';
-                                paxLine = `<div style="font-size:10px;color:${paxColor};margin-bottom:4px;">👥 ~${pax.toLocaleString()} / ${craftSpec2.pax} pax · $${(route.ticketPrice || BASE_TICKET_PRICE).toLocaleString()}/ticket</div>`;
+                                paxLine = `<div style="font-size:10px;color:${paxColor};margin-bottom:4px;">👥 ${pax.toLocaleString()} / ${craftSpec2.pax} pax</div>`;
                             }
                             return `<div style="background:rgba(0,0,0,0.22);border:1px solid ${borderColor};border-radius:6px;padding:7px;margin-bottom:5px;">
                                 <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:3px;">
@@ -6103,29 +6107,8 @@ if (groundAllBtn) {
                     card.className = 'card';
                     card.style.marginBottom = '8px';
                     card.style.padding = '10px';
-                    // Pre-compute ticket price input HTML
+                    // (ticket pricing removed)
                     let ticketTierHtml = '';
-                    if (!isContract) {
-                        const curPrice = route.ticketPrice || BASE_TICKET_PRICE;
-                        const ratio = curPrice / BASE_TICKET_PRICE;
-                        const paxEffect = Math.round((Math.max(0.1, Math.pow(ratio, -0.5)) - 1) * 100);
-                        const revenueEffect = Math.round((ratio * Math.max(0.1, Math.pow(ratio, -0.5)) - 1) * 100);
-                        const paxColor = paxEffect >= 0 ? '#10b981' : '#ef4444';
-                        const revColor = revenueEffect >= 0 ? '#10b981' : '#ef4444';
-                        ticketTierHtml = `<div style="margin-top:6px;">
-                            <div style="font-size:9px;color:#64748b;margin-bottom:4px;text-transform:uppercase;letter-spacing:1px;">🎫 Ticket Price</div>
-                            <div style="display:flex;align-items:center;gap:6px;">
-                                <span style="color:#64748b;font-size:12px;">$</span>
-                                <input type="number" min="1" value="${curPrice}"
-                                    style="width:90px;background:var(--input-bg);border:1px solid var(--input-border);color:var(--text-color);border-radius:4px;padding:3px 6px;font-size:12px;"
-                                    onchange="setRouteTicketPrice(${JSON.stringify(route.id)},this.value)"
-                                    onblur="setRouteTicketPrice(${JSON.stringify(route.id)},this.value)" />
-                                <span style="font-size:10px;color:#64748b;">per ticket</span>
-                                <span style="font-size:10px;color:${paxColor};margin-left:2px;">${paxEffect>=0?'+':''}${paxEffect}% pax</span>
-                                <span style="font-size:10px;color:${revColor};">${revenueEffect>=0?'+':''}${revenueEffect}% rev</span>
-                            </div>
-                        </div>`;
-                    }
                     card.innerHTML = `
                         <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:6px;">
                             <div>
@@ -7110,31 +7093,6 @@ if (groundAllBtn) {
         }
 
         // ============================================================
-        // TICKET PRICING SYSTEM
-        // ============================================================
-        const BASE_TICKET_PRICE = 150; // baseline $/ticket — earnings formula anchored here
-
-        function setRouteTicketPrice(routeId, price) {
-            const route = gameState.routes.find(r => String(r.id) === String(routeId));
-            if (!route) return;
-            const val = parseInt(price, 10);
-            route.ticketPrice = isNaN(val) || val < 1 ? BASE_TICKET_PRICE : val;
-            saveProgress();
-            updateUI();
-        }
-
-        function getRouteTicketMods(route) {
-            if (route.isSpecialContract) return { paxMod:1, earningsMod:1 };
-            const price = route.ticketPrice || BASE_TICKET_PRICE;
-            const ratio = price / BASE_TICKET_PRICE;
-            // Higher price = fewer passengers (demand penalty), more revenue per pax
-            // paxMod: at 2× price → 70% fill, at 0.5× price → 130% fill
-            const paxMod = Math.max(0.1, Math.pow(ratio, -0.5));
-            // earningsMod: total revenue = price × pax, anchored so at base price earningsMod=1
-            const earningsMod = ratio * paxMod;
-            return { paxMod, earningsMod };
-        }
-
         function switchTab(tabId) {
             document.querySelectorAll('.tab-content').forEach(el => el.classList.remove('active'));
             document.querySelectorAll('.tab-btn').forEach(el => el.classList.remove('active'));
