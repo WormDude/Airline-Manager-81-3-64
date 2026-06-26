@@ -2413,7 +2413,7 @@ z-index:99999;
             "fleet_commander":  { title: "Fleet Commander",          desc: "Own 50 aircraft across all types",                      unlocked: false, badge: "🎖️", rewardDesc: "$1,000,000 and +200 AeroTokens", rarity: "Legendary" },
             "refuel_veteran":   { title: "Fuel Hoarder",             desc: "Refuel aircraft 50 times total",                        unlocked: false, badge: "🛢️", rewardDesc: "$50,000 and +25 AeroTokens", rarity: "Rare" },
             "crash_veteran":    { title: "Crash Test Dummy",         desc: "Experience 5 aircraft crashes",                         unlocked: false, badge: "💀", rewardDesc: "+15 AeroTokens (it's something)", rarity: "Rare" },
-            "secret_collector": { title: "Area 51 Escapee",          desc: "Own all secret aircraft (Avrocar, SR-71, SR-72, Stratolaunch, Kaman K-MAX, Mil V-12, Sikorsky Skycrane)", unlocked: false, badge: "👽", rewardDesc: "$10,000,000 and +2,000 AeroTokens", rarity: "Mythic" },
+            "secret_collector": { title: "Secret Collector",          desc: "Own all secret aircraft ", unlocked: false, badge: "🛸", rewardDesc: "$10,000,000 and +2,000 AeroTokens", rarity: "Mythic" },
             "crate_addict":     { title: "Crate Addict",             desc: "Open 50 supply crates",                                 unlocked: false, badge: "📦", rewardDesc: "$100,000 and +100 AeroTokens", rarity: "Epic" },
             "old_faithful":     { title: "Old Faithful",             desc: "Fly a legacy aircraft on a route for 10 minutes",       unlocked: false, badge: "🕰️", rewardDesc: "$75,000 and +30 AeroTokens", rarity: "Rare" },
             "transcontinental": { title: "Transcontinental",         desc: "Have a route longer than 5,000 NM",                     unlocked: false, badge: "🗺️", rewardDesc: "$100,000 and +30 AeroTokens", rarity: "Rare" },
@@ -5933,7 +5933,7 @@ if (!achievements.route_it_ns.unlocked && routeExists("Bolzano Airport", "Lamped
 
             // Secret Collector: own all 7 secret aircraft
             if (!achievements.secret_collector.unlocked) {
-                const secretNames = ["Avro Canada VZ-9 Avrocar","Lockheed SR-71 Blackbird","Lockheed Martin SR-72","Scaled Composites Model 351 Stratolaunch","Kaman K-MAX","Mil V-12","Sikorsky Skycrane"];
+                const secretNames = ["Avro Canada VZ-9 Avrocar","Lockheed SR-71 Blackbird","Lockheed Martin SR-72","Scaled Composites Model 351 Stratolaunch","Kaman K-MAX","Mil V-12","Lun-Class Ekranoplan","Hughes H-4 Hercules","Messerschmitt Me 323 Gigant","Wright Flyer","A-90 Orlyonok","Bartini Beriev VVA-14","Cessna 172 Skyhawk"];
                 const owned2 = new Set(Object.keys(gameState.hangar).filter(k => gameState.hangar[k] > 0));
                 gameState.routes.forEach(r => { if (r.fleet) r.fleet.forEach(f => owned2.add(f.type)); });
                 if (secretNames.every(n => owned2.has(n))) {
