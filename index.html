@@ -949,6 +949,132 @@ z-index:99999;
         const CARGO_EARNINGS_MULTIPLIER = 0.00055; // $ per NM per kg — cargo is now meaningfully more lucrative than passengers
         const BACKGROUND_EARNINGS_RATIO = 1.0;    // tab-unfocused: no bonus, no penalty
 
+        // ============================================================
+        // TICKETING SYSTEM
+        // ============================================================
+        // Three cabin classes with base prices per NM (multiplied by distance at earn time)
+        // These represent $/seat at 1 NM — actual ticket = BASE_PRICE_PER_NM * distanceNM
+        const CABIN_CLASSES = {
+            // Realistic pricing: baseFare (fixed per flight) + pricePerNM (distance component)
+            // Economy short-haul ~$100-180, medium ~$200-350, long-haul ~$400-700
+            // Business ~2.5-4x economy, First ~5-8x economy
+            economy:  { label: 'Economy',  icon: '🟦', color: '#60a5fa', baseFare:  75, pricePerNM: 0.085, defaultShare: 0.70 },
+            business: { label: 'Business', icon: '🟨', color: '#fbbf24', baseFare: 180, pricePerNM: 0.260, defaultShare: 0.20 },
+            first:    { label: 'First',    icon: '🟥', color: '#f87171', baseFare: 350, pricePerNM: 0.580, defaultShare: 0.10 },
+        };
+        // Demand elasticity: fill% = clamp(baseFill * (basePrice/actualPrice)^elasticity, 0%, 100%)
+        // At 3x base price → economy goes to ~0, business ~15%, first ~30%
+        // Hard cutoff: if price > MAX_PRICE_RATIO * base, fill = 0
+        const CABIN_ELASTICITY   = { economy: 2.2, business: 1.2, first: 0.7 };
+        const CABIN_MAX_RATIO    = { economy: 2.5, business: 4.0, first: 6.0 }; // above this → 0 pax
+
+        // Compute the realistic base ticket price for a given distance
+        function getBaseTicketPrice(cls, distanceNM) {
+            const cc = CABIN_CLASSES[cls];
+            return Math.round(cc.baseFare + cc.pricePerNM * distanceNM);
+        }
+
+        // Central demand calculation: combines airport baseDemand (intrinsic popularity)
+        // with route.routeDemand (event/condition modifier, default 100 = no change).
+        // Returns a 0–1+ multiplier for fill rate calculations.
+        function getRouteDemandMod(route, evDemandMod) {
+            const origAp  = findAirportData(route.origin);
+            const destAp  = findAirportData(route.destination);
+            const origBase = origAp  ? (origAp.baseDemand  || 50) : 50;
+            const destBase = destAp  ? (destAp.baseDemand  || 50) : 50;
+            // Average both airports' intrinsic demand (0–100 scale → 0–1)
+            const airportDemand = ((origBase + destBase) / 2) / 100;
+            // Route-level event modifier (default 100 = unchanged)
+            const routeMod = (route.routeDemand == null ? 100 : route.routeDemand) / 100;
+            // Combine: airport sets the ceiling, route events shift it
+            return Math.max(0, Math.min(1.5, airportDemand * routeMod + (evDemandMod || 0)));
+        }
+
+        function getDefaultTicketing(distanceNM) {
+            return {
+                economy:  { price: getBaseTicketPrice('economy',  distanceNM), share: CABIN_CLASSES.economy.defaultShare  },
+                business: { price: getBaseTicketPrice('business', distanceNM), share: CABIN_CLASSES.business.defaultShare },
+                first:    { price: getBaseTicketPrice('first',    distanceNM), share: CABIN_CLASSES.first.defaultShare    },
+            };
+        }
+
+        function ensureRouteTicketing(route) {
+            if (!route.ticketing) route.ticketing = getDefaultTicketing(route.distanceNM);
+            for (const cls of ['economy','business','first']) {
+                if (!route.ticketing[cls]) route.ticketing[cls] = { price: getBaseTicketPrice(cls, route.distanceNM), share: CABIN_CLASSES[cls].defaultShare };
+                // Migrate old pricePerNM format → price in dollars
+                if (route.ticketing[cls].pricePerNM !== undefined && route.ticketing[cls].price === undefined) {
+                    route.ticketing[cls].price = Math.round(route.ticketing[cls].pricePerNM * route.distanceNM);
+                    delete route.ticketing[cls].pricePerNM;
+                }
+            }
+        }
+
+        // Returns { pax, revenue } for one completed flight leg given aircraft pax capacity
+        function calcTicketingResult(route, totalPax, demandMod, condMod) {
+            ensureRouteTicketing(route);
+            let totalRevenue = 0, totalFilledPax = 0;
+            for (const cls of ['economy','business','first']) {
+                const cfg = route.ticketing[cls];
+                const clsSeats = Math.round(totalPax * cfg.share);
+                const basePrice = getBaseTicketPrice(cls, route.distanceNM);
+                const actualPrice = cfg.price;
+                const ratio = actualPrice / Math.max(1, basePrice);
+                if (ratio > CABIN_MAX_RATIO[cls]) continue;
+                const inverseRatio = basePrice / Math.max(1, actualPrice);
+                const fillRate = Math.min(1, Math.max(0, demandMod * condMod * Math.pow(inverseRatio, CABIN_ELASTICITY[cls])));
+                const filledSeats = Math.round(clsSeats * fillRate);
+                totalRevenue += filledSeats * actualPrice;
+                totalFilledPax += filledSeats;
+            }
+            return { revenue: Math.round(totalRevenue), pax: totalFilledPax };
+        }
+
+        // Used for route card display — shows per-class breakdown
+        function getTicketingDisplayData(route, totalPax, demandMod) {
+            ensureRouteTicketing(route);
+            const rows = [];
+            for (const cls of ['economy','business','first']) {
+                const cfg = route.ticketing[cls];
+                const clsSeats = Math.round(totalPax * cfg.share);
+                const basePrice = getBaseTicketPrice(cls, route.distanceNM);
+                const ratio = cfg.price / Math.max(1, basePrice);
+                const tooExpensive = ratio > CABIN_MAX_RATIO[cls];
+                const inverseRatio = basePrice / Math.max(1, cfg.price);
+                const fillRate = tooExpensive ? 0 : Math.min(1, Math.max(0, demandMod * Math.pow(inverseRatio, CABIN_ELASTICITY[cls])));
+                const filledSeats = Math.round(clsSeats * fillRate);
+                rows.push({ cls, clsSeats, filledSeats, fillRate, ticketPrice: cfg.price, revenue: filledSeats * cfg.price, tooExpensive });
+            }
+            return rows;
+        }
+
+        function setRouteTicketingPrice(routeId, cls, dollarPrice) {
+            const route = gameState.routes.find(r => String(r.id) === String(routeId));
+            if (!route) return;
+            ensureRouteTicketing(route);
+            const val = parseInt(dollarPrice, 10);
+            route.ticketing[cls].price = isNaN(val) || val < 1 ? getBaseTicketPrice(cls, route.distanceNM) : val;
+            saveProgress(); updateUI();
+        }
+
+        function setRouteTicketingShare(routeId, cls, sharePct) {
+            const route = gameState.routes.find(r => String(r.id) === String(routeId));
+            if (!route) return;
+            ensureRouteTicketing(route);
+            // Adjust other classes proportionally so total = 100%
+            const val = Math.min(95, Math.max(1, parseFloat(sharePct) || 0)) / 100;
+            const others = ['economy','business','first'].filter(c => c !== cls);
+            const remaining = 1 - val;
+            const otherTotal = others.reduce((s,c) => s + route.ticketing[c].share, 0);
+            if (otherTotal > 0) {
+                others.forEach(c => { route.ticketing[c].share = (route.ticketing[c].share / otherTotal) * remaining; });
+            } else {
+                others.forEach(c => { route.ticketing[c].share = remaining / 2; });
+            }
+            route.ticketing[cls].share = val;
+            saveProgress(); updateUI();
+        }
+
         // Dynamic aircraft pricing: scales with lifetime earnings
         // 1x at $0, 2x at $10M, 3x at $100M, capped at 5x
         function getAircraftPriceMultiplier() {
@@ -3577,7 +3703,7 @@ if (rarityData && !achievements[rarityData.id].unlocked) {
         
         gameState.routes.forEach(route => {
             if (!route.fleet || route.fleet.length === 0) return;
-            const routeDemandMod = (route.routeDemand || 100) / 100;
+            const routeDemandMod = getRouteDemandMod(route, 0);
             
             for (let i = route.fleet.length - 1; i >= 0; i--) {
                 let f = route.fleet[i];
@@ -3646,11 +3772,14 @@ if (rarityData && !achievements[rarityData.id].unlocked) {
                         const mult = isCargo ? CARGO_EARNINGS_MULTIPLIER : EARNINGS_MULTIPLIER;
                         const fUnit = isCargo ? (ac.cargo || 0) : ((ac.pax || 0));
                         const evMods = (typeof getEventModsForRoute === 'function') ? getEventModsForRoute(route) : { earningsMod:0, demandMod:0 };
-                        const ticketMods = { paxMod:1, earningsMod:1 };
-                        const effectivePaxMod = isCargo ? 1 : ticketMods.paxMod;
-                        const effectiveEarnMod = ticketMods.earningsMod * (1 + evMods.earningsMod);
-                        const effectiveDemandMod = Math.max(0, routeDemandMod + evMods.demandMod);
-                        const baseCash = Math.round(route.distanceNM * mult * fUnit * effectivePaxMod * effectiveDemandMod * effectiveEarnMod) * completedLegs;
+                        const effectiveDemandMod = getRouteDemandMod(route, evMods.demandMod);
+                        let baseCash;
+                        if (!isCargo && fUnit > 0) {
+                            const tickResult = calcTicketingResult(route, fUnit, effectiveDemandMod, 1);
+                            baseCash = tickResult.revenue * completedLegs;
+                        } else {
+                            baseCash = Math.round(route.distanceNM * mult * fUnit * effectiveDemandMod * (1 + evMods.earningsMod)) * completedLegs;
+                        }
                         earnedCash += Math.round(baseCash * OFFLINE_EARN_RATIO);
                         earnedXp += Math.round(route.distanceNM) * completedLegs;
                         const tokenOdds = Math.min(0.98, route.distanceNM / 1500 + 0.25);
@@ -4510,7 +4639,7 @@ const hub =
             if (gameState.routes) {
                 gameState.routes.forEach(route => {
                     if (!route.fleet || route.fleet.length === 0) return;
-                    const routeDemandMod = (route.routeDemand || 100) / 100;
+                    const routeDemandMod = getRouteDemandMod(route, 0);
                     for (let i = route.fleet.length - 1; i >= 0; i--) {
                         let f = route.fleet[i];
                         currentFleetIds.add(String(f.id));
@@ -4795,11 +4924,17 @@ if (!isTabFocused || !isLiveTick) {
                                 // Condition penalty: below 50% earns less
                                 const condMod = Math.max(0.2, condPct / 100);
                                 const evMods = (typeof getEventModsForRoute === 'function') ? getEventModsForRoute(route) : { earningsMod:0, demandMod:0 };
-                                const ticketMods = { paxMod:1, earningsMod:1 };
-                                const effectivePaxMod = isCargo ? 1 : ticketMods.paxMod;
-                                const effectiveEarnMod = ticketMods.earningsMod * (1 + evMods.earningsMod);
-                                const effectiveDemandMod = Math.max(0, routeDemandMod + evMods.demandMod);
-                                const cashReward = Math.round(route.distanceNM * mult * unit * effectivePaxMod * effectiveDemandMod * condMod * effectiveEarnMod) * legsFinished;
+                                const effectiveDemandMod = getRouteDemandMod(route, evMods.demandMod);
+
+                                let cashReward;
+                                if (!isCargo && unit > 0) {
+                                    // Use ticketing system for passenger aircraft
+                                    const tickResult = calcTicketingResult(route, unit, effectiveDemandMod, condMod);
+                                    cashReward = tickResult.revenue * legsFinished;
+                                } else {
+                                    // Cargo: flat multiplier as before
+                                    cashReward = Math.round(route.distanceNM * mult * unit * effectiveDemandMod * condMod * (1 + evMods.earningsMod)) * legsFinished;
+                                }
                                 gameState.cash += applyCashForTick(cashReward, isLiveTick);
                                 gameState.lifetimeEarnings = (gameState.lifetimeEarnings || 0) + applyCashForTick(cashReward, isLiveTick);
                                 gameState.xp += Math.round(route.distanceNM) * legsFinished;
@@ -6025,7 +6160,7 @@ if (groundAllBtn) {
                     const origShort = route.origin.split(' (')[0];
                     const destShort = route.destination.split(' (')[0];
                     const distStr = convertDistance(route.distanceNM);
-                    const demandPct = route.routeDemand || 0;
+                    const demandPct = Math.round(getRouteDemandMod(route, 0) * 100);
                     const demandColor = demandPct >= 70 ? '#10b981' : demandPct >= 40 ? '#eab308' : '#94a3b8';
                     // Event effects on this route
                     const evMods = (typeof getEventModsForRoute === 'function') ? getEventModsForRoute(route) : { earningsMod:0, demandMod:0 };
@@ -6070,7 +6205,7 @@ if (groundAllBtn) {
                             if (!isCargoF && craftSpec2 && craftSpec2.pax) {
                                 const paxMod = 1;
                                 const evMods2 = (typeof getEventModsForRoute === 'function') ? getEventModsForRoute(route) : { demandMod: 0 };
-                                const effectiveDemand = Math.min(1, Math.max(0.05, ((route.routeDemand || 50) / 100 + evMods2.demandMod) * paxMod));
+                                const effectiveDemand = Math.min(1, Math.max(0, getRouteDemandMod(route, evMods2.demandMod) * paxMod));
                                 const pax = Math.round(craftSpec2.pax * effectiveDemand);
                                 const paxColor = pax >= craftSpec2.pax * 0.8 ? '#10b981' : pax >= craftSpec2.pax * 0.4 ? '#eab308' : '#94a3b8';
                                 paxLine = `<div style="font-size:10px;color:${paxColor};margin-bottom:4px;">👥 ${pax.toLocaleString()} / ${craftSpec2.pax} pax</div>`;
@@ -6107,8 +6242,78 @@ if (groundAllBtn) {
                     card.className = 'card';
                     card.style.marginBottom = '8px';
                     card.style.padding = '10px';
-                    // (ticket pricing removed)
+                    // Build ticketing UI for passenger routes
                     let ticketTierHtml = '';
+                    if (!isContract) {
+                        ensureRouteTicketing(route);
+                        const allCraftsT = { ...aircraftCatalog, ...cargoCatalog, ...legacyAircraftCatalog, ...secretCatalog };
+                        const sampleFleet = route.fleet && route.fleet.find(f => !cargoCatalog[f.type]);
+                        const samplePax = sampleFleet ? (allCraftsT[sampleFleet.type]?.pax || 0) : 0;
+                        const evMods2 = (typeof getEventModsForRoute === 'function') ? getEventModsForRoute(route) : { demandMod:0 };
+                        const demandModVal = getRouteDemandMod(route, evMods2.demandMod);
+                        const rows = samplePax > 0 ? getTicketingDisplayData(route, samplePax, demandModVal) : null;
+                        const totalRevPerFlight = rows ? rows.reduce((s,r2) => s + r2.revenue, 0) : 0;
+                        const totalPaxFilled = rows ? rows.reduce((s,r2) => s + r2.filledSeats, 0) : 0;
+
+                        const clsRowsHtml = ['economy','business','first'].map(cls => {
+                            const cc = CABIN_CLASSES[cls];
+                            const cfg = route.ticketing[cls];
+                            const ticketPrice = cfg.price || getBaseTicketPrice(cls, route.distanceNM);
+                            const basePriceTicket = getBaseTicketPrice(cls, route.distanceNM);
+                            
+                            const sharePct = Math.round(cfg.share * 100);
+                            const row2 = rows ? rows.find(r2 => r2.cls === cls) : null;
+                            const fillRate = row2 ? row2.fillRate : null;
+                            const filledSeats = row2 ? row2.filledSeats : null;
+                            const clsSeats = row2 ? row2.clsSeats : null;
+                            const tooExpensive = row2 ? row2.tooExpensive : false;
+                            const revenue = row2 ? row2.revenue : null;
+                            const fillColor = tooExpensive ? '#ef4444' : fillRate === null ? '#475569' : fillRate > 0.7 ? '#10b981' : fillRate > 0.35 ? '#eab308' : '#ef4444';
+                            const fillPct = fillRate !== null ? Math.round(fillRate * 100) : null;
+                            const priceColor = tooExpensive ? '#ef4444' : ticketPrice > basePriceTicket * 1.5 ? '#f97316' : ticketPrice > basePriceTicket ? '#fbbf24' : ticketPrice < basePriceTicket ? '#34d399' : '#94a3b8';
+                            const rid = JSON.stringify(route.id);
+
+                            return `<div style="background:rgba(0,0,0,0.18);border:1px solid ${tooExpensive ? '#ef444455' : '#1e293b'};border-radius:6px;padding:8px;margin-bottom:5px;">
+                                <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:6px;">
+                                    <span style="font-size:11px;font-weight:700;color:${cc.color};">${cc.icon} ${cc.label}</span>
+                                    ${tooExpensive
+                                        ? `<span style="font-size:10px;color:#ef4444;font-weight:700;">🚫 No passengers — price too high</span>`
+                                        : fillPct !== null
+                                            ? `<span style="font-size:10px;color:${fillColor};">${filledSeats}/${clsSeats} seats · ${fillPct}% full · $${(revenue||0).toLocaleString()}</span>`
+                                            : `<span style="font-size:10px;color:#475569;">$${basePriceTicket} base</span>`
+                                    }
+                                </div>
+                                <div style="display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-bottom:${fillPct !== null ? '5px' : '0'};">
+                                    <div>
+                                        <div style="font-size:9px;color:#64748b;margin-bottom:3px;">💺 Seat share %</div>
+                                        <input type="number" min="1" max="98" value="${sharePct}"
+                                            style="width:100%;background:var(--input-bg);border:1px solid var(--input-border);color:var(--text-color);border-radius:4px;padding:3px 6px;font-size:12px;"
+                                            onchange="setRouteTicketingShare(${rid},'${cls}',this.value)"
+                                            onblur="setRouteTicketingShare(${rid},'${cls}',this.value)" />
+                                    </div>
+                                    <div>
+                                        <div style="font-size:9px;color:#64748b;margin-bottom:3px;">🎫 Ticket price <span style="color:#475569;">(base $${basePriceTicket})</span></div>
+                                        <input type="number" min="1" value="${ticketPrice}"
+                                            style="width:100%;background:var(--input-bg);border:1px solid ${tooExpensive ? '#ef4444' : 'var(--input-border)'};color:${priceColor};border-radius:4px;padding:3px 6px;font-size:12px;font-weight:700;"
+                                            onchange="setRouteTicketingPrice(${rid},'${cls}',this.value)"
+                                            onblur="setRouteTicketingPrice(${rid},'${cls}',this.value)" />
+                                    </div>
+                                </div>
+                                ${fillPct !== null ? `<div style="height:3px;background:rgba(0,0,0,0.35);border-radius:2px;"><div style="height:100%;width:${tooExpensive ? 100 : fillPct}%;background:${fillColor};border-radius:2px;"></div></div>` : ''}
+                            </div>`;
+                        }).join('');
+
+                        ticketTierHtml = `
+                        <div style="margin-top:8px;border-top:1px solid #1e293b;padding-top:8px;">
+                            <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:7px;">
+                                <span style="font-size:10px;font-weight:700;color:#94a3b8;text-transform:uppercase;letter-spacing:1px;">🎫 Cabin Pricing</span>
+                                ${rows
+                                    ? `<span style="font-size:10px;color:${totalPaxFilled===0?'#ef4444':'#10b981'};font-weight:700;">${totalPaxFilled===0 ? '🚫 Empty flights' : `$${totalRevPerFlight.toLocaleString()} · ${totalPaxFilled}/${samplePax} pax`}</span>`
+                                    : `<span style="font-size:10px;color:#475569;">Assign aircraft to preview</span>`}
+                            </div>
+                            ${clsRowsHtml}
+                        </div>`;
+                    }
                     card.innerHTML = `
                         <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:6px;">
                             <div>
