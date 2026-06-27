@@ -2937,7 +2937,7 @@ function repairAllGrounded() {
     triggerMilestonePopupNotification("Fleet Repaired!", `Repaired ${repairedCount} aircraft for $${totalNeededCost.toLocaleString()}`);
 }
  
-        function showCrashModal(aircraftType, reason) {
+        function showCrashModal(aircraftType, reason, crashedFleetId) {
             const box = document.getElementById('crash-box');
             box.classList.remove('crash-box-shake');
             void box.offsetWidth; // force reflow
@@ -2945,6 +2945,11 @@ function repairAllGrounded() {
             document.getElementById('crash-desc').innerHTML =
                 `Uh oh... Your <strong>${aircraftType}</strong> crashed because of <strong>${reason}</strong>.<br><br>The aircraft has been removed from service.`;
             document.getElementById('crash-modal').style.display = 'flex';
+
+            // If the ATC feed was tracking this aircraft, cut the signal
+            if (crashedFleetId !== undefined && atcFeedFleetId !== null && String(atcFeedFleetId) === String(crashedFleetId)) {
+                signalLostATC(crashedFleetId);
+            }
  
             // First crash achievement
             gameState.totalCrashes = (gameState.totalCrashes || 0) + 1;
@@ -4653,6 +4658,14 @@ const hub =
                             const newCooldown = remaining - deltaTicks;
                             
                             if (newCooldown <= 0) {
+                                // ATC Hold: keep aircraft on ground until ATC clears takeoff
+                                // Only applies if this aircraft has an open ATC feed watching it
+                                const atcWatching = atcFeedFleetId && String(atcFeedFleetId) === String(f.id);
+                                if (atcWatching && window._atcHeldFleets && window._atcHeldFleets.has(String(f.id))) {
+                                    // Keep aircraft grounded — reset cooldown to 1 tick so it re-checks next cycle
+                                    setAircraftStat(f.id, 'cooldownTicks', 1);
+                                    uiDirty = true;
+                                } else {
                                 // Pre-flight check: Can we survive the next leg?
                                 const craftSpec = allCrafts[f.type];
                                 const requiredFuel = 100 * (route.distanceNM / craftSpec.rangeNM);
@@ -4677,6 +4690,7 @@ const hub =
     setAircraftStat(f.id, 'cooldownTicks', 0);
 }; // Cleared for takeoff
                                 }
+                                } // end ATC hold else
                             } else {
                                 setAircraftStat(f.id, 'cooldownTicks', newCooldown);
                             }
@@ -4701,7 +4715,7 @@ const hub =
                                     delete (gameState.aircraftStats || {})[f.id];
                                     delete (gameState.voluntarilyGrounded || {})[f.id];
                                     delete (gameState.pendingGround || {})[f.id];
-                                    showCrashModal(f.type, 'running out of fuel ⛽');
+                                    showCrashModal(f.type, 'running out of fuel ⛽', f.id);
                                     uiDirty = true;
                                     continue;
                                 }
@@ -4712,7 +4726,7 @@ const hub =
                                     delete (gameState.aircraftStats || {})[f.id];
                                     delete (gameState.voluntarilyGrounded || {})[f.id];
                                     delete (gameState.pendingGround || {})[f.id];
-                                    showCrashModal(f.type, 'critical structural failure 🔧');
+                                    showCrashModal(f.type, 'critical structural failure 🔧', f.id);
                                     uiDirty = true;
                                     continue;
                                 }
@@ -4726,6 +4740,45 @@ const hub =
  
                         const dLat = route.destLat - route.origLat, dLng = route.destLng - route.origLng;
                         let curLat, curLng, bearing;
+
+                        // === HOLDING PATTERN (waiting for ATC landing clearance) ===
+                        // Only holds if the ATC feed is actively watching THIS aircraft and hasn't cleared it to land
+                        const atcWatchingThis = atcFeedFleetId && String(atcFeedFleetId) === String(f.id);
+                        // Auto-add to land hold when approaching with ATC watching
+                        if (atcWatchingThis && !isGrounded && f.progress >= 88) {
+                            if (!window._atcLandHeldFleets.has(String(f.id))) {
+                                window._atcLandHeldFleets.add(String(f.id));
+                            }
+                        }
+                        const inLandHold = atcWatchingThis && window._atcLandHeldFleets && window._atcLandHeldFleets.has(String(f.id));
+                        if (inLandHold && !isGrounded) {
+                            // Freeze progress so it doesn't land
+                            if (f.progress > 92) f.progress = 92;
+                            // Compute a holding-pattern oval around a point ~90% along the route
+                            if (!window._holdingAngle) window._holdingAngle = {};
+                            if (window._holdingAngle[f.id] === undefined) window._holdingAngle[f.id] = 0;
+                            window._holdingAngle[f.id] = (window._holdingAngle[f.id] + 2.5) % 360;
+                            const hAngleRad = (window._holdingAngle[f.id] * Math.PI) / 180;
+                            const holdFrac = 0.90;
+                            const holdBaseLat = f.directionForward
+                                ? route.origLat + dLat * holdFrac
+                                : route.destLat - dLat * holdFrac;
+                            const holdBaseLng = f.directionForward
+                                ? route.origLng + dLng * holdFrac
+                                : route.destLng - dLng * holdFrac;
+                            // Oval radii: racetrack pattern
+                            const ovalLat = 0.18;
+                            const ovalLng = 0.32;
+                            curLat = holdBaseLat + ovalLat * Math.sin(hAngleRad);
+                            curLng = holdBaseLng + ovalLng * Math.cos(hAngleRad);
+                            // Bearing follows tangent of the oval
+                            const nextAngleRad = ((window._holdingAngle[f.id] + 2.5) * Math.PI) / 180;
+                            const nextLat = holdBaseLat + ovalLat * Math.sin(nextAngleRad);
+                            const nextLng = holdBaseLng + ovalLng * Math.cos(nextAngleRad);
+                            bearing = calculateBearing(curLat, curLng, nextLat, nextLng);
+                        } else {
+                            // Normal position interpolation
+                            if (window._holdingAngle && window._holdingAngle[f.id] !== undefined) delete window._holdingAngle[f.id];
                         if (f.directionForward) {
                             curLat = route.origLat + (dLat * (f.progress / 100));
                             curLng = route.origLng + (dLng * (f.progress / 100));
@@ -4735,6 +4788,7 @@ const hub =
                             curLng = route.destLng - (dLng * (f.progress / 100));
                             bearing = calculateBearing(curLat, curLng, route.origLat, route.origLng);
                         }
+                        } // end holding pattern else
  
                         let marker = activeFlightMarkers[String(f.id)];
                         const craftSpec = allCrafts[f.type];
@@ -5326,8 +5380,484 @@ if (requiredRunway) {
             const latlng = marker.getLatLng();
             map.setView(latlng, Math.max(map.getZoom(), 5), { animate: true });
             setTimeout(() => { marker.openPopup(); }, 400);
-            // Switch to the routes tab so map is fully visible
             switchTab('routes');
+            openATCFeed(fleetId);
+        }
+
+        // ============================================================
+        // LIVE ATC FEED
+        // ============================================================
+        let atcFeedFleetId = null;
+        let atcFeedInterval = null;
+        let atcMessageHistory = []; // kept for Claude context
+        window._atcHeldFleets = new Set(); // aircraft IDs waiting for ATC takeoff clearance
+        window._atcLandHeldFleets = new Set(); // aircraft IDs waiting for ATC landing clearance (holding pattern)
+
+        function openATCFeed(fleetId) {
+            // Close any existing feed
+            closeATCFeed();
+            atcFeedFleetId = String(fleetId);
+            atcMessageHistory = [];
+            atcConvoState = 'idle';
+
+            // Build panel HTML
+            const panel = document.createElement('div');
+            panel.id = 'atc-feed-panel';
+            panel.style.cssText = `
+                position: fixed; bottom: 20px; right: 20px; width: 320px; max-height: 400px;
+                background: rgba(10,15,28,0.97); border: 1px solid #22d3ee44;
+                border-radius: 10px; z-index: 9999; display: flex; flex-direction: column;
+                box-shadow: 0 8px 32px rgba(0,0,0,0.8), 0 0 0 1px #22d3ee22;
+                font-family: 'Courier New', monospace;
+            `;
+            panel.innerHTML = `
+                <div id="atc-header" style="display:flex;align-items:center;justify-content:space-between;padding:8px 12px;border-bottom:1px solid #1e3a4a;cursor:move;user-select:none;">
+                    <div style="display:flex;align-items:center;gap:8px;">
+                        <span style="font-size:16px;">📡</span>
+                        <div>
+                            <div style="font-size:11px;font-weight:700;color:#22d3ee;letter-spacing:1px;">LIVE ATC FEED</div>
+                            <div id="atc-reg-label" style="font-size:9px;color:#64748b;">Loading...</div>
+                        </div>
+                    </div>
+                    <div style="display:flex;align-items:center;gap:6px;">
+                        <span id="atc-live-dot" style="width:7px;height:7px;border-radius:50%;background:#22d3ee;display:inline-block;animation:atcPulse 1.2s infinite;"></span>
+                        <button onclick="closeATCFeed()" style="background:none;border:none;color:#64748b;cursor:pointer;font-size:16px;padding:0 2px;line-height:1;">×</button>
+                    </div>
+                </div>
+                <div id="atc-messages" style="flex:1;overflow-y:auto;padding:8px 10px;display:flex;flex-direction:column;gap:5px;min-height:80px;max-height:320px;"></div>
+                <div id="atc-status" style="padding:5px 12px;font-size:9px;color:#334155;border-top:1px solid #0f172a;text-align:right;">Connecting to tower...</div>
+            `;
+            document.body.appendChild(panel);
+
+            // Add pulse animation if not already added
+            if (!document.getElementById('atc-style')) {
+                const style = document.createElement('style');
+                style.id = 'atc-style';
+                style.textContent = `@keyframes atcPulse { 0%,100%{opacity:1;} 50%{opacity:0.2;} } @keyframes atcFadeIn { from{opacity:0;transform:translateY(4px);} to{opacity:1;transform:none;} }`;
+                document.head.appendChild(style);
+            }
+
+            // Make draggable
+            makeDraggable(panel, panel.querySelector('#atc-header'));
+
+            // If the aircraft is currently on the ground / in cooldown, hold it until ATC clears takeoff
+            const _atcCtxCheck = getATCFlightContext();
+            if (_atcCtxCheck && (_atcCtxCheck.phase === 'on ground')) {
+                window._atcHeldFleets.add(String(fleetId));
+            }
+            // If the aircraft is on approach, hold it in a holding pattern until ATC clears to land
+            if (_atcCtxCheck && (_atcCtxCheck.phase === 'approach')) {
+                window._atcLandHeldFleets.add(String(fleetId));
+            }
+
+            // Initial fetch then repeat
+            fetchATCMessage(true);
+            atcFeedInterval = setInterval(fetchATCMessage, 12000);
+        }
+
+        function closeATCFeed() {
+            if (atcFeedInterval) { clearInterval(atcFeedInterval); atcFeedInterval = null; }
+            const panel = document.getElementById('atc-feed-panel');
+            if (panel) panel.remove();
+            if (atcFeedFleetId) window._atcHeldFleets.delete(String(atcFeedFleetId));
+            if (atcFeedFleetId) window._atcLandHeldFleets.delete(String(atcFeedFleetId));
+            atcFeedFleetId = null;
+            atcMessageHistory = [];
+            atcMessagePending = false;
+        }
+
+        function signalLostATC(fleetId) {
+            // Cut the ATC feed with a dramatic SIGNAL LOST overlay
+            if (atcFeedInterval) { clearInterval(atcFeedInterval); atcFeedInterval = null; }
+            const panel = document.getElementById('atc-feed-panel');
+            if (!panel) return;
+            // Stop the live dot animation
+            const dot = document.getElementById('atc-live-dot');
+            if (dot) { dot.style.animation = 'none'; dot.style.background = '#ef4444'; }
+            // Clear the messages area and show SIGNAL LOST
+            const msgs = document.getElementById('atc-messages');
+            if (msgs) {
+                msgs.innerHTML = '';
+                const lost = document.createElement('div');
+                lost.style.cssText = `
+                    display:flex; flex-direction:column; align-items:center; justify-content:center;
+                    padding:30px 10px; gap:12px;
+                `;
+                lost.innerHTML = `
+                    <div style="font-size:28px; animation: atcSignalBlink 0.6s step-end infinite;">📡</div>
+                    <div style="font-size:16px; font-weight:900; color:#ef4444; letter-spacing:3px;
+                                text-transform:uppercase; animation: atcSignalBlink 0.6s step-end infinite;">
+                        ⚠ SIGNAL LOST ⚠
+                    </div>
+                    <div style="font-size:10px; color:#7f1d1d; letter-spacing:1px; text-align:center; margin-top:4px;">
+                        CONTACT WITH FLIGHT LOST<br>EMERGENCY SERVICES NOTIFIED
+                    </div>
+                `;
+                msgs.appendChild(lost);
+            }
+            // Tint the panel border red
+            panel.style.border = '1px solid #ef444488';
+            panel.style.boxShadow = '0 8px 32px rgba(0,0,0,0.8), 0 0 0 1px #ef444444, 0 0 20px rgba(239,68,68,0.3)';
+            const header = document.getElementById('atc-header');
+            if (header) header.style.borderBottom = '1px solid #7f1d1d';
+            const titleEl = panel.querySelector('[style*="LIVE ATC FEED"]') || panel.querySelector('[style*="22d3ee"]');
+            if (titleEl) titleEl.style.color = '#ef4444';
+            const statusEl = document.getElementById('atc-status');
+            if (statusEl) { statusEl.textContent = 'FEED TERMINATED'; statusEl.style.color = '#ef4444'; }
+            // Add blink keyframe if not present
+            if (!document.getElementById('atc-signal-lost-style')) {
+                const s = document.createElement('style');
+                s.id = 'atc-signal-lost-style';
+                s.textContent = `@keyframes atcSignalBlink { 0%,49%{opacity:1;} 50%,100%{opacity:0;} }`;
+                document.head.appendChild(s);
+            }
+            // Remove the close button so it stays until dismissed manually
+            // (user can still close crash modal and see it, then × to dismiss)
+            if (fleetId) window._atcHeldFleets.delete(String(fleetId));
+            if (fleetId) window._atcLandHeldFleets.delete(String(fleetId));
+            atcFeedFleetId = null; // disown the feed so it doesn't auto-close on next tick
+        }
+
+        function getATCFlightContext() {
+            if (!atcFeedFleetId) return null;
+            const allCrafts = { ...aircraftCatalog, ...cargoCatalog, ...legacyAircraftCatalog, ...secretCatalog };
+            let route = null, fleetEntry = null;
+            for (const r of gameState.routes) {
+                if (!r.fleet) continue;
+                const f = r.fleet.find(f => String(f.id) === atcFeedFleetId);
+                if (f) { route = r; fleetEntry = f; break; }
+            }
+            if (!route || !fleetEntry) return null;
+            const spec = allCrafts[fleetEntry.type];
+            const reg = getAircraftRegistration(fleetEntry.id);
+            const fuel = Math.round(getAircraftStat(fleetEntry.id, 'fuel'));
+            const cond = Math.round(getAircraftStat(fleetEntry.id, 'condition'));
+            const progress = fleetEntry.directionForward ? fleetEntry.progress : (100 - fleetEntry.progress);
+            const isCargo = !!cargoCatalog[fleetEntry.type];
+            const pax = isCargo ? null : spec?.pax;
+            const origin = route.origin.split(' (')[0];
+            const dest = route.destination.split(' (')[0];
+            const altitude = spec?.type === 'helicopter' ? Math.round(3000 + Math.random()*2000) : Math.round(25000 + Math.random()*10000);
+            const speedKts = spec?.topSpeedKnots || 400;
+            const distFlown = Math.round((progress / 100) * route.distanceNM);
+            const distLeft = Math.round(route.distanceNM - distFlown);
+            const inCooldown = isInCooldown(fleetEntry.id);
+            const grounded = gameState.voluntarilyGrounded[fleetEntry.id];
+            const phase = inCooldown || grounded ? 'on ground' : progress < 10 ? 'departure' : progress > 90 ? 'approach' : 'cruise';
+            return { reg, type: fleetEntry.type, origin, dest, fuel, cond, progress: Math.round(progress), altitude, speedKts, distFlown, distLeft, isCargo, pax, phase, distanceNM: route.distanceNM };
+        }
+
+        // ATC State machine — tracks where in the procedure sequence each aircraft is
+        // States drive a scripted back-and-forth exchange
+        let atcConvoState = 'idle'; // tracks current step in the ATC procedure
+        let atcMessagePending = false; // guard against overlapping batches
+        let atcCruiseOptionIndex = 0; // increments so cruise never repeats the same chatter
+
+        async function fetchATCMessage(isFirst) {
+            if (atcMessagePending && !isFirst) return; // don't overlap message batches
+            const ctx = getATCFlightContext();
+            if (!ctx) { closeATCFeed(); return; }
+
+            const regEl = document.getElementById('atc-reg-label');
+            if (regEl) regEl.textContent = `${ctx.reg} · ${ctx.type}`;
+            const statusEl = document.getElementById('atc-status');
+
+            // On first open, reset state based on flight phase
+            if (isFirst) {
+                atcCruiseOptionIndex = 0;
+                if (ctx.phase === 'on ground') atcConvoState = 'idle';
+                else if (ctx.phase === 'departure') atcConvoState = 'airborne';
+                else if (ctx.phase === 'cruise') atcConvoState = 'cruise';
+                else if (ctx.phase === 'approach') atcConvoState = 'approach_active';
+            }
+
+            // If aircraft is in approach phase but ATC state hasn't caught up yet, fast-forward
+            if (ctx.phase === 'approach' && (atcConvoState === 'cruise' || atcConvoState === 'airborne')) {
+                atcConvoState = 'cruise'; // will hit the approach branch in generateATCSequence
+            }
+
+            const msgs = generateATCSequence(ctx, atcConvoState, atcCruiseOptionIndex);
+            if (msgs && msgs.length) {
+                atcMessagePending = true;
+                const nextState = msgs._nextState || atcConvoState;
+                msgs.forEach((m, i) => {
+                    setTimeout(() => {
+                        if (!document.getElementById('atc-messages')) return; // feed was closed
+                        atcMessageHistory.push(m);
+                        appendATCMessage(m.speaker, m.message, false, m.label);
+                        // When ATC clears takeoff, release ATC hold on this aircraft
+                        if (m.label === 'ATC' && m.message && m.message.includes('cleared for takeoff') && atcFeedFleetId) {
+                            if (window._atcHeldFleets) window._atcHeldFleets.delete(String(atcFeedFleetId));
+                        }
+                        // When ATC clears to land, release landing hold
+                        if (m.label === 'ATC' && m.message && m.message.includes('cleared to land') && atcFeedFleetId) {
+                            if (window._atcLandHeldFleets) window._atcLandHeldFleets.delete(String(atcFeedFleetId));
+                        }
+                        // Advance state only after the last message of the sequence fires
+                        if (i === msgs.length - 1) {
+                            atcConvoState = nextState;
+                            atcCruiseOptionIndex++;
+                            atcMessagePending = false;
+                            // If aircraft is still in landing hold, immediately chain the next ATC sequence
+                            // so it races through descent→approach→cleared to land without waiting 12s
+                            const stillHeld = atcFeedFleetId && window._atcLandHeldFleets && window._atcLandHeldFleets.has(String(atcFeedFleetId));
+                            if (stillHeld) {
+                                setTimeout(fetchATCMessage, 1200);
+                            }
+                            // Same for takeoff hold — chain quickly through ground sequences
+                            const takeoffHeld = atcFeedFleetId && window._atcHeldFleets && window._atcHeldFleets.has(String(atcFeedFleetId));
+                            if (takeoffHeld) {
+                                setTimeout(fetchATCMessage, 1200);
+                            }
+                        }
+                    }, i * 1800);
+                });
+            }
+
+            if (statusEl) statusEl.textContent = `Last update: ${new Date().toLocaleTimeString()}`;
+        }
+
+        function generateATCSequence(ctx, state) {
+            const { reg, type, origin, dest, fuel, cond, progress, altitude, speedKts, distLeft, isCargo, pax, phase, distanceNM } = ctx;
+            const cs = reg; // e.g. "VT-XKR"
+            const fuelWarn = fuel < 25;
+            const condWarn = cond < 40;
+
+            // Generate stable-ish random values seeded by callsign
+            const seed = cs.split('').reduce((a,c) => a + c.charCodeAt(0), 0);
+            const rng = (n, offset=0) => (seed + offset) % n;
+
+            const rwys     = ['04L','04R','10L','10R','18','22L','22R','28L','28R','36'];
+            const rwy      = rwys[rng(rwys.length)];
+            const oppRwy   = rwys[(rng(rwys.length) + 5) % rwys.length];
+            const gate     = `${['A','B','C','D'][rng(4,1)]}${rng(30,7)+1}`;
+            const sq       = String(1200 + rng(5400,3)).padStart(4,'0');
+            const atis     = String.fromCharCode(65 + rng(26,9));
+
+            // Frequencies
+            const freqDel  = (121.6 + rng(4,1) * 0.05).toFixed(2);
+            const freqGnd  = (121.7 + rng(3,2) * 0.05).toFixed(2);
+            const freqTwr  = (118.1 + rng(20,3) * 0.05).toFixed(2);
+            const freqDep  = (124.0 + rng(16,4) * 0.05).toFixed(2);
+            const freqCtr  = (132.0 + rng(20,5) * 0.05).toFixed(2);
+            const freqApp  = (119.1 + rng(16,6) * 0.05).toFixed(2);
+
+            // Taxiways
+            const twys = ['Alpha','Bravo','Charlie','Delta','Echo','Foxtrot'];
+            const twy1 = twys[rng(twys.length, 1)];
+            const twy2 = twys[(rng(twys.length,1)+2) % twys.length];
+
+            const wind     = `${String(rng(36,7)*10).padStart(3,'0')} at ${8 + rng(22,8)} knots`;
+            const vis      = `${[6,8,10,10,10][rng(5)]} miles`;
+            const ceiling  = `${[2500,3000,3500,4000,'clear'][rng(5)]}${typeof [2500,3000,3500,4000,'clear'][rng(5)]==='number'?' feet':''}`;
+            const cruiseFL = Math.max(60, Math.round(altitude/100));
+            const descentFL= Math.max(30, cruiseFL - 80);
+            const eta      = Math.max(1, Math.round(distLeft / Math.max(1, speedKts) * 60));
+
+            // Extract IATA-style short codes from airport name strings
+            // Try to pull a bracketed code like "(LAX)" first, else take first word of city name up to 3 chars
+            const extractIATA = (str) => {
+                const m = str.match(/\(([A-Z]{2,4})\)/);
+                if (m) return m[1];
+                return str.split(',')[0].split(' ')[0].toUpperCase().slice(0, 3);
+            };
+            const origIATA = extractIATA(origin);
+            const destIATA = extractIATA(dest);
+
+            const originShort = origin.split(',')[0].split('(')[0].trim();
+            const destShort   = dest.split(',')[0].split('(')[0].trim();
+            const paxStr   = isCargo ? 'cargo only' : `${pax || 0} souls on board`;
+
+            // Traffic scenario for cruise
+            const trafficDir = ['2','3','9','10','11','12'][rng(6,2)];
+            const trafficDist = 8 + rng(20,3);
+            const trafficFL = cruiseFL + [-4,-2,2,4][rng(4,1)];
+
+            const effectivePhase = phase;
+            const seq = (msgs, next) => { const a = [...msgs]; a._nextState = next; return a; };
+
+            // Helper: pilot speaker tag
+            const PLT = `✈ ${cs}`;
+            // ATC speaker tags using IATA codes
+            const DEL = `📋 ${origIATA} DEL`;
+            const OGND = `🚧 ${origIATA} GND`;
+            const TWR  = `🗼 ${origIATA} TWR`;
+            const DEP  = `📡 ${origIATA} DEP`;
+            const CTR  = `🛰 ${destIATA} CTR`;
+            const APP  = `📡 ${destIATA} APP`;
+            const DTWR = `🗼 ${destIATA} TWR`;
+            const DGND = `🚧 ${destIATA} GND`;
+
+            // ── DELIVERY / CLEARANCE ─────────────────────────────────────────
+            if ((effectivePhase === 'on ground' || effectivePhase === 'departure') && (state === 'idle' || state === 'parked')) {
+                return seq([
+                    { speaker:PLT,  label:'PILOT', message:`${origIATA} Delivery, ${cs}, request IFR clearance to ${destIATA}, with information ${atis}, ${paxStr}.` },
+                    { speaker:DEL,  label:'ATC',   message:`${cs}, ${origIATA} Delivery, cleared to ${destIATA} as filed. Climb via SID, maintain 5,000, expect FL${cruiseFL} ten minutes after departure. Squawk ${sq}. Information ${atis} current.` },
+                    { speaker:PLT,  label:'PILOT', message:`Cleared to ${destIATA} as filed, climb via SID, maintain 5,000, FL${cruiseFL} after 10, squawk ${sq}, ${cs}. Request pushback.` },
+                    { speaker:DEL,  label:'ATC',   message:`${cs}, pushback approved, tail south. When ready, contact ${origIATA} Ground on ${freqGnd}.` },
+                    { speaker:PLT,  label:'PILOT', message:`Pushback approved, Ground on ${freqGnd}, ${cs}.` },
+                ], 'pushback');
+            }
+
+            // ── GROUND / TAXI OUT ────────────────────────────────────────────
+            if ((effectivePhase === 'on ground' || effectivePhase === 'departure') && state === 'pushback') {
+                return seq([
+                    { speaker:PLT,   label:'PILOT', message:`${origIATA} Ground, ${cs}, pushback complete, engines running, request taxi to runway ${rwy}.` },
+                    { speaker:OGND,  label:'ATC',   message:`${cs}, ${origIATA} Ground, taxi to runway ${rwy} via taxiways ${twy1}, ${twy2}. Hold short of runway ${rwy} at ${twy2}.` },
+                    { speaker:PLT,   label:'PILOT', message:`Taxi runway ${rwy} via ${twy1}, ${twy2}, hold short runway ${rwy} at ${twy2}, ${cs}.` },
+                ], 'taxiing');
+            }
+
+            // ── TOWER / TAKEOFF ──────────────────────────────────────────────
+            if ((effectivePhase === 'on ground' || effectivePhase === 'departure') && state === 'taxiing') {
+                return seq([
+                    { speaker:PLT,  label:'PILOT', message:`${origIATA} Tower, ${cs}, holding short runway ${rwy} at ${twy2}, requesting takeoff.` },
+                    { speaker:TWR,  label:'ATC',   message:`${cs}, ${origIATA} Tower, runway ${rwy}, wind ${wind}, traffic clear — line up and wait.` },
+                    { speaker:PLT,  label:'PILOT', message:`Line up and wait, runway ${rwy}, ${cs}.` },
+                    { speaker:TWR,  label:'ATC',   message:`${cs}, runway ${rwy}, cleared for takeoff. After departure, contact ${origIATA} Departure on ${freqDep}.` },
+                    { speaker:PLT,  label:'PILOT', message:`Runway ${rwy} cleared for takeoff, Departure on ${freqDep} airborne, ${cs}. Rolling.` },
+                ], 'airborne');
+            }
+
+            // ── DEPARTURE / INITIAL CLIMB ────────────────────────────────────
+            if (state === 'airborne') {
+                return seq([
+                    { speaker:PLT,  label:'PILOT', message:`${origIATA} Departure, ${cs}, airborne runway ${rwy}, climbing through 3,000 for FL${cruiseFL}.` },
+                    { speaker:DEP,  label:'ATC',   message:`${cs}, ${origIATA} Departure, radar contact. Climb and maintain FL${cruiseFL}, proceed direct ${destIATA}. Squawk ${sq} confirmed.` },
+                    { speaker:PLT,  label:'PILOT', message:`Climb FL${cruiseFL}, direct ${destIATA}, ${cs}.` },
+                    { speaker:DEP,  label:'ATC',   message:`${cs}, leaving my airspace in ${Math.round(distLeft*0.15)} miles. Contact ${destIATA} Center on ${freqCtr}. Good day.` },
+                    { speaker:PLT,  label:'PILOT', message:`Center on ${freqCtr}, ${cs}. Good day.` },
+                ], 'cruise');
+            }
+
+            // ── EN ROUTE / CENTER ────────────────────────────────────────────
+            if (state === 'cruise') {
+                if (effectivePhase === 'approach') {
+                    return seq([
+                        { speaker:PLT,  label:'PILOT', message:`${destIATA} Center, ${cs}, level FL${cruiseFL}, estimating ${destIATA} in ${eta} minutes. Request descent.` },
+                        { speaker:CTR,  label:'ATC',   message:`${cs}, ${destIATA} Center, roger. Descend and maintain FL${descentFL}, expect ILS runway ${oppRwy}. ${destIATA} weather: ceiling ${ceiling}, visibility ${vis}, wind ${wind}.` },
+                        { speaker:PLT,  label:'PILOT', message:`Leaving FL${cruiseFL} descending FL${descentFL}, ILS runway ${oppRwy}, ${cs}.` },
+                        { speaker:CTR,  label:'ATC',   message:`${cs}, ${Math.round(distLeft)} miles from ${destIATA}. Contact ${destIATA} Approach on ${freqApp}.` },
+                        { speaker:PLT,  label:'PILOT', message:`Approach on ${freqApp}, ${cs}. Good day.` },
+                    ], 'descending');
+                }
+
+                const options = [
+                    seq([
+                        { speaker:PLT,  label:'PILOT', message:`${destIATA} Center, ${cs}, checking in FL${cruiseFL}, direct ${destIATA}.` },
+                        { speaker:CTR,  label:'ATC',   message:`${cs}, Center, radar contact. Maintain FL${cruiseFL}. Traffic, ${trafficDir} o'clock, ${trafficDist} miles, FL${trafficFL}, opposite direction.` },
+                        { speaker:PLT,  label:'PILOT', message:`Looking for traffic, ${cs}. Negative contact, maintaining FL${cruiseFL}.` },
+                    ], 'cruise'),
+                    seq([
+                        { speaker:CTR,  label:'ATC',   message:`${cs}, ${destIATA} Center, say altitude and fuel state.` },
+                        { speaker:PLT,  label:'PILOT', message:`${destIATA} Center, ${cs}, FL${cruiseFL}, fuel ${fuelWarn ? 'minimum — declaring minimum fuel' : 'state normal'}, ${eta} minutes to ${destIATA}.` },
+                        { speaker:CTR,  label:'ATC',   message:`${cs}, roger${fuelWarn ? ', priority handling approved, stand by for direct routing' : '. Proceed as filed, no delay expected'}.` },
+                    ], 'cruise'),
+                    seq([
+                        { speaker:PLT,  label:'PILOT', message:`${destIATA} Center, ${cs}, requesting ride report for FL${cruiseFL+2}.` },
+                        { speaker:CTR,  label:'ATC',   message:`${cs}, Center, PIREP FL${cruiseFL+2} — light chop reported by company traffic 20 miles ahead. Your discretion.` },
+                        { speaker:PLT,  label:'PILOT', message:`We'll stay at FL${cruiseFL}, ${cs}.` },
+                    ], 'cruise'),
+                ];
+                return options[rng(options.length, eta)];
+            }
+
+            // ── APPROACH ─────────────────────────────────────────────────────
+            if (state === 'descending') {
+                return seq([
+                    { speaker:PLT,  label:'PILOT', message:`${destIATA} Approach, ${cs}, descending through FL${Math.round(descentFL*0.6)}, information ${atis}, requesting ILS runway ${oppRwy}.` },
+                    { speaker:APP,  label:'ATC',   message:`${cs}, ${destIATA} Approach, radar contact, ${Math.round(distLeft)} miles from ${destIATA}. Cleared ILS runway ${oppRwy}. Descend and maintain 3,000. Reduce to 180 knots. Wind ${wind}.` },
+                    { speaker:PLT,  label:'PILOT', message:`ILS runway ${oppRwy}, descending 3,000, slowing to 180, ${cs}.` },
+                ], 'approach_active');
+            }
+
+            if (state === 'approach_active') {
+                const seqNum = Math.random() > 0.4 ? 'one' : 'two';
+                return seq([
+                    { speaker:PLT,   label:'PILOT', message:`${destIATA} Approach, ${cs}, established ILS runway ${oppRwy}, gear down, ${fuelWarn ? 'minimum fuel declared, ' : ''}requesting landing clearance.` },
+                    { speaker:APP,   label:'ATC',   message:`${cs}, Approach, you are number ${seqNum}. Contact ${destIATA} Tower on ${freqTwr}. They have your information.` },
+                    { speaker:PLT,   label:'PILOT', message:`Tower on ${freqTwr}, ${cs}.` },
+                    { speaker:DTWR,  label:'ATC',   message:`${cs}, ${destIATA} Tower, runway ${oppRwy}, wind ${wind}, ${fuelWarn ? 'priority traffic, ' : ''}cleared to land. Report runway vacated.` },
+                    { speaker:PLT,   label:'PILOT', message:`Runway ${oppRwy} cleared to land, wilco, ${cs}.` },
+                ], 'landing');
+            }
+
+            // ── LANDING / VACATING ───────────────────────────────────────────
+            if (state === 'landing') {
+                return seq([
+                    { speaker:PLT,   label:'PILOT', message:`${destIATA} Tower, ${cs}, runway ${oppRwy} vacated at ${twy1}.` },
+                    { speaker:DTWR,  label:'ATC',   message:`${cs}, roger, runway vacated. Contact ${destIATA} Ground on ${freqGnd}. Welcome to ${destIATA}.` },
+                    { speaker:PLT,   label:'PILOT', message:`Ground on ${freqGnd}, ${cs}. Thank you, good day.` },
+                ], 'landed');
+            }
+
+            // ── TAXI IN / GATE ───────────────────────────────────────────────
+            if (state === 'landed') {
+                return seq([
+                    { speaker:PLT,   label:'PILOT', message:`${destIATA} Ground, ${cs}, clear of runway ${oppRwy} at ${twy1}, requesting taxi to gate ${gate}.` },
+                    { speaker:DGND,  label:'ATC',   message:`${cs}, ${destIATA} Ground, taxi to gate ${gate} via taxiways ${twy2}, ${twy1}. Hold short of runway ${rwy} at ${twy2}.` },
+                    { speaker:PLT,   label:'PILOT', message:`Gate ${gate} via ${twy2}, ${twy1}, hold short runway ${rwy}, ${cs}.` },
+                    ...(condWarn ? [
+                        { speaker:DGND,  label:'ATC',   message:`${cs}, be advised maintenance crew standing by at gate ${gate}.` },
+                        { speaker:PLT,   label:'PILOT', message:`Copy, maintenance at gate ${gate}, ${cs}. We have a caution advisory to report.` },
+                    ] : [
+                        { speaker:PLT,   label:'PILOT', message:`${cs}, blocks in at gate ${gate}. Shutting down. Thank you ${destIATA} Ground.` },
+                    ]),
+                ], 'parked');
+            }
+
+            // Fallback
+            return seq([
+                { speaker:CTR,  label:'ATC',   message:`${cs}, say position and intentions.` },
+                { speaker:PLT,  label:'PILOT', message:`${destIATA} Center, ${cs}, FL${cruiseFL}, proceeding direct ${destIATA}, estimating ${eta} minutes.` },
+            ], state);
+        }
+
+        function appendATCMessage(speaker, message, isFirst, label) {
+            const container = document.getElementById('atc-messages');
+            if (!container) return;
+            const isPilot = label === 'PILOT';
+            const el = document.createElement('div');
+            el.style.cssText = `animation: atcFadeIn 0.4s ease;`;
+            // For pilot: speaker is "✈ VT-XKR" — strip the emoji to get callsign
+            // For ATC: speaker is "🗼 LAX TWR" — strip emoji to get "LAX TWR"
+            const tagText = isPilot
+                ? speaker.replace(/^[^\s]+\s*/, '')   // strip leading emoji → callsign e.g. "VT-XKR"
+                : speaker.replace(/^[^\s]+\s*/, '');  // strip leading emoji → "LAX TWR"
+            el.innerHTML = `
+                <div style="display:flex;gap:6px;align-items:flex-start;margin-bottom:2px;">
+                    <span style="font-size:9px;font-weight:700;color:${isPilot ? '#a78bfa' : '#22d3ee'};min-width:60px;padding-top:1px;letter-spacing:0.5px;flex-shrink:0;">${isPilot ? '✈' : '📡'} ${tagText}</span>
+                    <span style="font-size:11px;color:${isPilot ? '#c4b5fd' : '#e2e8f0'};line-height:1.4;">${message}</span>
+                </div>`;
+            container.appendChild(el);
+            container.scrollTop = container.scrollHeight;
+
+            // Keep max 20 messages visible
+            while (container.children.length > 20) container.removeChild(container.firstChild);
+        }
+
+        function makeDraggable(panel, handle) {
+            let startX, startY, startLeft, startBottom;
+            handle.addEventListener('mousedown', e => {
+                startX = e.clientX;
+                startY = e.clientY;
+                const rect = panel.getBoundingClientRect();
+                startLeft = rect.left;
+                startBottom = window.innerHeight - rect.bottom;
+                const onMove = ev => {
+                    const dx = ev.clientX - startX;
+                    const dy = ev.clientY - startY;
+                    panel.style.left = (startLeft + dx) + 'px';
+                    panel.style.bottom = (startBottom - dy) + 'px';
+                    panel.style.right = 'auto';
+                };
+                const onUp = () => {
+                    document.removeEventListener('mousemove', onMove);
+                    document.removeEventListener('mouseup', onUp);
+                };
+                document.addEventListener('mousemove', onMove);
+                document.addEventListener('mouseup', onUp);
+            });
         }
 
         function removeAircraftFromRoute(routeId, fleetId) {
