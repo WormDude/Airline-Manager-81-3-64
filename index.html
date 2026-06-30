@@ -80,6 +80,28 @@
         .main-layout { display: flex; flex: 1; overflow: hidden; }
         #map { flex: 2; height: 100%; background: #0b0f19; position: relative; }
         .control-panel { flex: 1; max-width: 480px; background-color: var(--panel-color); border-left: 2px solid var(--card-border); display: flex; flex-direction: column; }
+
+        @media (max-width: 768px) {
+            header { padding: 8px 12px; flex-wrap: wrap; gap: 6px; }
+            header > div:first-child h2 { font-size: 14px; }
+            header > div:first-child p { display: none; }
+            .stats-container { gap: 6px; }
+            .stat-box { padding: 4px 8px; font-size: 11px; }
+            .xp-bar-outer { width: 50px; }
+            .stat-xp { display: none; }
+            .main-layout { flex-direction: column; }
+            #map { flex: none; height: 42vh; width: 100%; border-bottom: 2px solid var(--card-border); }
+            .control-panel { flex: 1; max-width: 100%; border-left: none; border-top: 2px solid var(--card-border); min-height: 0; overflow: hidden; }
+            .tab-btn { font-size: 9px; padding: 10px 1px; min-width: 0; }
+            .tab-content { padding: 10px; }
+            #interactive-tutorial-bubble { width: calc(100% - 24px); left: 12px; bottom: 12px; }
+            #atc-feed-panel { width: calc(100% - 24px) !important; right: 12px !important; bottom: 12px !important; left: 12px !important; }
+            .card { padding: 10px; }
+            .hangar-sort-select { min-width: 0; }
+            .modal-content, .modal-box { padding: 16px; }
+            .city-search-container { position: static; }
+            .route-form-grid { grid-template-columns: 1fr !important; }
+        }
         .tabs { display: flex; background: rgba(0,0,0,0.1); flex-wrap: wrap; }
         .tab-btn { flex: 1; min-width: 60px; padding: 12px 2px; background: none; border: none; color: #94a3b8; font-weight: 600; font-size: 10px; cursor: pointer; text-align: center; border-bottom: 3px solid transparent; }
         .tab-btn.active { color: var(--text-color); background: var(--panel-color); border-bottom: 3px solid var(--accent-color); }
@@ -136,6 +158,7 @@
         .search-dropdown-item:hover { background:var(--accent-color); color:#fff; }
         .search-dropdown-group-header { padding:4px 8px; font-size:11px; font-weight:bold; color:var(--token-color); background:rgba(0,0,0,0.2); border-bottom:1px solid var(--card-border); position:sticky; top:0; }
         .hangar-grid-2col { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+        @media (max-width: 768px) { .hangar-grid-2col { grid-template-columns: 1fr; } }
         .hangar-card-btn { background: var(--card-bg); border: 1px solid var(--card-border); border-radius: 8px; padding: 8px; cursor: pointer; transition: transform 0.2s, border-color 0.2s; text-align: center; }
         .hangar-card-btn:hover { transform: scale(1.02); border-color: var(--accent-color); }
         .hangar-card-btn .aircraft-img { width:100%; height:70px; background-size:cover; background-position:center; border-radius:4px; margin-bottom:5px; }
@@ -702,7 +725,7 @@ z-index:99999;
                     <div style="font-size:13px;font-weight:900;color:var(--accent-color);margin-bottom:2px;">✈ New Route</div>
                     <div style="font-size:10px;color:#64748b;margin-bottom:10px;">15 ✈ AeroTokens · origin must be a hub</div>
 
-                    <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:8px;">
+                    <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:8px;" class="route-form-grid">
                         <!-- ORIGIN -->
                         <div>
                             <label style="font-size:11px;color:#94a3b8;display:block;margin-bottom:3px;">🏢 Origin Hub</label>
@@ -4653,48 +4676,42 @@ const hub =
                         const voluntGrnd   = isVoluntarilyGrounded(f.id);
                         const isGrounded   = inCooldown || voluntGrnd;
  
+                        // ATC TAKEOFF HOLD — single source of truth.
+                        // _atcHeldFleets is only cleared inside the setTimeout that delivers
+                        // the actual "cleared for takeoff" message to the ATC panel, so there
+                        // is no race between convo-state transitions and the game tick.
+                        const atcTakeoffHeld = window._atcHeldFleets && window._atcHeldFleets.has(String(f.id));
+                        // Debug: update ATC panel with live tick state
+                        if (atcFeedFleetId && String(atcFeedFleetId) === String(f.id)) {
+                            const _dbg = document.getElementById('atc-debug');
+                            if (_dbg) _dbg.textContent = `state:${atcConvoState} held:${atcTakeoffHeld} cd:${Math.round(getAircraftStat(f.id,'cooldownTicks'))} prog:${Math.round(f.progress)}`;
+                        }
+
                         if (inCooldown) {
                             const remaining = getAircraftStat(f.id, 'cooldownTicks');
                             const newCooldown = remaining - deltaTicks;
-                            
+
                             if (newCooldown <= 0) {
-                                // ATC Hold: keep aircraft on ground until ATC clears takeoff
-                                // Only applies if this aircraft has an open ATC feed watching it
-                                const atcWatching = atcFeedFleetId && String(atcFeedFleetId) === String(f.id);
-                                if (atcWatching && window._atcHeldFleets && window._atcHeldFleets.has(String(f.id))) {
-                                    // Keep aircraft grounded — reset cooldown to 1 tick so it re-checks next cycle
-                                    setAircraftStat(f.id, 'cooldownTicks', 1);
-                                    uiDirty = true;
-                                } else {
-                                // Pre-flight check: Can we survive the next leg?
-                                const craftSpec = allCrafts[f.type];
-                                const requiredFuel = 100 * (route.distanceNM / craftSpec.rangeNM);
-                                const requiredCond = requiredFuel * 0.2;
-                                const curFuel = getAircraftStat(f.id, 'fuel');
-                                const curCond = getAircraftStat(f.id, 'condition');
-   // If offline/unfocused/catch-up, ground safely. If live, let it fly (may crash).
-                                if (
-    (!isTabFocused && gameState.pendingGround[f.id])
-) {
-                                    gameState.voluntarilyGrounded[f.id] =
-    gameState.pendingGround[f.id]
-        ? true
-        : "maintenance";
-                                    if (!gameState.voluntarilyGrounded[f.id]) {
-    setAircraftStat(f.id, 'cooldownTicks', 0);
-}
+                                {
+                                // Pre-flight check / offline ground logic
+                                if (!isTabFocused && gameState.pendingGround[f.id]) {
+                                    gameState.voluntarilyGrounded[f.id] = gameState.pendingGround[f.id] ? true : "maintenance";
+                                    if (!gameState.voluntarilyGrounded[f.id]) setAircraftStat(f.id, 'cooldownTicks', 0);
                                     delete gameState.pendingGround[f.id];
                                     uiDirty = true;
                                 } else {
-                                    if (!gameState.voluntarilyGrounded[f.id]) {
-    setAircraftStat(f.id, 'cooldownTicks', 0);
-}; // Cleared for takeoff
+                                    if (!gameState.voluntarilyGrounded[f.id]) setAircraftStat(f.id, 'cooldownTicks', 0);
                                 }
-                                } // end ATC hold else
+                                } // end hold else
                             } else {
                                 setAircraftStat(f.id, 'cooldownTicks', newCooldown);
                             }
                         } else if (!voluntGrnd) {
+                            // Also block progress if ATC clearance hasn't been delivered yet
+                            if (atcTakeoffHeld) {
+                                // Pin on ground — clearance message not yet delivered
+                                uiDirty = true;
+                            } else {
                             const progressAdded = f.speed * deltaTicks;
                             const craftSpec = allCrafts[f.type];
 
@@ -4736,29 +4753,33 @@ const hub =
                             }
 
                             f.progress += progressAdded;
+                            } // end ATC ground hold else
                         }
  
                         const dLat = route.destLat - route.origLat, dLng = route.destLng - route.origLng;
                         let curLat, curLng, bearing;
 
+                        const destLat = f.directionForward ? route.destLat : route.origLat;
+                        const destLng = f.directionForward ? route.destLng : route.origLng;
+
                         // === HOLDING PATTERN (waiting for ATC landing clearance) ===
-                        // Only holds if the ATC feed is actively watching THIS aircraft and hasn't cleared it to land
                         const atcWatchingThis = atcFeedFleetId && String(atcFeedFleetId) === String(f.id);
-                        // Auto-add to land hold when approaching with ATC watching
-                        if (atcWatchingThis && !isGrounded && f.progress >= 88) {
+                        if (atcWatchingThis && !isGrounded && f.progress >= 88
+                            && !window._atcLandClearedFleets.has(String(f.id))) {
                             if (!window._atcLandHeldFleets.has(String(f.id))) {
                                 window._atcLandHeldFleets.add(String(f.id));
                             }
                         }
-                        const inLandHold = atcWatchingThis && window._atcLandHeldFleets && window._atcLandHeldFleets.has(String(f.id));
+                        const inLandHold = atcWatchingThis && window._atcLandHeldFleets.has(String(f.id))
+                            && !window._atcLandClearedFleets.has(String(f.id));
+
+                        if (!window._holdingState) window._holdingState = {};
+
                         if (inLandHold && !isGrounded) {
-                            // Freeze progress so it doesn't land
+                            // Clamp progress
                             if (f.progress > 92) f.progress = 92;
-                            // Compute a holding-pattern oval around a point ~90% along the route
-                            if (!window._holdingAngle) window._holdingAngle = {};
-                            if (window._holdingAngle[f.id] === undefined) window._holdingAngle[f.id] = 0;
-                            window._holdingAngle[f.id] = (window._holdingAngle[f.id] + 2.5) % 360;
-                            const hAngleRad = (window._holdingAngle[f.id] * Math.PI) / 180;
+
+                            // Hold fix: 90% along the route toward destination
                             const holdFrac = 0.90;
                             const holdBaseLat = f.directionForward
                                 ? route.origLat + dLat * holdFrac
@@ -4766,29 +4787,148 @@ const hub =
                             const holdBaseLng = f.directionForward
                                 ? route.origLng + dLng * holdFrac
                                 : route.destLng - dLng * holdFrac;
-                            // Oval radii: racetrack pattern
-                            const ovalLat = 0.18;
-                            const ovalLng = 0.32;
-                            curLat = holdBaseLat + ovalLat * Math.sin(hAngleRad);
-                            curLng = holdBaseLng + ovalLng * Math.cos(hAngleRad);
-                            // Bearing follows tangent of the oval
-                            const nextAngleRad = ((window._holdingAngle[f.id] + 2.5) * Math.PI) / 180;
-                            const nextLat = holdBaseLat + ovalLat * Math.sin(nextAngleRad);
-                            const nextLng = holdBaseLng + ovalLng * Math.cos(nextAngleRad);
-                            bearing = calculateBearing(curLat, curLng, nextLat, nextLng);
+                            const ovalLat = 0.22;
+                            const ovalLng = 0.38;
+
+                            // Init holding state
+                            if (!window._holdingState[f.id]) {
+                                const entryLat = f.directionForward
+                                    ? route.origLat + dLat * (f.progress / 100)
+                                    : route.destLat - dLat * (f.progress / 100);
+                                const entryLng = f.directionForward
+                                    ? route.origLng + dLng * (f.progress / 100)
+                                    : route.destLng - dLng * (f.progress / 100);
+
+                                // Entry bearing: compass degrees (0=N, 90=E)
+                                const entryBearing = f.directionForward
+                                    ? calculateBearing(entryLat, entryLng, route.destLat, route.destLng)
+                                    : calculateBearing(entryLat, entryLng, route.origLat, route.origLng);
+                                const entryRad = entryBearing * Math.PI / 180;
+                                // Entry direction as unit lat/lng vector (compass→cartesian)
+                                const entryDLat = Math.cos(entryRad);
+                                const entryDLng = Math.sin(entryRad);
+
+                                // Find the phase on the oval where the oval's tangent best aligns
+                                // with the aircraft's entry direction, AND is ahead of the aircraft.
+                                // Oval: lat=holdBaseLat+ovalLat*sin(θ), lng=holdBaseLng+ovalLng*cos(θ)
+                                // Tangent: dLat/dθ=ovalLat*cos(θ), dLng/dθ=-ovalLng*sin(θ)
+                                // We want the phase where dot(tangent, entryDir) is maximised
+                                // and the join point is in the forward half-plane from entry.
+                                let bestPhase = 0, bestScore = -Infinity;
+                                for (let i = 0; i < 360; i++) {
+                                    const θ = (i / 360) * 2 * Math.PI;
+                                    const tDLat = ovalLat * Math.cos(θ);
+                                    const tDLng = -ovalLng * Math.sin(θ);
+                                    const tLen = Math.sqrt(tDLat*tDLat + tDLng*tDLng);
+                                    // Dot product of normalised tangent with entry direction
+                                    const dot = (tDLat/tLen)*entryDLat + (tDLng/tLen)*entryDLng;
+                                    // Join point
+                                    const jLat = holdBaseLat + ovalLat * Math.sin(θ);
+                                    const jLng = holdBaseLng + ovalLng * Math.cos(θ);
+                                    // Must be in forward half-plane from entry
+                                    const fwdDot = (jLat-entryLat)*entryDLat + (jLng-entryLng)*entryDLng;
+                                    if (fwdDot < 0) continue; // behind aircraft, skip
+                                    if (dot > bestScore) { bestScore = dot; bestPhase = θ; }
+                                }
+
+                                const joinLat = holdBaseLat + ovalLat * Math.sin(bestPhase);
+                                const joinLng = holdBaseLng + ovalLng * Math.cos(bestPhase);
+
+                                // Oval tangent at join (normalised, compass direction)
+                                const oTanDLat = ovalLat * Math.cos(bestPhase);
+                                const oTanDLng = -ovalLng * Math.sin(bestPhase);
+
+                                // Arm length: distance from entry to join * 0.5
+                                const distToJoin = Math.sqrt((joinLat-entryLat)**2 + (joinLng-entryLng)**2);
+                                const arm = Math.max(distToJoin * 0.5, 0.04);
+
+                                // CP1: forward from entry along entry direction
+                                const cp1Lat = entryLat + entryDLat * arm;
+                                const cp1Lng = entryLng + entryDLng * arm;
+
+                                // CP2: back from join along reverse of oval tangent
+                                const oLen = Math.sqrt(oTanDLat*oTanDLat + oTanDLng*oTanDLng);
+                                const cp2Lat = joinLat - (oTanDLat/oLen) * arm;
+                                const cp2Lng = joinLng - (oTanDLng/oLen) * arm;
+
+                                window._holdingState[f.id] = {
+                                    phase: bestPhase,
+                                    blendT: 0,
+                                    entryLat, entryLng,
+                                    cp1Lat, cp1Lng,
+                                    cp2Lat, cp2Lng,
+                                    joinLat, joinLng,
+                                };
+                            }
+                            const hs = window._holdingState[f.id];
+
+                            hs.blendT = Math.min(1, (hs.blendT || 0) + 0.018);
+                            const bt = hs.blendT;
+
+                            if (bt < 1) {
+                                // Cubic Bezier entry
+                                const u = 1 - bt;
+                                const u2 = u*u, u3 = u2*u, bt2 = bt*bt, bt3 = bt2*bt;
+                                curLat = u3*hs.entryLat + 3*u2*bt*hs.cp1Lat + 3*u*bt2*hs.cp2Lat + bt3*hs.joinLat;
+                                curLng = u3*hs.entryLng + 3*u2*bt*hs.cp1Lng + 3*u*bt2*hs.cp2Lng + bt3*hs.joinLng;
+                                const dLat_dt = 3*(u2*(hs.cp1Lat-hs.entryLat) + 2*u*bt*(hs.cp2Lat-hs.cp1Lat) + bt2*(hs.joinLat-hs.cp2Lat));
+                                const dLng_dt = 3*(u2*(hs.cp1Lng-hs.entryLng) + 2*u*bt*(hs.cp2Lng-hs.cp1Lng) + bt2*(hs.joinLng-hs.cp2Lng));
+                                bearing = (Math.atan2(dLng_dt, dLat_dt) * 180 / Math.PI + 360) % 360;
+                            } else {
+                                // Orbiting
+                                hs.phase = (hs.phase + 0.018) % (2 * Math.PI);
+                                const θ = hs.phase;
+                                curLat = holdBaseLat + ovalLat * Math.sin(θ);
+                                curLng = holdBaseLng + ovalLng * Math.cos(θ);
+                                const tanLat = ovalLat * Math.cos(θ);
+                                const tanLng = -ovalLng * Math.sin(θ);
+                                bearing = (Math.atan2(tanLng, tanLat) * 180 / Math.PI + 360) % 360;
+                            }
+
+                            // Store last hold position for smooth exit
+                            hs.lastLat = curLat;
+                            hs.lastLng = curLng;
+                            hs.lastBearing = bearing;
+
+                        } else if (!inLandHold && window._holdingState[f.id] && window._holdingState[f.id].lastLat !== undefined && !isGrounded) {
+                            // === SMOOTH FINAL APPROACH after cleared to land ===
+                            const hs = window._holdingState[f.id];
+                            if (hs.approachT === undefined) hs.approachT = 0;
+
+                            // Advance approachT — reaches 1 over ~45 ticks
+                            hs.approachT = Math.min(1, hs.approachT + 0.022);
+                            const t = hs.approachT * hs.approachT; // quadratic ease-in
+
+                            curLat = hs.lastLat + (destLat - hs.lastLat) * t;
+                            curLng = hs.lastLng + (destLng - hs.lastLng) * t;
+
+                            // Blend bearing toward airport
+                            const targetBearing = calculateBearing(curLat, curLng, destLat, destLng);
+                            const holdBearing = hs.lastBearing || targetBearing;
+                            let bearingDiff = ((targetBearing - holdBearing + 540) % 360) - 180;
+                            bearing = (holdBearing + bearingDiff * Math.min(1, hs.approachT * 2)) % 360;
+
+                            // Also drive progress toward 100 so landing triggers normally
+                            f.progress = 92 + (hs.approachT * 8); // 92→100 as t goes 0→1
+
+                            if (hs.approachT >= 1) {
+                                f.progress = 100;
+                                delete window._holdingState[f.id];
+                            }
+
                         } else {
                             // Normal position interpolation
-                            if (window._holdingAngle && window._holdingAngle[f.id] !== undefined) delete window._holdingAngle[f.id];
-                        if (f.directionForward) {
-                            curLat = route.origLat + (dLat * (f.progress / 100));
-                            curLng = route.origLng + (dLng * (f.progress / 100));
-                            bearing = calculateBearing(curLat, curLng, route.destLat, route.destLng);
-                        } else {
-                            curLat = route.destLat - (dLat * (f.progress / 100));
-                            curLng = route.destLng - (dLng * (f.progress / 100));
-                            bearing = calculateBearing(curLat, curLng, route.origLat, route.origLng);
+                            if (window._holdingState[f.id]) delete window._holdingState[f.id];
+                            if (f.directionForward) {
+                                curLat = route.origLat + (dLat * (f.progress / 100));
+                                curLng = route.origLng + (dLng * (f.progress / 100));
+                                bearing = calculateBearing(curLat, curLng, route.destLat, route.destLng);
+                            } else {
+                                curLat = route.destLat - (dLat * (f.progress / 100));
+                                curLng = route.destLng - (dLng * (f.progress / 100));
+                                bearing = calculateBearing(curLat, curLng, route.origLat, route.origLng);
+                            }
                         }
-                        } // end holding pattern else
  
                         let marker = activeFlightMarkers[String(f.id)];
                         const craftSpec = allCrafts[f.type];
@@ -4918,6 +5058,16 @@ const hub =
     f.progress = f.progress % 100;
     if (legsFinished % 2 !== 0) f.directionForward = !f.directionForward;
     setAircraftStat(f.id, 'cooldownTicks', COOLDOWN_TICKS);
+    // Reset all ATC clearance flags — every new leg needs fresh clearances
+    const fIdStr = String(f.id);
+    if (window._atcLandClearedFleets) window._atcLandClearedFleets.delete(fIdStr);
+    if (window._atcLandHeldFleets)    window._atcLandHeldFleets.delete(fIdStr);
+    if (window._holdingState)         delete window._holdingState[fIdStr];
+    // If ATC feed is open for this aircraft, arm the departure hold immediately on landing
+    // so the aircraft can't take off again until ATC clears it for the next departure.
+    if (atcFeedFleetId && String(atcFeedFleetId) === fIdStr && window._atcHeldFleets) {
+        window._atcHeldFleets.add(fIdStr);
+    }
                            // If aircraft landed while player was away, park it
 if (!isTabFocused || !isLiveTick) {
     gameState.voluntarilyGrounded[f.id] = true;
@@ -5392,6 +5542,7 @@ if (requiredRunway) {
         let atcMessageHistory = []; // kept for Claude context
         window._atcHeldFleets = new Set(); // aircraft IDs waiting for ATC takeoff clearance
         window._atcLandHeldFleets = new Set(); // aircraft IDs waiting for ATC landing clearance (holding pattern)
+        window._atcLandClearedFleets = new Set(); // aircraft IDs that have received landing clearance — never re-hold
 
         function openATCFeed(fleetId) {
             // Close any existing feed
@@ -5426,6 +5577,7 @@ if (requiredRunway) {
                 </div>
                 <div id="atc-messages" style="flex:1;overflow-y:auto;padding:8px 10px;display:flex;flex-direction:column;gap:5px;min-height:80px;max-height:320px;"></div>
                 <div id="atc-status" style="padding:5px 12px;font-size:9px;color:#334155;border-top:1px solid #0f172a;text-align:right;">Connecting to tower...</div>
+                <div id="atc-debug" style="padding:3px 12px;font-size:8px;color:#ef4444;font-family:monospace;border-top:1px solid #0f172a;"></div>
             `;
             document.body.appendChild(panel);
 
@@ -5445,8 +5597,9 @@ if (requiredRunway) {
             if (_atcCtxCheck && (_atcCtxCheck.phase === 'on ground')) {
                 window._atcHeldFleets.add(String(fleetId));
             }
-            // If the aircraft is on approach, hold it in a holding pattern until ATC clears to land
-            if (_atcCtxCheck && (_atcCtxCheck.phase === 'approach')) {
+            // If the aircraft is on approach OR close enough that descent/approach chatter will fire,
+            // hold it in a holding pattern until ATC clears to land.
+            if (_atcCtxCheck && (_atcCtxCheck.phase === 'approach' || _atcCtxCheck.progress >= 85)) {
                 window._atcLandHeldFleets.add(String(fleetId));
             }
 
@@ -5461,6 +5614,8 @@ if (requiredRunway) {
             if (panel) panel.remove();
             if (atcFeedFleetId) window._atcHeldFleets.delete(String(atcFeedFleetId));
             if (atcFeedFleetId) window._atcLandHeldFleets.delete(String(atcFeedFleetId));
+            if (atcFeedFleetId) window._atcLandClearedFleets.delete(String(atcFeedFleetId));
+            if (atcFeedFleetId && window._holdingState) delete window._holdingState[String(atcFeedFleetId)];
             atcFeedFleetId = null;
             atcMessageHistory = [];
             atcMessagePending = false;
@@ -5515,6 +5670,7 @@ if (requiredRunway) {
             // (user can still close crash modal and see it, then × to dismiss)
             if (fleetId) window._atcHeldFleets.delete(String(fleetId));
             if (fleetId) window._atcLandHeldFleets.delete(String(fleetId));
+            if (fleetId) window._atcLandClearedFleets.delete(String(fleetId));
             atcFeedFleetId = null; // disown the feed so it doesn't auto-close on next tick
         }
 
@@ -5571,9 +5727,65 @@ if (requiredRunway) {
                 else if (ctx.phase === 'approach') atcConvoState = 'approach_active';
             }
 
-            // If aircraft is in approach phase but ATC state hasn't caught up yet, fast-forward
-            if (ctx.phase === 'approach' && (atcConvoState === 'cruise' || atcConvoState === 'airborne')) {
-                atcConvoState = 'cruise'; // will hit the approach branch in generateATCSequence
+            // If the aircraft has landed (phase on ground) but we're still in a flight state,
+            // snap immediately to the landing sequence — this handles the case where the plane
+            // landed normally without going through the approach hold path.
+            if (ctx.phase === 'on ground' && (atcConvoState === 'cruise' || atcConvoState === 'airborne' || atcConvoState === 'descending' || atcConvoState === 'approach_active')) {
+                atcConvoState = 'landing';
+            }
+
+            // If aircraft is in land hold or approach, skip ALL cruise chatter and
+            // inject the full descent→approach→cleared-to-land chain immediately
+            const inLandHoldNow = atcFeedFleetId && window._atcLandHeldFleets && window._atcLandHeldFleets.has(String(atcFeedFleetId));
+            if ((ctx.phase === 'approach' || ctx.progress >= 85 || inLandHoldNow) &&
+                (atcConvoState === 'cruise' || atcConvoState === 'airborne' || atcConvoState === 'descending' || atcConvoState === 'approach_active')) {
+                // Build the full landing sequence in one shot
+                const landingMsgs = buildFullApproachSequence(ctx);
+                if (landingMsgs && landingMsgs.length) {
+                    atcMessagePending = true;
+                    landingMsgs.forEach((m, i) => {
+                        setTimeout(() => {
+                            if (!document.getElementById('atc-messages')) return;
+                            atcMessageHistory.push(m);
+                            appendATCMessage(m.speaker, m.message, false, m.label);
+                            if (m.label === 'ATC' && m.message && m.message.includes('cleared to land') && atcFeedFleetId) {
+                                if (window._atcLandHeldFleets) window._atcLandHeldFleets.delete(String(atcFeedFleetId));
+                                if (window._atcLandClearedFleets) window._atcLandClearedFleets.add(String(atcFeedFleetId));
+                            }
+                            if (i === landingMsgs.length - 1) {
+                                atcConvoState = 'landing';
+                                atcMessagePending = false;
+                                // Chain landing sequences immediately — don't wait for 12s interval.
+                                // Poll until the aircraft actually touches down, then fire.
+                                const _chainLanding = () => {
+                                    if (!atcFeedFleetId) return;
+                                    let _landed = false;
+                                    for (const r of gameState.routes) {
+                                        if (!r.fleet) continue;
+                                        const fe = r.fleet.find(fe => String(fe.id) === String(atcFeedFleetId));
+                                        if (fe) { _landed = isInCooldown(fe.id) || isVoluntarilyGrounded(fe.id); break; }
+                                    }
+                                    if (_landed) {
+                                        fetchATCMessage();
+                                    } else {
+                                        setTimeout(_chainLanding, 300);
+                                    }
+                                };
+                                setTimeout(_chainLanding, 300);
+                            }
+                        }, i * 1800);
+                    });
+                }
+                if (statusEl) statusEl.textContent = `Last update: ${new Date().toLocaleTimeString()}`;
+                return;
+            }
+
+
+            // Don't fire the landing/vacating sequence until the aircraft is actually on the ground.
+            // The approach animation drives progress 92→100 over ~45 ticks; we must wait for that.
+            if ((atcConvoState === 'landing' || atcConvoState === 'landed') && ctx.phase !== 'on ground') {
+                if (statusEl) statusEl.textContent = `Last update: ${new Date().toLocaleTimeString()}`;
+                return; // still airborne — wait for cooldown to start
             }
 
             const msgs = generateATCSequence(ctx, atcConvoState, atcCruiseOptionIndex);
@@ -5589,24 +5801,39 @@ if (requiredRunway) {
                         if (m.label === 'ATC' && m.message && m.message.includes('cleared for takeoff') && atcFeedFleetId) {
                             if (window._atcHeldFleets) window._atcHeldFleets.delete(String(atcFeedFleetId));
                         }
-                        // When ATC clears to land, release landing hold
+                        // When ATC clears to land, release landing hold and pre-arm
+                        // the departure hold so it's in place before ground cooldown expires
                         if (m.label === 'ATC' && m.message && m.message.includes('cleared to land') && atcFeedFleetId) {
                             if (window._atcLandHeldFleets) window._atcLandHeldFleets.delete(String(atcFeedFleetId));
+                            if (window._atcLandClearedFleets) window._atcLandClearedFleets.add(String(atcFeedFleetId));
+                            // Departure hold is armed by the parked→idle chain, not here
                         }
                         // Advance state only after the last message of the sequence fires
                         if (i === msgs.length - 1) {
                             atcConvoState = nextState;
                             atcCruiseOptionIndex++;
                             atcMessagePending = false;
-                            // If aircraft is still in landing hold, immediately chain the next ATC sequence
-                            // so it races through descent→approach→cleared to land without waiting 12s
-                            const stillHeld = atcFeedFleetId && window._atcLandHeldFleets && window._atcLandHeldFleets.has(String(atcFeedFleetId));
-                            if (stillHeld) {
-                                setTimeout(fetchATCMessage, 1200);
+                            // After 'parked', check if the aircraft is still on the ground
+                            // or has already taken off (cooldown cleared before sequence finished).
+                            if (atcConvoState === 'parked' && atcFeedFleetId) {
+                                const _ctx = getATCFlightContext();
+                                if (_ctx && _ctx.phase === 'on ground') {
+                                    // Still on ground — run departure sequence (hold was armed at landing)
+                                    atcConvoState = 'idle';
+                                    atcMessagePending = false;
+                                } else if (_ctx) {
+                                    // Already airborne — snap state to match reality
+                                    if (_ctx.phase === 'departure') atcConvoState = 'airborne';
+                                    else if (_ctx.phase === 'cruise') atcConvoState = 'cruise';
+                                    else if (_ctx.phase === 'approach') atcConvoState = 'approach_active';
+                                    atcMessagePending = false;
+                                }
                             }
-                            // Same for takeoff hold — chain quickly through ground sequences
-                            const takeoffHeld = atcFeedFleetId && window._atcHeldFleets && window._atcHeldFleets.has(String(atcFeedFleetId));
-                            if (takeoffHeld) {
+                            // Chain ground sequences (idle→pushback→taxiing→airborne) without waiting
+                            const stillOnGround = atcConvoState === 'idle' || atcConvoState === 'pushback' || atcConvoState === 'taxiing';
+                            // Chain landing sequences (landing→landed→parked) without waiting
+                            const stillLanding = atcConvoState === 'landing' || atcConvoState === 'landed';
+                            if ((stillOnGround || stillLanding) && atcFeedFleetId) {
                                 setTimeout(fetchATCMessage, 1200);
                             }
                         }
@@ -5615,9 +5842,42 @@ if (requiredRunway) {
             }
 
             if (statusEl) statusEl.textContent = `Last update: ${new Date().toLocaleTimeString()}`;
+            const _dbg = document.getElementById('atc-debug');
+            if (_dbg && atcFeedFleetId) _dbg.textContent = `state:${atcConvoState} held:${window._atcHeldFleets?.has(String(atcFeedFleetId))} pending:${atcMessagePending}`;
         }
 
-        function generateATCSequence(ctx, state) {
+        function buildFullApproachSequence(ctx) {
+            const { reg, dest, fuel, cond, distLeft } = ctx;
+            const cs = reg;
+            const fuelWarn = fuel < 25;
+            const seed = cs.split('').reduce((a,c) => a + c.charCodeAt(0), 0);
+            const rng = (n, offset=0) => (seed + offset) % n;
+            const extractIATA = (str) => { const m = str.match(/\(([A-Z]{2,4})\)/); if (m) return m[1]; return str.split(',')[0].split(' ')[0].toUpperCase().slice(0, 3); };
+            const destIATA = extractIATA(dest);
+            const rwys = ['04L','04R','10L','10R','18','22L','22R','28L','28R','36'];
+            const oppRwy = rwys[(rng(rwys.length) + 5) % rwys.length];
+            const freqApp = (119.1 + rng(16,6) * 0.05).toFixed(2);
+            const freqTwr = (118.1 + rng(20,3) * 0.05).toFixed(2);
+            const freqGnd = (121.7 + rng(3,2) * 0.05).toFixed(2);
+            const wind = `${String(rng(36,7)*10).padStart(3,'0')} at ${8 + rng(22,8)} knots`;
+            const atis = String.fromCharCode(65 + rng(26,9));
+            const descentFL = 30 + rng(20,4);
+            const PLT  = `✈ ${cs}`;
+            const APP  = `📡 ${destIATA} APP`;
+            const DTWR = `🗼 ${destIATA} TWR`;
+            return [
+                { speaker:PLT,  label:'PILOT', message:`${destIATA} Approach, ${cs}, descending, information ${atis}, requesting ILS runway ${oppRwy}.` },
+                { speaker:APP,  label:'ATC',   message:`${cs}, ${destIATA} Approach, radar contact, ${Math.round(distLeft)} miles out. Cleared ILS runway ${oppRwy}. Descend and maintain 3,000. Wind ${wind}.` },
+                { speaker:PLT,  label:'PILOT', message:`ILS runway ${oppRwy}, descending 3,000, ${cs}.` },
+                { speaker:PLT,  label:'PILOT', message:`${destIATA} Approach, ${cs}, established ILS runway ${oppRwy}, gear down${fuelWarn ? ', minimum fuel' : ''}.` },
+                { speaker:APP,  label:'ATC',   message:`${cs}, contact ${destIATA} Tower on ${freqTwr}.` },
+                { speaker:PLT,  label:'PILOT', message:`Tower on ${freqTwr}, ${cs}.` },
+                { speaker:DTWR, label:'ATC',   message:`${cs}, ${destIATA} Tower, runway ${oppRwy}, wind ${wind}, cleared to land.` },
+                { speaker:PLT,  label:'PILOT', message:`Runway ${oppRwy} cleared to land, ${cs}.` },
+            ];
+        }
+
+        function generateATCSequence(ctx, state, cruiseOptionIndex) {
             const { reg, type, origin, dest, fuel, cond, progress, altitude, speedKts, distLeft, isCargo, pax, phase, distanceNM } = ctx;
             const cs = reg; // e.g. "VT-XKR"
             const fuelWarn = fuel < 25;
@@ -5720,6 +5980,8 @@ if (requiredRunway) {
             }
 
             // ── DEPARTURE / INITIAL CLIMB ────────────────────────────────────
+            // Fire once state is 'airborne' — the aircraft may still briefly read as
+            // 'on ground' right after takeoff clearance while the hold releases.
             if (state === 'airborne') {
                 return seq([
                     { speaker:PLT,  label:'PILOT', message:`${origIATA} Departure, ${cs}, airborne runway ${rwy}, climbing through 3,000 for FL${cruiseFL}.` },
@@ -5732,7 +5994,8 @@ if (requiredRunway) {
 
             // ── EN ROUTE / CENTER ────────────────────────────────────────────
             if (state === 'cruise') {
-                if (effectivePhase === 'approach') {
+                // Always escape to descent once progress is high enough — never loop cruise chatter near destination
+                if (effectivePhase === 'approach' || progress >= 85) {
                     return seq([
                         { speaker:PLT,  label:'PILOT', message:`${destIATA} Center, ${cs}, level FL${cruiseFL}, estimating ${destIATA} in ${eta} minutes. Request descent.` },
                         { speaker:CTR,  label:'ATC',   message:`${cs}, ${destIATA} Center, roger. Descend and maintain FL${descentFL}, expect ILS runway ${oppRwy}. ${destIATA} weather: ceiling ${ceiling}, visibility ${vis}, wind ${wind}.` },
@@ -5759,7 +6022,8 @@ if (requiredRunway) {
                         { speaker:PLT,  label:'PILOT', message:`We'll stay at FL${cruiseFL}, ${cs}.` },
                     ], 'cruise'),
                 ];
-                return options[rng(options.length, eta)];
+                // Use incrementing counter so cruise chatter never repeats the same option
+                return options[(cruiseOptionIndex || 0) % options.length];
             }
 
             // ── APPROACH ─────────────────────────────────────────────────────
