@@ -82,26 +82,63 @@
         .control-panel { flex: 1; max-width: 480px; background-color: var(--panel-color); border-left: 2px solid var(--card-border); display: flex; flex-direction: column; }
 
         @media (max-width: 768px) {
-            header { padding: 8px 12px; flex-wrap: wrap; gap: 6px; }
-            header > div:first-child h2 { font-size: 14px; }
-            header > div:first-child p { display: none; }
-            .stats-container { gap: 6px; }
-            .stat-box { padding: 4px 8px; font-size: 11px; }
-            .xp-bar-outer { width: 50px; }
-            .stat-xp { display: none; }
-            .main-layout { flex-direction: column; }
-            #map { flex: none; height: 42vh; width: 100%; border-bottom: 2px solid var(--card-border); }
-            .control-panel { flex: 1; max-width: 100%; border-left: none; border-top: 2px solid var(--card-border); min-height: 0; overflow: hidden; }
-            .tab-btn { font-size: 9px; padding: 10px 1px; min-width: 0; }
-            .tab-content { padding: 10px; }
-            #interactive-tutorial-bubble { width: calc(100% - 24px); left: 12px; bottom: 12px; }
-            #atc-feed-panel { width: calc(100% - 24px) !important; right: 12px !important; bottom: 12px !important; left: 12px !important; }
-            .card { padding: 10px; }
-            .hangar-sort-select { min-width: 0; }
-            .modal-content, .modal-box { padding: 16px; }
-            .city-search-container { position: static; }
-            .route-form-grid { grid-template-columns: 1fr !important; }
+            body:not(.pc-mode) header { padding: 8px 12px; flex-wrap: wrap; gap: 6px; }
+            body:not(.pc-mode) header > div:first-child h2 { font-size: 14px; }
+            body:not(.pc-mode) header > div:first-child p { display: none; }
+            body:not(.pc-mode) .stats-container { gap: 6px; }
+            body:not(.pc-mode) .stat-box { padding: 4px 8px; font-size: 11px; }
+            body:not(.pc-mode) .xp-bar-outer { width: 50px; }
+            body:not(.pc-mode) .stat-xp { display: none; }
+            body:not(.pc-mode) .main-layout { flex-direction: column; }
+            body:not(.pc-mode) #map { flex: none; height: 42vh; width: 100%; border-bottom: 2px solid var(--card-border); }
+            body:not(.pc-mode) .control-panel { flex: 1; max-width: 100%; border-left: none; border-top: 2px solid var(--card-border); min-height: 0; overflow: hidden; }
+            body:not(.pc-mode) .tab-btn { font-size: 9px; padding: 10px 1px; min-width: 0; }
+            body:not(.pc-mode) .tab-content { padding: 10px; }
+            body:not(.pc-mode) #interactive-tutorial-bubble { width: calc(100% - 24px); left: 12px; bottom: 12px; }
+            body:not(.pc-mode) #atc-feed-panel { width: calc(100% - 24px) !important; right: 12px !important; bottom: 12px !important; left: 12px !important; }
+            body:not(.pc-mode) .card { padding: 10px; }
+            body:not(.pc-mode) .hangar-sort-select { min-width: 0; }
+            body:not(.pc-mode) .modal-content, body:not(.pc-mode) .modal-box { padding: 16px; }
+            body:not(.pc-mode) .city-search-container { position: static; }
+            body:not(.pc-mode) .route-form-grid { grid-template-columns: 1fr !important; }
         }
+        /* Forced mobile mode — applies on any screen size */
+        body.mobile-mode header { padding: 8px 12px; flex-wrap: wrap; gap: 6px; }
+        body.mobile-mode header > div:first-child h2 { font-size: 14px; }
+        body.mobile-mode header > div:first-child p { display: none; }
+        body.mobile-mode .stats-container { gap: 6px; }
+        body.mobile-mode .stat-box { padding: 4px 8px; font-size: 11px; }
+        body.mobile-mode .xp-bar-outer { width: 50px; }
+        body.mobile-mode .stat-xp { display: none; }
+        body.mobile-mode .main-layout { flex-direction: column; }
+        body.mobile-mode #map { flex: none; height: 42vh; width: 100%; border-bottom: 2px solid var(--card-border); }
+        body.mobile-mode .control-panel { flex: 1; max-width: 100%; border-left: none; border-top: 2px solid var(--card-border); min-height: 0; overflow: hidden; }
+        body.mobile-mode .tab-btn { font-size: 9px; padding: 10px 1px; min-width: 0; }
+        body.mobile-mode .tab-content { padding: 10px; }
+        body.mobile-mode #interactive-tutorial-bubble { width: calc(100% - 24px); left: 12px; bottom: 12px; }
+        body.mobile-mode #atc-feed-panel { width: calc(100% - 24px) !important; right: 12px !important; bottom: 12px !important; left: 12px !important; }
+        body.mobile-mode .card { padding: 10px; }
+        body.mobile-mode .hangar-sort-select { min-width: 0; }
+        body.mobile-mode .modal-content, body.mobile-mode .modal-box { padding: 16px; }
+        body.mobile-mode .city-search-container { position: static; }
+        body.mobile-mode .route-form-grid { grid-template-columns: 1fr !important; }
+        body.pc-mode header { padding: 12px 20px; flex-wrap: nowrap; gap: 0; }
+        body.pc-mode header > div:first-child h2 { font-size: 18px; }
+        body.pc-mode header > div:first-child p { display: block; }
+        body.pc-mode .stats-container { gap: 15px; }
+        body.pc-mode .stat-box { padding: 6px 14px; font-size: 13px; }
+        body.pc-mode .xp-bar-outer { width: 80px; }
+        body.pc-mode .stat-xp { display: flex; }
+        body.pc-mode .main-layout { flex-direction: row; }
+        body.pc-mode #map { flex: 2; height: 100%; width: auto; border-bottom: none; }
+        body.pc-mode .control-panel { flex: 1; max-width: 480px; border-left: 2px solid var(--card-border); border-top: none; }
+        body.pc-mode .tab-btn { font-size: 10px; padding: 12px 2px; min-width: 60px; }
+        body.pc-mode .tab-content { padding: 15px; }
+        body.pc-mode #interactive-tutorial-bubble { width: 380px; left: 30px; bottom: 30px; }
+        body.pc-mode #atc-feed-panel { width: 320px !important; right: 20px !important; bottom: 20px !important; left: auto !important; }
+        body.pc-mode .hangar-sort-select { min-width: 170px; }
+        body.pc-mode .modal-content, body.pc-mode .modal-box { padding: 30px; }
+        body.pc-mode .route-form-grid { grid-template-columns: 1fr 1fr !important; }
         .tabs { display: flex; background: rgba(0,0,0,0.1); flex-wrap: wrap; }
         .tab-btn { flex: 1; min-width: 60px; padding: 12px 2px; background: none; border: none; color: #94a3b8; font-weight: 600; font-size: 10px; cursor: pointer; text-align: center; border-bottom: 3px solid transparent; }
         .tab-btn.active { color: var(--text-color); background: var(--panel-color); border-bottom: 3px solid var(--accent-color); }
@@ -662,6 +699,14 @@ z-index:99999;
         <input type="checkbox" id="contracts-disabled-checkbox" onchange="toggleContractsDisabled(this.checked)">
         <span class="slider"></span>
     </label>
+</div>
+            <div class="settings-row">
+    <span>Layout Mode</span>
+    <div class="unit-toggle-bar">
+        <button id="layout-pc-btn" class="unit-btn active" onclick="setLayoutMode('pc')">🖥 PC</button>
+        <button id="layout-auto-btn" class="unit-btn" onclick="setLayoutMode('auto')">⚡ Auto</button>
+        <button id="layout-mobile-btn" class="unit-btn" onclick="setLayoutMode('mobile')">📱 Mobile</button>
+    </div>
 </div>
             <div class="settings-row">
     <span>Runway Length Unit</span>
@@ -2560,7 +2605,7 @@ z-index:99999;
         const DEFAULT_STATE = {
             cash: 0, tokens: 0, rank: 1, xp: 0, airlineName: "", primaryHub: "",
             hangar: {},
-            routes: [], distanceUnit: "NM", speedUnit: "KN", showRouteLines: true, showHospitals: true, multiplierX: 2500, tutorialActive: false, tutorialFastForward: false, interactiveStage: 0, lightTheme: false,
+            routes: [], distanceUnit: "NM", speedUnit: "KN", showRouteLines: true, showHospitals: true, multiplierX: 2500, tutorialActive: false, tutorialFastForward: false, interactiveStage: 0, lightTheme: false, layoutMode: 'auto',
             speedBoostEndTime: 0, cratesClaimed: 0, totalRefuels: 0, totalCrashes: 0, legacyFlightTicks: 0,
             crateLuckMultiplier: 0, crateLuckEndTime: 0,
             categories: [], aircraftCategories: {}, categoryColors: {},
@@ -3932,6 +3977,8 @@ if (rarityData && !achievements[rarityData.id].unlocked) {
             const northEast = L.latLng(85, 180);
             map = L.map('map', { minZoom: 2, maxZoom: 7, maxBounds: L.latLngBounds(southWest, northEast), maxBoundsViscosity: 1.0 }).setView([20, 0], 2);
             updateMapStyle(); renderMapGraphics(); buildDirectoryTree(); updateUI();
+            // Apply saved layout mode
+            if (gameState.layoutMode) setLayoutMode(gameState.layoutMode);
  
             // Add crate indicator
             const mapEl = document.getElementById('map');
@@ -4015,6 +4062,19 @@ if (rarityData && !achievements[rarityData.id].unlocked) {
             }
             saveProgress();
         }
+        function setLayoutMode(mode) {
+            // mode: 'pc' | 'auto' | 'mobile'
+            gameState.layoutMode = mode;
+            document.body.classList.remove('pc-mode', 'mobile-mode');
+            if (mode === 'pc') document.body.classList.add('pc-mode');
+            else if (mode === 'mobile') document.body.classList.add('mobile-mode');
+            ['pc','auto','mobile'].forEach(m => {
+                const btn = document.getElementById('layout-' + m + '-btn');
+                if (btn) btn.classList.toggle('active', m === mode);
+            });
+            saveProgress();
+            if (window.map) map.invalidateSize();
+        }
         function setRunwayUnit(unit) {
             gameState.runwayUnit = unit;
             const rft = document.getElementById('runway-ft-btn'); if (rft) rft.classList.toggle('active', unit === 'ft');
@@ -4052,6 +4112,11 @@ if (rarityData && !achievements[rarityData.id].unlocked) {
             document.getElementById('route-line-checkbox').checked = gameState.showRouteLines;
             document.getElementById('hospital-marker-checkbox').checked = gameState.showHospitals !== false;
             document.getElementById('contracts-disabled-checkbox').checked = !!gameState.contractsDisabled;
+            const layoutMode = gameState.layoutMode || 'auto';
+            ['pc','auto','mobile'].forEach(m => {
+                const btn = document.getElementById('layout-' + m + '-btn');
+                if (btn) btn.classList.toggle('active', m === layoutMode);
+            });
             const runwayUnit = gameState.runwayUnit || 'ft';
             document.getElementById('runway-ft-btn').classList.toggle('active', runwayUnit === 'ft');
             document.getElementById('runway-m-btn').classList.toggle('active', runwayUnit === 'm');
