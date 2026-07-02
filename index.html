@@ -160,6 +160,14 @@
         .market-item.locked { opacity: 0.6; filter: grayscale(80%); cursor: not-allowed; }
         .market-item.cargo-item { border-color: var(--cargo-color); }
         .market-item.cargo-item:hover { border-color: #fb923c; }
+        .new-badge {
+            position: absolute; top: -6px; right: -6px; z-index: 5;
+            background: linear-gradient(135deg, #2563eb, #60a5fa);
+            color: #fff; font-size: 9px; font-weight: 800; letter-spacing: 0.5px;
+            padding: 3px 7px; border-radius: 999px; box-shadow: 0 2px 6px rgba(37,99,235,0.5);
+            animation: newBadgePulse 1.6s ease-in-out infinite; pointer-events: none;
+        }
+        @keyframes newBadgePulse { 0%,100%{ transform:scale(1); } 50%{ transform:scale(1.12); } }
         .market-item-img { width: 100%; height: 60px; background-size: cover; background-position: center; border-radius: 4px; margin-bottom: 5px; }
         .tutorial-highlight { border: 2px solid var(--achievement-color) !important; background: rgba(234,179,8,0.05) !important; box-shadow: 0 0 10px rgba(234,179,8,0.4); }
         #interactive-tutorial-bubble { position: fixed; bottom: 30px; left: 30px; width: 380px; background: var(--panel-color); border: 2px solid var(--achievement-color); border-radius: 10px; padding: 20px; z-index: 1050; box-shadow: 0 15px 30px rgba(0,0,0,0.5); display: none; flex-direction: column; gap: 12px; }
@@ -196,7 +204,7 @@
         .search-dropdown-group-header { padding:4px 8px; font-size:11px; font-weight:bold; color:var(--token-color); background:rgba(0,0,0,0.2); border-bottom:1px solid var(--card-border); position:sticky; top:0; }
         .hangar-grid-2col { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
         @media (max-width: 768px) { .hangar-grid-2col { grid-template-columns: 1fr; } }
-        .hangar-card-btn { background: var(--card-bg); border: 1px solid var(--card-border); border-radius: 8px; padding: 8px; cursor: pointer; transition: transform 0.2s, border-color 0.2s; text-align: center; }
+        .hangar-card-btn { background: var(--card-bg); border: 1px solid var(--card-border); border-radius: 8px; padding: 8px; cursor: pointer; transition: transform 0.2s, border-color 0.2s; text-align: center; position: relative; }
         .hangar-card-btn:hover { transform: scale(1.02); border-color: var(--accent-color); }
         .hangar-card-btn .aircraft-img { width:100%; height:70px; background-size:cover; background-position:center; border-radius:4px; margin-bottom:5px; }
         .hangar-card-btn .label { font-size:11px; font-weight:bold; }
@@ -213,21 +221,30 @@
         .rarity-tag::after { content:''; position:absolute; inset:-80% -35%; background:linear-gradient(115deg, transparent 35%, rgba(255,255,255,0.75) 50%, transparent 65%); transform:translateX(-140%); animation:rarityShine 2.1s linear infinite; }
         .rarity-tag.rarity-legendary { color:#451a03; border:1px solid #facc15; background:linear-gradient(135deg,#fde68a,#f59e0b,#fef3c7); box-shadow:0 0 8px rgba(250,204,21,0.7); animation:legendaryTagAnim 1.6s ease-in-out infinite; }
 .rarity-tag.rarity-mythic { color:#faf5ff; border:1px solid #ef4444; background:linear-gradient(135deg,#7e22ce,#db2777,#ef4444); box-shadow:0 0 8px rgba(239,68,68,0.7); animation:mythicTagAnim 1.45s ease-in-out infinite; }
+.rarity-tag.rarity-exotic { color:#fff; border:1px solid #fff; background:linear-gradient(90deg,#ff0080,#ff8c00,#ffe600,#00ff8c,#00d4ff,#8c00ff,#ff0080); background-size:400% 100%; box-shadow:0 0 10px rgba(255,255,255,0.9), 0 0 22px rgba(0,212,255,0.7); animation:exoticTagAnim 0.9s linear infinite, exoticTagShift 2.2s linear infinite; font-weight:1000; text-shadow:0 0 4px rgba(0,0,0,0.6); }
         .rarity-tag.rarity-common { color:#94a3b8; border:1px solid #475569; background:rgba(71,85,105,0.25); font-size:9px; }
         /* Achievement filter buttons */
         .ach-filter-btn { padding:4px 10px; border-radius:999px; border:1px solid var(--card-border); background:var(--card-bg); color:var(--text-color); font-size:11px; font-weight:600; cursor:pointer; transition:all 0.15s; white-space:nowrap; }
         .ach-filter-btn:hover { border-color:var(--accent-color); color:var(--accent-color); }
         .ach-filter-btn.active { background:var(--accent-color); color:#fff; border-color:var(--accent-color); }
+        .ach-filter-btn[data-filter="exotic"] { position:relative; overflow:hidden; z-index:0; }
+        .ach-filter-btn[data-filter="exotic"] span { position:relative; z-index:1; }
+        .ach-filter-btn[data-filter="exotic"].active { border-color:#fff; color:#fff; box-shadow:0 0 10px rgba(255,255,255,0.7); animation:exoticFilterPulse 1.6s ease-in-out infinite; }
+        .ach-filter-btn[data-filter="exotic"].active::before { content:''; position:absolute; inset:0; z-index:0; pointer-events:none; background:linear-gradient(90deg,#ff0080,#ff8c00,#ffe600,#00ff8c,#00d4ff,#8c00ff,#ff0080); background-size:400% 100%; animation:exoticTagShift 2.2s linear infinite; }
         .ach-filter-btn[data-filter="mythic"].active   { background:linear-gradient(135deg,#7e22ce,#db2777,#ef4444); border-color:#ef4444; color:#fff; box-shadow:0 0 8px rgba(239,68,68,0.5); }
         .ach-filter-btn[data-filter="legendary"].active { background:linear-gradient(135deg,#fde68a,#f59e0b); border-color:#facc15; color:#451a03; box-shadow:0 0 8px rgba(250,204,21,0.5); }
         .ach-filter-btn[data-filter="epic"].active     { background:linear-gradient(135deg,#e9d5ff,#a855f7); border-color:#a855f7; color:#2e1065; box-shadow:0 0 8px rgba(168,85,247,0.5); }
         .ach-filter-btn[data-filter="rare"].active     { background:linear-gradient(135deg,#a5f3fc,#06b6d4); border-color:#06b6d4; color:#0c4a6e; }
+        .ach-filter-btn[data-filter="uncommon"].active { background:linear-gradient(135deg,#a7f3d0,#10b981); border-color:#10b981; color:#052e16; }
+        .ach-filter-btn[data-filter="common"].active   { background:linear-gradient(135deg,#cbd5e1,#94a3b8); border-color:#94a3b8; color:#1e293b; }
         /* Achievement cards */
         .ach-card { transition: border-color 0.2s, box-shadow 0.2s; }
         .ach-card.rarity-mythic    { border-color:#db2777 !important; box-shadow:0 0 10px rgba(239,68,68,0.3); }
+        .ach-card.rarity-exotic    { border-color:#fff !important; box-shadow:0 0 14px rgba(0,212,255,0.5), 0 0 22px rgba(255,0,128,0.35); }
         .ach-card.rarity-legendary { border-color:#f59e0b !important; box-shadow:0 0 10px rgba(250,204,21,0.25); }
         .ach-card.rarity-epic      { border-color:#a855f7 !important; box-shadow:0 0 8px rgba(168,85,247,0.25); }
         .ach-card.rarity-rare      { border-color:#06b6d4 !important; }
+        .ach-card.rarity-uncommon  { border-color:#10b981 !important; }
         .rarity-tag.rarity-uncommon { color:#1e3a5f; border:1px solid #38bdf8; background:linear-gradient(135deg,#bae6fd,#38bdf8); }
         .rarity-tag.rarity-epic { color: #2e1065; border: 1px solid #a855f7; background: linear-gradient(135deg, #e9d5ff, #a855f7, #f3e8ff); box-shadow: 0 0 8px rgba(168,85,247,0.9), 0 0 16px rgba(168,85,247,0.45); animation: epicTagPulse 1.6s ease-in-out infinite; }
 .rarity-tag.rarity-uncommon { color: #052e16; border: 1px solid #10b981; background: linear-gradient(135deg, #a7f3d0, #10b981, #d1fae5); }
@@ -236,6 +253,9 @@
         @keyframes rarityShine { to { transform:translateX(140%); } }
        @keyframes legendaryTagAnim { 0%,100% { box-shadow:0 0 5px rgba(250,204,21,0.4); } 50% { box-shadow:0 0 12px rgba(250,204,21,0.9); } }
 @keyframes mythicTagAnim { 0%,100% { transform:scale(1); box-shadow:0 0 8px rgba(239,68,68,0.7); } 50% { transform:scale(1.07); box-shadow:0 0 14px rgba(239,68,68,1); } }
+@keyframes exoticTagAnim { 0%,100% { transform:scale(1) rotate(0deg); box-shadow:0 0 10px rgba(255,255,255,0.9), 0 0 22px rgba(0,212,255,0.7); } 50% { transform:scale(1.14) rotate(-1deg); box-shadow:0 0 20px rgba(255,255,255,1), 0 0 36px rgba(255,0,128,0.9); } }
+@keyframes exoticTagShift { 0% { background-position:0% 50%; } 100% { background-position:400% 50%; } }
+@keyframes exoticFilterPulse { 0%,100% { box-shadow:0 0 10px rgba(255,255,255,0.7); } 50% { box-shadow:0 0 18px rgba(255,255,255,1); } }
         @keyframes epicTagPulse { 0%,100% { transform: scale(1); filter: saturate(1); } 50% { transform: scale(1.06); filter: saturate(1.45); } }
         .hangar-stats-table td { padding:4px 0; border-bottom:1px solid var(--card-border); }
         .hangar-stats-table td:last-child { text-align:right; font-weight:bold; }
@@ -374,6 +394,8 @@
         .rarity-epic      { background: rgba(168,85,247,0.2); color: #a855f7; border: 1px solid #a855f7; }
         .rarity-legendary { background: rgba(234,179,8,0.2);  color: #eab308; border: 1px solid #eab308; }
         .rarity-mythic    { background: rgba(239,68,68,0.2);   color: #ef4444; border: 1px solid #ef4444; }
+        .reel-text-rainbow { background: linear-gradient(90deg,#ff0080,#ff8c00,#ffe600,#00ff8c,#00d4ff,#8c00ff,#ff0080); background-size:400% 100%; -webkit-background-clip:text; background-clip:text; color:transparent; animation: exoticTagShift 1.8s linear infinite; font-weight:900; }
+        .rarity-exotic    { background: linear-gradient(90deg,#ff0080,#ff8c00,#ffe600,#00ff8c,#00d4ff,#8c00ff); background-size:400% 100%; animation: exoticTagShift 2.2s linear infinite; color: #fff; border: 1px solid #fff; text-shadow:0 0 4px rgba(0,0,0,0.7); box-shadow:0 0 10px rgba(255,255,255,0.8); }
         .claim-btn { background: linear-gradient(135deg, #10b981, #059669); color: white; border: none; padding: 12px 36px; border-radius: 50px; font-size: 15px; font-weight: 900; cursor: pointer; letter-spacing: 1px; box-shadow: 0 4px 15px rgba(16,185,129,0.4); transition: all 0.2s; margin-top: 8px; display: block; margin-left: auto; margin-right: auto; }
         .claim-btn:hover { transform: scale(1.05); }
         .crate-indicator { position: absolute; top: 10px; right: 10px; background: rgba(234,179,8,0.2); border: 1px solid #eab308; border-radius: 8px; padding: 4px 10px; font-size: 11px; color: #eab308; font-weight: bold; z-index: 905; pointer-events: none; }
@@ -426,6 +448,39 @@
             0%   { opacity:1; transform: translateY(0) scale(1); }
             100% { opacity:0; transform: translateY(-60px) scale(0.2); }
         }
+        @keyframes exoticSupernova {
+            0%   { opacity:0; transform: scale(0.15) rotate(-25deg); filter: brightness(8) saturate(3) hue-rotate(0deg); }
+            15%  { opacity:1; transform: scale(1.7) rotate(8deg); filter: brightness(4) saturate(2.5) hue-rotate(120deg); }
+            30%  { transform: scale(0.8) rotate(-4deg); filter: brightness(3) saturate(2) hue-rotate(240deg); }
+            45%  { transform: scale(1.35) rotate(3deg); filter: brightness(2.4) saturate(1.8) hue-rotate(360deg); }
+            60%  { transform: scale(0.92) rotate(-2deg); filter: brightness(1.8) saturate(1.5) hue-rotate(480deg); }
+            75%  { transform: scale(1.12) rotate(1deg); filter: brightness(1.4) saturate(1.3) hue-rotate(600deg); }
+            90%  { transform: scale(0.98) rotate(0deg); filter: brightness(1.1) saturate(1.1) hue-rotate(700deg); }
+            100% { opacity:1; transform: scale(1) rotate(0deg); filter: brightness(1) saturate(1) hue-rotate(720deg); }
+        }
+        @keyframes exoticShake {
+            0%,100% { transform: translateX(0) translateY(0); }
+            10% { transform: translateX(-14px) translateY(-4px) rotate(-3deg); }
+            20% { transform: translateX(14px) translateY(4px) rotate(3deg); }
+            30% { transform: translateX(-12px) translateY(-3px) rotate(-2.5deg); }
+            40% { transform: translateX(12px) translateY(3px) rotate(2.5deg); }
+            50% { transform: translateX(-9px) rotate(-2deg); }
+            60% { transform: translateX(9px) rotate(2deg); }
+            70% { transform: translateX(-5px); }
+            80% { transform: translateX(5px); }
+            90% { transform: translateX(-2px); }
+        }
+        @keyframes exoticParticles {
+            0%   { opacity:1; transform: translateY(0) scale(1) rotate(0deg); }
+            100% { opacity:0; transform: translateY(-100px) scale(0.1) rotate(180deg); }
+        }
+        @keyframes exoticRainbowBg {
+            0%   { background: radial-gradient(ellipse at center, rgba(255,0,128,0.25) 0%, rgba(0,0,0,0.9) 70%); }
+            25%  { background: radial-gradient(ellipse at center, rgba(255,230,0,0.25) 0%, rgba(0,0,0,0.9) 70%); }
+            50%  { background: radial-gradient(ellipse at center, rgba(0,255,140,0.25) 0%, rgba(0,0,0,0.9) 70%); }
+            75%  { background: radial-gradient(ellipse at center, rgba(0,212,255,0.25) 0%, rgba(0,0,0,0.9) 70%); }
+            100% { background: radial-gradient(ellipse at center, rgba(255,0,128,0.25) 0%, rgba(0,0,0,0.9) 70%); }
+        }
         @keyframes legendaryGlow {
             0%,100% { box-shadow: 0 0 20px rgba(234,179,8,0.5); }
             50% { box-shadow: 0 0 50px rgba(234,179,8,0.9), 0 0 80px rgba(234,179,8,0.4); }
@@ -440,6 +495,7 @@
         .rarity-reveal-epic      { animation: epicPulse 0.9s cubic-bezier(0.175,0.885,0.32,1.275) forwards, epicGlow 2s ease 0.9s infinite; }
         .rarity-reveal-legendary { animation: legendaryFlare 1.1s cubic-bezier(0.175,0.885,0.32,1.275) forwards, legendaryGlow 1.5s ease 1.1s infinite; }
         .rarity-reveal-mythic    { animation: mythicExplosion 1.4s cubic-bezier(0.175,0.885,0.32,1.275) forwards; }
+        .rarity-reveal-exotic    { animation: exoticSupernova 2.2s cubic-bezier(0.175,0.885,0.32,1.275) forwards; }
         @keyframes legendaryGlowTag {
             0%,100% { box-shadow: 0 0 5px rgba(234,179,8,0.4); filter: brightness(1); }
             50% { box-shadow: 0 0 15px rgba(234,179,8,0.8); filter: brightness(1.3); }
@@ -449,13 +505,18 @@
             50% { box-shadow: 0 0 15px rgba(239,68,68,0.8); filter: brightness(1.3); }
         }
         .card-mythic { border-color: #ef4444 !important; }
+        .card-exotic { border-color: #fff !important; box-shadow:0 0 14px rgba(0,212,255,0.6); }
         .card-legAndary { border-color: #eab308 !important; }
         .reel-box-shake { animation: mythicShake 0.6s ease 0.5s; }
+        .reel-box-shake-exotic { animation: exoticShake 1.1s ease 0.3s; }
         .mythic-particles { position:absolute; top:0; left:0; width:100%; height:100%; pointer-events:none; overflow:hidden; border-radius:16px; }
         .mythic-particle { position:absolute; font-size:16px; animation: mythicParticles 1.2s ease-out forwards; }
+        .exotic-particles { position:absolute; top:0; left:0; width:100%; height:100%; pointer-events:none; overflow:hidden; border-radius:16px; }
+        .exotic-particle { position:absolute; font-size:20px; animation: exoticParticles 1.8s ease-out forwards; }
         #reel-modal.mythic-bg { background: radial-gradient(ellipse at center, rgba(239,68,68,0.15) 0%, rgba(0,0,0,0.85) 70%); }
         #reel-modal-bg { background: radial-gradient(ellipse at center, rgba(234,179,8,0.12) 0%, rgba(0,0,0,0.85) 70%); }
         #reel-modal.epic-bg { background: radial-gradient(ellipse at center, rgba(168,85,247,0.1) 0%, rgba(0,0,0,0.85) 70%); }
+        #reel-modal.exotic-bg { animation: exoticRainbowBg 1.6s linear infinite; }
  
         /* === HUB PURCHASE MODAL === */
         #buy-hub-modal { position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.7); z-index:20000; display:none; justify-content:center; align-items:center; }
@@ -909,10 +970,13 @@ z-index:99999;
                     <button class="ach-filter-btn active" data-filter="all"     onclick="setAchFilter('all')">All</button>
                     <button class="ach-filter-btn"        data-filter="unlocked" onclick="setAchFilter('unlocked')">✅ Unlocked</button>
                     <button class="ach-filter-btn"        data-filter="locked"   onclick="setAchFilter('locked')">🔒 Locked</button>
+                    <button class="ach-filter-btn"        data-filter="exotic"   onclick="setAchFilter('exotic')" style="color:#00d4ff;"><span>Exotic</span></button>
                     <button class="ach-filter-btn"        data-filter="mythic"   onclick="setAchFilter('mythic')" style="color:#ef4444;">Mythic</button>
                     <button class="ach-filter-btn"        data-filter="legendary" onclick="setAchFilter('legendary')" style="color:#eab308;">Legendary</button>
                     <button class="ach-filter-btn"        data-filter="epic"     onclick="setAchFilter('epic')" style="color:#a855f7;">Epic</button>
                     <button class="ach-filter-btn"        data-filter="rare"     onclick="setAchFilter('rare')" style="color:#06b6d4;">Rare</button>
+                    <button class="ach-filter-btn"        data-filter="uncommon" onclick="setAchFilter('uncommon')" style="color:#10b981;">Uncommon</button>
+                    <button class="ach-filter-btn"        data-filter="common"   onclick="setAchFilter('common')" style="color:#94a3b8;">Common</button>
                 </div>
 
                 <div id="achievements-list" style="margin-top:4px;"></div>
@@ -1013,6 +1077,9 @@ z-index:99999;
         const SAAB_ICON_B64 = 'https://github.com/WormDude/Airline-Manager-81-3-64/blob/main/saab340.png?raw=true';
         const Q400_ICON_B64 = 'https://github.com/WormDude/Airline-Manager-81-3-64/blob/main/q400%20or%20saab.png?raw=true';
         const AVROCAR_ICON_B64 = 'https://github.com/WormDude/Airline-Manager-81-3-64/blob/main/avrocar.png?raw=true';
+        const AN2_ICON_B64 = 'https://github.com/WormDude/Airline-Manager-81-3-64/blob/main/an2.png?raw=true';
+        const FLYINGV_ICON_B64 = 'https://github.com/WormDude/Airline-Manager-81-3-64/blob/main/flyingv.png?raw=true';
+        const SHORT360_ICON_B64 = 'https://github.com/WormDude/Airline-Manager-81-3-64/blob/main/short360.png?raw=true';
         const EARNINGS_MULTIPLIER = 0.28;        // $ per NM per pax — tuned so Cessna earns back price in ~5min active play
         const CARGO_EARNINGS_MULTIPLIER = 0.00055; // $ per NM per kg — cargo is now meaningfully more lucrative than passengers
         const BACKGROUND_EARNINGS_RATIO = 1.0;    // tab-unfocused: no bonus, no penalty
@@ -2484,94 +2551,146 @@ z-index:99999;
             "Cessna 208 Caravan":       { name: "Cessna 208 Caravan",    category: "Other",  price: 25000,    pax: 11,  rangeNM: 1070,  topSpeedKnots: 186, minRank: 1,  iconSize: 24, img: "https://upload.wikimedia.org/wikipedia/commons/b/b3/Iraqi_Air_Force_Cessna_208_Caravan_training_mission.jpg", type: "plane" },
             "Bell 407 Helicopter":      { name: "Bell 407 Helicopter",   category: "Other",  price: 85000,    pax: 6,   rangeNM: 324,  topSpeedKnots: 140, minRank: 1,  iconSize: 24, img: "https://upload.wikimedia.org/wikipedia/commons/4/4e/Nassau_County_Police_Bell_407.jpg", type: "helicopter" },
             "de Havilland Canada DHC-6 Twin Otter": { name: "de Havilland Canada DHC-6 Twin Otter", category: "Other", price: 120000, pax: 20, rangeNM: 771, topSpeedKnots: 160, minRank: 2, iconSize: 24, img: "https://upload.wikimedia.org/wikipedia/commons/thumb/2/20/WinAir_De_Havilland_Canada_DHC-6-300_Twin_Otter_Breidenstein.jpg/1280px-WinAir_De_Havilland_Canada_DHC-6-300_Twin_Otter_Breidenstein.jpg", type: "plane" },
-            "Saab 340":                 { name: "Saab 340",              category: "Other",  price: 220000,   pax: 34,  rangeNM: 730,  topSpeedKnots: 283, minRank: 2,  iconSize: 24, img: "https://upload.wikimedia.org/wikipedia/commons/thumb/0/08/Saab_340_G-LGNC_IMG_3425_%2811712072893%29.jpg/1920px-Saab_340_G-LGNC_IMG_3425_%2811712072893%29.jpg", type: "plane" },
-            "ATR 72-600":               { name: "ATR 72-600",            category: "ATR",    price: 480000,   pax: 72,  rangeNM: 758,  topSpeedKnots: 275, minRank: 3,  iconSize: 26, img: "https://upload.wikimedia.org/wikipedia/commons/thumb/b/bc/Wings_Air_ATR_72-600_with_special_livery_as_the_50th_delivered_aircraft.jpg/1280px-Wings_Air_ATR_72-600_with_special_livery_as_the_50th_delivered_aircraft.jpg", type: "plane" },
-            "Bombardier Q400":          { name: "Bombardier Q400",       category: "Other",  price: 850000,   pax: 82,  rangeNM: 1100, topSpeedKnots: 360, minRank: 4,  iconSize: 26, img: "https://upload.wikimedia.org/wikipedia/commons/thumb/e/ec/Hamburg_Airport_Wider%C3%B8e_Bombardier_DHC-8-402Q_LN-WDR_%28DSC08713%29.jpg/1920px-Hamburg_Airport_Wider%C3%B8e_Bombardier_DHC-8-402Q_LN-WDR_%28DSC08713%29.jpg", type: "plane" },
-            "Airbus A220-300":          { name: "Airbus A220-300",       category: "Airbus", price: 1800000,  pax: 130, rangeNM: 3400, topSpeedKnots: 488, minRank: 5,  iconSize: 26, img: "https://upload.wikimedia.org/wikipedia/commons/thumb/9/96/Delta_Airbus_A220-300_N333DU_departing_Boston_June_2025.jpg/1920px-Delta_Airbus_A220-300_N333DU_departing_Boston_June_2025.jpg", type: "plane" },
-            "Boeing 737-800":           { name: "Boeing 737-800",        category: "Boeing", price: 2800000,  pax: 160, rangeNM: 2927, topSpeedKnots: 452, minRank: 6,  iconSize: 28, img: "https://upload.wikimedia.org/wikipedia/commons/thumb/8/8b/D-ATUF_B737-8K5W_TUIfly-Hapag_retro_PMI_26SEP10_%286341092368%29.jpg/1280px-D-ATUF_B737-8K5W_TUIfly-Hapag_retro_PMI_26SEP10_%286341092368%29.jpg", type: "plane" },
-            "Airbus A320":              { name: "Airbus A320",           category: "Airbus", price: 2600000,  pax: 150, rangeNM: 3350, topSpeedKnots: 448, minRank: 6,  iconSize: 28, img: "https://upload.wikimedia.org/wikipedia/commons/c/c1/Airbus_A320-214%2C_Airbus_Industrie_JP7617615.jpg", type: "plane" },
-            "Embraer E175":             { name: "Embraer E175",          category: "Other",  price: 2200000,  pax: 76,  rangeNM: 2200, topSpeedKnots: 470, minRank: 7,  iconSize: 28, img: "https://upload.wikimedia.org/wikipedia/commons/thumb/e/e0/N199SY_SkyWest_Embraer_175_for_Alaska_Airlines.jpg/1920px-N199SY_SkyWest_Embraer_175_for_Alaska_Airlines.jpg", type: "plane" },
-            "Boeing 787-9 Dreamliner":  { name: "Boeing 787-9 Dreamliner", category: "Boeing", price: 8500000, pax: 242, rangeNM: 7305, topSpeedKnots: 516, minRank: 8, iconSize: 32, img: "https://upload.wikimedia.org/wikipedia/commons/thumb/4/4e/Boeing_787_N1015B_ANA_Airlines_%2827611880663%29_%28cropped%29.jpg/1920px-Boeing_787_N1015B_ANA_Airlines_%2827611880663%29_%28cropped%29.jpg", type: "plane" },
-            "Airbus A350-900":          { name: "Airbus A350-900",       category: "Airbus", price: 13000000, pax: 315, rangeNM: 8500, topSpeedKnots: 513, minRank: 9,  iconSize: 32, img: "https://upload.wikimedia.org/wikipedia/commons/thumb/c/ce/F-WWCF_A350_LBG_SIAE_2015_%2818953559366%29.jpg/1920px-F-WWCF_A350_LBG_SIAE_2015_%2818953559366%29.jpg", type: "plane" },
-            "Boeing 747-8":             { name: "Boeing 747-8",          category: "Boeing", price: 22000000, pax: 467, rangeNM: 7730, topSpeedKnots: 600, minRank: 11, iconSize: 36, img: "https://upload.wikimedia.org/wikipedia/commons/thumb/b/b1/D-ABYT_at_FRA.jpg/1280px-D-ABYT_at_FRA.jpg", type: "plane" },
-            "Airbus A380":              { name: "Airbus A380",           category: "Airbus", price: 32000000, pax: 525, rangeNM: 7991, topSpeedKnots: 515, minRank: 13, iconSize: 38, img: "https://upload.wikimedia.org/wikipedia/commons/e/ef/Singapore_Airlines_A380-841_%289V-SKB%29_landing_at_Singapore_Changi_Airport_%283%29.jpg", type: "plane" }
+            "Saab 340":                 { name: "Saab 340",              category: "Other",  price: 220000,   pax: 34,  rangeNM: 730,  topSpeedKnots: 283, minRank: 3,  iconSize: 24, img: "https://upload.wikimedia.org/wikipedia/commons/thumb/0/08/Saab_340_G-LGNC_IMG_3425_%2811712072893%29.jpg/1920px-Saab_340_G-LGNC_IMG_3425_%2811712072893%29.jpg", type: "plane" },
+            "ATR 72-600":               { name: "ATR 72-600",            category: "ATR",    price: 480000,   pax: 72,  rangeNM: 758,  topSpeedKnots: 275, minRank: 4,  iconSize: 26, img: "https://upload.wikimedia.org/wikipedia/commons/thumb/b/bc/Wings_Air_ATR_72-600_with_special_livery_as_the_50th_delivered_aircraft.jpg/1280px-Wings_Air_ATR_72-600_with_special_livery_as_the_50th_delivered_aircraft.jpg", type: "plane" },
+            "Bombardier Q400":          { name: "Bombardier Q400",       category: "Other",  price: 850000,   pax: 82,  rangeNM: 1100, topSpeedKnots: 360, minRank: 5,  iconSize: 26, img: "https://upload.wikimedia.org/wikipedia/commons/thumb/e/ec/Hamburg_Airport_Wider%C3%B8e_Bombardier_DHC-8-402Q_LN-WDR_%28DSC08713%29.jpg/1920px-Hamburg_Airport_Wider%C3%B8e_Bombardier_DHC-8-402Q_LN-WDR_%28DSC08713%29.jpg", type: "plane" },
+            "Airbus A220-300":          { name: "Airbus A220-300",       category: "Airbus", price: 1800000,  pax: 130, rangeNM: 3400, topSpeedKnots: 488, minRank: 8,  iconSize: 26, img: "https://upload.wikimedia.org/wikipedia/commons/thumb/9/96/Delta_Airbus_A220-300_N333DU_departing_Boston_June_2025.jpg/1920px-Delta_Airbus_A220-300_N333DU_departing_Boston_June_2025.jpg", type: "plane" },
+            "Boeing 737-800":           { name: "Boeing 737-800",        category: "Boeing", price: 2800000,  pax: 160, rangeNM: 2927, topSpeedKnots: 452, minRank: 12,  iconSize: 28, img: "https://upload.wikimedia.org/wikipedia/commons/thumb/8/8b/D-ATUF_B737-8K5W_TUIfly-Hapag_retro_PMI_26SEP10_%286341092368%29.jpg/1280px-D-ATUF_B737-8K5W_TUIfly-Hapag_retro_PMI_26SEP10_%286341092368%29.jpg", type: "plane" },
+            "Airbus A320":              { name: "Airbus A320",           category: "Airbus", price: 2600000,  pax: 150, rangeNM: 3350, topSpeedKnots: 448, minRank: 11,  iconSize: 28, img: "https://upload.wikimedia.org/wikipedia/commons/c/c1/Airbus_A320-214%2C_Airbus_Industrie_JP7617615.jpg", type: "plane" },
+            "Embraer E175":             { name: "Embraer E175",          category: "Other",  price: 2200000,  pax: 76,  rangeNM: 2200, topSpeedKnots: 470, minRank: 9,  iconSize: 28, img: "https://upload.wikimedia.org/wikipedia/commons/thumb/e/e0/N199SY_SkyWest_Embraer_175_for_Alaska_Airlines.jpg/1920px-N199SY_SkyWest_Embraer_175_for_Alaska_Airlines.jpg", type: "plane" },
+            "Boeing 787-9 Dreamliner":  { name: "Boeing 787-9 Dreamliner", category: "Boeing", price: 8500000, pax: 242, rangeNM: 7305, topSpeedKnots: 516, minRank: 16, iconSize: 32, img: "https://upload.wikimedia.org/wikipedia/commons/thumb/4/4e/Boeing_787_N1015B_ANA_Airlines_%2827611880663%29_%28cropped%29.jpg/1920px-Boeing_787_N1015B_ANA_Airlines_%2827611880663%29_%28cropped%29.jpg", type: "plane" },
+            "Airbus A350-900":          { name: "Airbus A350-900",       category: "Airbus", price: 13000000, pax: 315, rangeNM: 8500, topSpeedKnots: 513, minRank: 20,  iconSize: 32, img: "https://upload.wikimedia.org/wikipedia/commons/thumb/c/ce/F-WWCF_A350_LBG_SIAE_2015_%2818953559366%29.jpg/1920px-F-WWCF_A350_LBG_SIAE_2015_%2818953559366%29.jpg", type: "plane" },
+            "Boeing 747-8":             { name: "Boeing 747-8",          category: "Boeing", price: 22000000, pax: 467, rangeNM: 7730, topSpeedKnots: 600, minRank: 25, iconSize: 36, img: "https://upload.wikimedia.org/wikipedia/commons/thumb/b/b1/D-ABYT_at_FRA.jpg/1280px-D-ABYT_at_FRA.jpg", type: "plane" },
+
+            // ===== ADDITIONAL PASSENGER AIRCRAFT =====
+            "Airbus Helicopters H135":  { name: "Airbus Helicopters H135",  category: "Other",  price: 850000,  pax: 6,   rangeNM: 325,  topSpeedKnots: 137, minRank: 5, isNew: true,  iconSize: 22, img: "https://canadiandefencereview.com/wp-content/uploads/2025/09/Website-3.png", type: "helicopter" },
+            "Airbus Helicopters EC160": { name: "Airbus Helicopters EC160", category: "Other",  price: 1200000,  pax: 8,   rangeNM: 335,  topSpeedKnots: 150, minRank: 6, isNew: true,  iconSize: 22, img: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTZ8PJ4SUEtbzQwgt3eSsbZp54GYcyY-o8-5gmBa__oBw&s=10", type: "helicopter" },
+            "Mil Mi-6":                 { name: "Mil Mi-6",                 category: "Other",  price: 2500000,  pax: 65,  rangeNM: 560,  topSpeedKnots: 162, minRank: 11, isNew: true, iconSize: 30, img: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSeiPt8GObYQIqukZiD5XW4Dr5wihWlw52WdcFpnhmsEw&s=10", type: "helicopter" },
+            "Boeing-Vertol H-47 Chinook":{ name: "Boeing-Vertol H-47 Chinook", category: "Boeing", price: 4500000, pax: 55,  rangeNM: 400,  topSpeedKnots: 170, minRank: 13, isNew: true, iconSize: 28, img: "https://upload.wikimedia.org/wikipedia/commons/thumb/a/a0/CH-47_assigned_to_3rd_General_Support_Aviation_Battalion%2C_82nd_Combat_Aviation_Brigade.jpg/330px-CH-47_assigned_to_3rd_General_Support_Aviation_Battalion%2C_82nd_Combat_Aviation_Brigade.jpg", type: "helicopter" },
+            "Beechcraft King Air":      { name: "Beechcraft King Air",      category: "Other",  price: 650000,  pax: 9,   rangeNM: 1806, topSpeedKnots: 312, minRank: 5, isNew: true,  iconSize: 24, img: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTmMK9SockCfcDBA0Ruj8Xe64wPGQVK5CrWW16JmYyTe-4IbLz8k3f8QzHq&s=10", type: "plane" },
+            "Beechcraft 1900":          { name: "Beechcraft 1900",          category: "Other",  price: 350000,  pax: 19,  rangeNM: 1587, topSpeedKnots: 260, minRank: 4, isNew: true,  iconSize: 24, img: "https://cdn11.bigcommerce.com/s-bng8bbzq86/images/stencil/640w/Beechcraft_1900d_d-cbig_fairford_arp1-e1433797517409.jpg", type: "plane" },
+            "Short 360":                { name: "Short 360",                category: "Other",  price: 280000,  pax: 36,  rangeNM: 396,  topSpeedKnots: 200, minRank: 3, isNew: true,  iconSize: 24, img: "https://i0.wp.com/northwestairlineshistory.org/wp-content/uploads/2020/11/Northwest_Short_360.jpg?resize=840%2C577&ssl=1", type: "plane" },
+            "Antonov An-2":             { name: "Antonov An-2",             category: "Other",  price: 45000,   pax: 12,  rangeNM: 560,  topSpeedKnots: 119, minRank: 1, isNew: true,  iconSize: 22, img: "https://images.squarespace-cdn.com/content/v1/602531ed52cb0b327fea1168/1710210495689-8WXLJS6L7P5O3QN6V2WU/DSC_1479EA-DeNoiseAI-clear.jpg", type: "plane" },
+            "Boeing 717":               { name: "Boeing 717",               category: "Boeing", price: 1600000,  pax: 134, rangeNM: 1430, topSpeedKnots: 447, minRank: 7, isNew: true,  iconSize: 26, img: "https://upload.wikimedia.org/wikipedia/commons/0/0d/Delta_Air_Lines_Boeing_717-2BD_N966AT.jpg", type: "plane" },
+            "Airbus A318":              { name: "Airbus A318",              category: "Airbus", price: 1900000,  pax: 107, rangeNM: 3100, topSpeedKnots: 449, minRank: 9, isNew: true,  iconSize: 26, img: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQiLcXqOCUeZP1tH7hPS47xaSb2Q7_FcOshG4Ur55XzgQ&s=10", type: "plane" },
+            "Airbus A319":              { name: "Airbus A319",              category: "Airbus", price: 2200000,  pax: 124, rangeNM: 3700, topSpeedKnots: 448, minRank: 10, isNew: true, iconSize: 26, img: "https://upload.wikimedia.org/wikipedia/commons/4/4d/United_Airbus_A319_%2813942617705%29.jpg", type: "plane" },
+            "Boeing 737-700":           { name: "Boeing 737-700",           category: "Boeing", price: 2400000,  pax: 140, rangeNM: 3440, topSpeedKnots: 448, minRank: 10, isNew: true, iconSize: 26, img: "https://upload.wikimedia.org/wikipedia/commons/thumb/5/55/United_Boeing_737-700_N54711_MD1.jpg/3840px-United_Boeing_737-700_N54711_MD1.jpg", type: "plane" },
+            "Boeing 737 MAX 8":         { name: "Boeing 737 MAX 8",         category: "Boeing", price: 3200000,  pax: 178, rangeNM: 3550, topSpeedKnots: 453, minRank: 13, isNew: true, iconSize: 28, img: "https://upload.wikimedia.org/wikipedia/commons/3/32/Alaska_737_Max_9.jpg", type: "plane" },
+            "Airbus A330":              { name: "Airbus A330",              category: "Airbus", price: 10000000, pax: 335, rangeNM: 6340, topSpeedKnots: 475, minRank: 17, isNew: true, iconSize: 32, img: "https://upload.wikimedia.org/wikipedia/commons/thumb/c/c8/Turkish_Airlines%2C_Airbus_A330-300_TC-JNL_NRT_%2823708073592%29.jpg/330px-Turkish_Airlines%2C_Airbus_A330-300_TC-JNL_NRT_%2823708073592%29.jpg", type: "plane" },
+            "Airbus A340":              { name: "Airbus A340",              category: "Airbus", price: 11500000, pax: 295, rangeNM: 7450, topSpeedKnots: 494, minRank: 18, isNew: true, iconSize: 32, img: "https://upload.wikimedia.org/wikipedia/commons/e/ec/Frankfurt_Airport_Lufthansa_Airbus_A340-313_D-AIGY_%28DSC02566%29.jpg", type: "plane" },
+            "Boeing 747-400":           { name: "Boeing 747-400",           category: "Boeing", price: 17000000, pax: 416, rangeNM: 7260, topSpeedKnots: 490, minRank: 22,isNew: true, iconSize: 36, img: "https://upload.wikimedia.org/wikipedia/commons/4/48/Frankfurt_Airport_Lufthansa_Boeing_747-430_D-ABVY_%28DSC09727%29.jpg", type: "plane" }, 
+            "Airbus A380":              { name: "Airbus A380",           category: "Airbus", price: 32000000, pax: 525, rangeNM: 7991, topSpeedKnots: 515, minRank: 30, iconSize: 38, img: "https://upload.wikimedia.org/wikipedia/commons/e/ef/Singapore_Airlines_A380-841_%289V-SKB%29_landing_at_Singapore_Changi_Airport_%283%29.jpg", type: "plane" }
         };
  
         // ===== CARGO AIRCRAFT (unlock at rank 10+) =====
         const cargoCatalog = {
-            "Cessna 208B Cargomaster":  { name: "Cessna 208B Cargomaster", category: "Cargo", price: 35000,    cargo: 1587,   rangeNM: 792,  topSpeedKnots: 185, minRank: 10, iconSize: 24, img: "https://upload.wikimedia.org/wikipedia/commons/thumb/3/30/Cessna_208B_Caravan_%27N876FE%27_FedEx_%2813006463414%29.jpg/1280px-Cessna_208B_Caravan_%27N876FE%27_FedEx_%2813006463414%29.jpg", type: "cargo-plane", isCargo: true },
-            "Sikorsky S-64 Skycrane":   { name: "Sikorsky S-64 Skycrane",   category: "Other",  price: 1800000,  cargo: 9100,   rangeNM: 200,  topSpeedKnots: 115, minRank: 12,  iconSize: 24, img: "https://upload.wikimedia.org/wikipedia/commons/thumb/5/56/Air-Crane_-_Flickr_-_Beige_Alert_%28cropped%29.jpg/1280px-Air-Crane_-_Flickr_-_Beige_Alert_%28cropped%29.jpg", type: "helicopter", isCargo: true },
-            "ATR 72 Freighter":         { name: "ATR 72 Freighter",         category: "Cargo", price: 600000,   cargo: 8900,   rangeNM: 950,  topSpeedKnots: 270, minRank: 10, iconSize: 26, img: "https://upload.wikimedia.org/wikipedia/commons/9/99/ATR_3.jpg", type: "cargo-plane", isCargo: true },
-            "Boeing 737-800F":          { name: "Boeing 737-800F",          category: "Cargo", price: 3500000,  cargo: 23900,  rangeNM: 2025, topSpeedKnots: 454, minRank: 11, iconSize: 28, img: "https://upload.wikimedia.org/wikipedia/commons/thumb/a/a4/G-NPTA_Boeing_737-86N_BCF_%28West_Atlantic_UK%29_at_East_Midlands_Airport.jpg/1280px-G-NPTA_Boeing_737-86N_BCF_%28West_Atlantic_UK%29_at_East_Midlands_Airport.jpg", type: "cargo-plane", isCargo: true },
-            "Boeing 767-300F":          { name: "Boeing 767-300F",          category: "Cargo", price: 8000000,  cargo: 52700,  rangeNM: 3225, topSpeedKnots: 461, minRank: 11, iconSize: 30, img: "https://upload.wikimedia.org/wikipedia/commons/thumb/2/2d/N107FE%40PEK_%2820190520150305%29.jpg/1280px-N107FE%40PEK_%2820190520150305%29.jpg", type: "cargo-plane", isCargo: true },
-            "Airbus A330-200F":         { name: "Airbus A330-200F",         category: "Cargo", price: 14000000, cargo: 70000,  rangeNM: 4000, topSpeedKnots: 470, minRank: 12, iconSize: 32, img: "https://upload.wikimedia.org/wikipedia/commons/thumb/8/80/CGN_20190331_SU-GCE_05.jpg/1280px-CGN_20190331_SU-GCE_05.jpg", type: "cargo-plane", isCargo: true },
-            "Boeing 777F":              { name: "Boeing 777F",              category: "Cargo", price: 20000000, cargo: 103700, rangeNM: 4970, topSpeedKnots: 511, minRank: 12, iconSize: 34, img: "https://upload.wikimedia.org/wikipedia/commons/thumb/f/f4/N866FD%40PEK_%2820200420152652%29.jpg/1280px-N866FD%40PEK_%2820200420152652%29.jpg", type: "cargo-plane", isCargo: true },
-            "Boeing 747-8F":            { name: "Boeing 747-8F",            category: "Cargo", price: 26000000, cargo: 137700, rangeNM: 4120, topSpeedKnots: 490, minRank: 12, iconSize: 36, img: "https://upload.wikimedia.org/wikipedia/commons/thumb/6/60/UPS_Boeing_747-8F_N611UP.jpg/1280px-UPS_Boeing_747-8F_N611UP.jpg", type: "cargo-plane", isCargo: true },
-            "Antonov An-124 Ruslan":    { name: "Antonov An-124 Ruslan",    category: "Cargo", price: 32000000, cargo: 150000, rangeNM: 2000, topSpeedKnots: 465, minRank: 13, iconSize: 38, img: "https://upload.wikimedia.org/wikipedia/commons/b/b6/%D0%90%D0%BD%D1%82%D0%BE%D0%BD%D0%BE%D0%B2_%D0%90%D0%BD-124_9773054055093%2C_%D0%9C%D0%BE%D1%81%D0%BA%D0%B2%D0%B0_-_%D0%94%D0%BE%D0%BC%D0%BE%D0%B4%D0%B5%D0%B4%D0%BE%D0%B2%D0%BE_RP2297.jpg", type: "cargo-plane", isCargo: true },
-            "Antonov An-22":            { name: "Antonov An-22",            category: "Cargo", price: 10000000, cargo: 80000,  rangeNM: 2700, topSpeedKnots: 400, minRank: 12, iconSize: 38, img: "https://upload.wikimedia.org/wikipedia/commons/e/e1/Antonov_An-22A_Antei%2C_Russia_-_Air_Force_AN2203462.jpg", type: "cargo-plane", isCargo: true },
-            "Boeing 747-400 LCF Dreamlifter": { name: "Boeing 747-400 LCF Dreamlifter", category: "Cargo", price: 28000000, cargo: 113400, rangeNM: 4200, topSpeedKnots: 471, minRank: 13, iconSize: 38, img: "https://upload.wikimedia.org/wikipedia/commons/thumb/a/a6/Boeing%2C_N780BA%2C_B747-409%28LCF%29_Dreamlifter_-_PAE_%2819833251496%29.jpg/1280px-Boeing%2C_N780BA%2C_B747-409%28LCF%29_Dreamlifter_-_PAE_%2819833251496%29.jpg", type: "cargo-plane", isCargo: true },
-            "Antonov An-225 Mriya":     { name: "Antonov An-225 Mriya",     category: "Cargo", price: 75000000, cargo: 250000, rangeNM: 2160, topSpeedKnots: 459, minRank: 14, iconSize: 42, img: "https://upload.wikimedia.org/wikipedia/commons/thumb/b/b5/Antonov_Design_Bureau_Antonov_An-225_Mriya_at_Leipzig_Halle_%28EDDP-LEJ%29.jpg/1280px-Antonov_Design_Bureau_Antonov_An-225_Mriya_at_Leipzig_Halle_%28EDDP-LEJ%29.jpg", type: "cargo-plane", isCargo: true }
+            "Cessna 208B Cargomaster":  { name: "Cessna 208B Cargomaster", category: "Cargo", price: 55000,    cargo: 1587,   rangeNM: 792,  topSpeedKnots: 185, minRank: 6, iconSize: 24, img: "https://upload.wikimedia.org/wikipedia/commons/thumb/3/30/Cessna_208B_Caravan_%27N876FE%27_FedEx_%2813006463414%29.jpg/1280px-Cessna_208B_Caravan_%27N876FE%27_FedEx_%2813006463414%29.jpg", type: "cargo-plane", isCargo: true },
+            "Sikorsky S-64 Skycrane":   { name: "Sikorsky S-64 Skycrane",   category: "Other",  price: 2200000,  cargo: 9100,   rangeNM: 200,  topSpeedKnots: 115, minRank: 11,  iconSize: 24, img: "https://upload.wikimedia.org/wikipedia/commons/thumb/5/56/Air-Crane_-_Flickr_-_Beige_Alert_%28cropped%29.jpg/1280px-Air-Crane_-_Flickr_-_Beige_Alert_%28cropped%29.jpg", type: "helicopter", isCargo: true },
+            "ATR 72 Freighter":         { name: "ATR 72 Freighter",         category: "Cargo", price: 750000,   cargo: 8900,   rangeNM: 950,  topSpeedKnots: 270, minRank: 8, iconSize: 26, img: "https://upload.wikimedia.org/wikipedia/commons/9/99/ATR_3.jpg", type: "cargo-plane", isCargo: true },
+            "Boeing 737-800F":          { name: "Boeing 737-800F",          category: "Cargo", price: 3800000,  cargo: 23900,  rangeNM: 2025, topSpeedKnots: 454, minRank: 14, iconSize: 28, img: "https://upload.wikimedia.org/wikipedia/commons/thumb/a/a4/G-NPTA_Boeing_737-86N_BCF_%28West_Atlantic_UK%29_at_East_Midlands_Airport.jpg/1280px-G-NPTA_Boeing_737-86N_BCF_%28West_Atlantic_UK%29_at_East_Midlands_Airport.jpg", type: "cargo-plane", isCargo: true },
+            "Boeing 767-300F":          { name: "Boeing 767-300F",          category: "Cargo", price: 9000000,  cargo: 52700,  rangeNM: 3225, topSpeedKnots: 461, minRank: 19, iconSize: 30, img: "https://upload.wikimedia.org/wikipedia/commons/thumb/2/2d/N107FE%40PEK_%2820190520150305%29.jpg/1280px-N107FE%40PEK_%2820190520150305%29.jpg", type: "cargo-plane", isCargo: true },
+            "Airbus A330-200F":         { name: "Airbus A330-200F",         category: "Cargo", price: 16000000, cargo: 70000,  rangeNM: 4000, topSpeedKnots: 470, minRank: 23, iconSize: 32, img: "https://upload.wikimedia.org/wikipedia/commons/thumb/8/80/CGN_20190331_SU-GCE_05.jpg/1280px-CGN_20190331_SU-GCE_05.jpg", type: "cargo-plane", isCargo: true },
+            "Boeing 777F":              { name: "Boeing 777F",              category: "Cargo", price: 22000000, cargo: 103700, rangeNM: 4970, topSpeedKnots: 511, minRank: 25, iconSize: 34, img: "https://upload.wikimedia.org/wikipedia/commons/thumb/f/f4/N866FD%40PEK_%2820200420152652%29.jpg/1280px-N866FD%40PEK_%2820200420152652%29.jpg", type: "cargo-plane", isCargo: true },
+            "Boeing 747-8F":            { name: "Boeing 747-8F",            category: "Cargo", price: 28000000, cargo: 137700, rangeNM: 4120, topSpeedKnots: 490, minRank: 26, iconSize: 36, img: "https://upload.wikimedia.org/wikipedia/commons/thumb/6/60/UPS_Boeing_747-8F_N611UP.jpg/1280px-UPS_Boeing_747-8F_N611UP.jpg", type: "cargo-plane", isCargo: true },
+            "Antonov An-124 Ruslan":    { name: "Antonov An-124 Ruslan",    category: "Cargo", price: 35000000, cargo: 150000, rangeNM: 2000, topSpeedKnots: 465, minRank: 31, iconSize: 38, img: "https://upload.wikimedia.org/wikipedia/commons/b/b6/%D0%90%D0%BD%D1%82%D0%BE%D0%BD%D0%BE%D0%B2_%D0%90%D0%BD-124_9773054055093%2C_%D0%9C%D0%BE%D1%81%D0%BA%D0%B2%D0%B0_-_%D0%94%D0%BE%D0%BC%D0%BE%D0%B4%D0%B5%D0%B4%D0%BE%D0%B2%D0%BE_RP2297.jpg", type: "cargo-plane", isCargo: true },
+            "Antonov An-22":            { name: "Antonov An-22",            category: "Cargo", price: 12000000, cargo: 80000,  rangeNM: 2700, topSpeedKnots: 400, minRank: 19, iconSize: 38, img: "https://upload.wikimedia.org/wikipedia/commons/e/e1/Antonov_An-22A_Antei%2C_Russia_-_Air_Force_AN2203462.jpg", type: "cargo-plane", isCargo: true },
+            "Boeing 747-400 LCF Dreamlifter": { name: "Boeing 747-400 LCF Dreamlifter", category: "Cargo", price: 30000000, cargo: 113400, rangeNM: 4200, topSpeedKnots: 471, minRank: 28, iconSize: 38, img: "https://upload.wikimedia.org/wikipedia/commons/thumb/a/a6/Boeing%2C_N780BA%2C_B747-409%28LCF%29_Dreamlifter_-_PAE_%2819833251496%29.jpg/1280px-Boeing%2C_N780BA%2C_B747-409%28LCF%29_Dreamlifter_-_PAE_%2819833251496%29.jpg", type: "cargo-plane", isCargo: true },
+
+            // ===== ADDITIONAL CARGO AIRCRAFT =====
+            "Antonov An-12":            { name: "Antonov An-12",            category: "Cargo",  price: 4500000,  cargo: 20000, rangeNM: 2000, topSpeedKnots: 342, minRank: 16, isNew: true, iconSize: 30, img: "https://upload.wikimedia.org/wikipedia/commons/b/b5/Antonov_An-12BK%2C_Russia_-_Air_Force_AN1879625.jpg", type: "cargo-plane", isCargo: true },
+            "Lockheed C-130 Hercules":  { name: "Lockheed C-130 Hercules",  category: "Cargo",  price: 30000000, cargo: 19356, rangeNM: 2100, topSpeedKnots: 320, minRank: 30, isNew: true, iconSize: 30, img: "https://upload.wikimedia.org/wikipedia/commons/c/cc/Lockheed_C-130_Hercules.jpg", type: "cargo-plane", isCargo: true },
+            "Boeing C-17 Globemaster III": { name: "Boeing C-17 Globemaster III", category: "Cargo", price: 90000000, cargo: 77519, rangeNM: 2800, topSpeedKnots: 450, minRank: 38, iconSize: 34, img: "https://upload.wikimedia.org/wikipedia/commons/b/bc/C-17_test_sortie.jpg", type: "cargo-plane", isCargo: true },
+            "Lockheed C-5 Galaxy":      { name: "Lockheed C-5 Galaxy",      category: "Cargo",  price: 75000000, cargo: 122472, rangeNM: 2400, topSpeedKnots: 503, minRank: 32, isNew: true, iconSize: 36, img: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTf2T4L_CECDpSpoBYnYlKTHf4lGUiIeGcxiVUt2FocLb1OnG80G7LKduvV&s=10", type: "cargo-plane", isCargo: true },
+            "Airbus Beluga":            { name: "Airbus Beluga",            category: "Cargo",  price: 14000000, cargo: 47000, rangeNM: 900,  topSpeedKnots: 247, minRank: 21, isNew: true, iconSize: 34, img: "https://upload.wikimedia.org/wikipedia/commons/f/f6/Hamburg-Finkenwerder_Airport_Airbus_Transport_International_Airbus_A300B4-608ST_F-GSTD_%28DSC09656%29.jpg", type: "cargo-plane", isCargo: true },
+            "Airbus BelugaXL":          { name: "Airbus BelugaXL",         category: "Cargo",  price: 18000000, cargo: 51000, rangeNM: 2370, topSpeedKnots: 260, minRank: 23, isNew: true, iconSize: 36, img: "https://skybrary.aero/sites/default/files/A337.jpg", type: "cargo-plane", isCargo: true },
+            "Antonov An-225 Mriya":     { name: "Antonov An-225 Mriya",     category: "Cargo", price: 80000000, cargo: 250000, rangeNM: 2160, topSpeedKnots: 459, minRank: 34, iconSize: 42, img: "https://upload.wikimedia.org/wikipedia/commons/thumb/b/b5/Antonov_Design_Bureau_Antonov_An-225_Mriya_at_Leipzig_Halle_%28EDDP-LEJ%29.jpg/1280px-Antonov_Design_Bureau_Antonov_An-225_Mriya_at_Leipzig_Halle_%28EDDP-LEJ%29.jpg", type: "cargo-plane", isCargo: true }
         };
       
           const legacyAircraftCatalog = {
-    "Boeing 727-200":          { name: "Boeing 727-200",              category: "Legacy", price: 300,  pax: 189, rangeNM: 1900, topSpeedKnots: 511,  minRank: 15, iconSize: 28, img: "https://upload.wikimedia.org/wikipedia/commons/thumb/1/13/11gg_-_Northwest_Airlines_Boeing_727-251%3B_N203US%40FLL%3B30.01.1998_%288064695962%29.jpg/1280px-11gg_-_Northwest_Airlines_Boeing_727-251%3B_N203US%40FLL%3B30.01.1998_%288064695962%29.jpg", type: "legacy-plane", isCargo: false },
-    "Boeing 314 Clipper":      { name: "Boeing 314 Clipper",          category: "Legacy", price: 120,  pax: 68,  rangeNM: 3202, topSpeedKnots: 180,  minRank: 15, iconSize: 28, img: "https://upload.wikimedia.org/wikipedia/commons/6/6e/Boeing_314_Clipper-cropped.jpg", type: "legacy-plane", isCargo: false },
-    "Douglas DC-3":            { name: "Douglas DC-3",                category: "Legacy", price: 40,   pax: 30,  rangeNM: 1370, topSpeedKnots: 223,  minRank: 15, iconSize: 28, img: "https://upload.wikimedia.org/wikipedia/commons/d/df/Douglas_DC-3%2C_SE-CFP.jpg", type: "legacy-plane", isCargo: false },
-    "Concorde":                { name: "Aérospatiale-BAC Concorde",   category: "Legacy", price: 1500, pax: 100, rangeNM: 3900, topSpeedKnots: 1176, minRank: 15, iconSize: 42, img: "https://upload.wikimedia.org/wikipedia/commons/8/86/Concorde_first_visit_Heathrow_Fitzgerald.jpg", type: "legacy-plane", isCargo: false },
-    "Vickers VC10":            { name: "Vickers VC10",                category: "Legacy", price: 250,  pax: 151, rangeNM: 4100, topSpeedKnots: 505,  minRank: 15, iconSize: 30, img: "https://upload.wikimedia.org/wikipedia/commons/e/e7/Ghana_Airways_VC-10_9G-ABO_LHR_1972-9-17.png", type: "legacy-plane", isCargo: false },
-    "McDonnell Douglas DC-10": { name: "McDonnell Douglas DC-10",     category: "Legacy", price: 500,  pax: 380, rangeNM: 4350, topSpeedKnots: 490,  minRank: 15, iconSize: 34, img: "https://upload.wikimedia.org/wikipedia/commons/d/d9/Continental_Airlines_DC-10.jpg", type: "legacy-plane", isCargo: false },
-    "McDonnell Douglas MD-11": { name: "McDonnell Douglas MD-11",     category: "Legacy", price: 700,  pax: 410, rangeNM: 6725, topSpeedKnots: 503,  minRank: 15, iconSize: 34, img: "https://upload.wikimedia.org/wikipedia/commons/thumb/0/00/McDonnell_Douglas_MD-11P_KLM_PH-KCC.jpg/1280px-McDonnell_Douglas_MD-11P_KLM_PH-KCC.jpg", type: "legacy-plane", isCargo: false },
-    "Boeing 707":              { name: "Boeing 707",                  category: "Legacy", price: 200,  pax: 194, rangeNM: 2900, topSpeedKnots: 394,  minRank: 15, iconSize: 30, img: "https://upload.wikimedia.org/wikipedia/commons/0/06/Boeing_707-321B_Pan_Am_Freer.jpg", type: "legacy-plane", isCargo: false },
+    "Boeing 727-200":          { name: "Boeing 727-200",              category: "Legacy", price: 320,  pax: 189, rangeNM: 1900, topSpeedKnots: 511,  minRank: 26, iconSize: 28, img: "https://upload.wikimedia.org/wikipedia/commons/thumb/1/13/11gg_-_Northwest_Airlines_Boeing_727-251%3B_N203US%40FLL%3B30.01.1998_%288064695962%29.jpg/1280px-11gg_-_Northwest_Airlines_Boeing_727-251%3B_N203US%40FLL%3B30.01.1998_%288064695962%29.jpg", type: "legacy-plane", isCargo: false },
+    "Boeing 314 Clipper":      { name: "Boeing 314 Clipper",          category: "Legacy", price: 130,  pax: 68,  rangeNM: 3202, topSpeedKnots: 180,  minRank: 21, iconSize: 28, img: "https://upload.wikimedia.org/wikipedia/commons/6/6e/Boeing_314_Clipper-cropped.jpg", type: "legacy-plane", isCargo: false },
+    "Douglas DC-3":            { name: "Douglas DC-3",                category: "Legacy", price: 50,   pax: 30,  rangeNM: 1370, topSpeedKnots: 223,  minRank: 18, iconSize: 28, img: "https://upload.wikimedia.org/wikipedia/commons/d/df/Douglas_DC-3%2C_SE-CFP.jpg", type: "legacy-plane", isCargo: false },
+    "Concorde":                { name: "Aérospatiale-BAC Concorde",   category: "Legacy", price: 1800, pax: 100, rangeNM: 3900, topSpeedKnots: 1176, minRank: 40, iconSize: 42, img: "https://upload.wikimedia.org/wikipedia/commons/8/86/Concorde_first_visit_Heathrow_Fitzgerald.jpg", type: "legacy-plane", isCargo: false },
+    "Vickers VC10":            { name: "Vickers VC10",                category: "Legacy", price: 240,  pax: 151, rangeNM: 4100, topSpeedKnots: 505,  minRank: 24, iconSize: 30, img: "https://upload.wikimedia.org/wikipedia/commons/e/e7/Ghana_Airways_VC-10_9G-ABO_LHR_1972-9-17.png", type: "legacy-plane", isCargo: false },
+    "McDonnell Douglas DC-10": { name: "McDonnell Douglas DC-10",     category: "Legacy", price: 500,  pax: 380, rangeNM: 4350, topSpeedKnots: 490,  minRank: 30, iconSize: 34, img: "https://upload.wikimedia.org/wikipedia/commons/d/d9/Continental_Airlines_DC-10.jpg", type: "legacy-plane", isCargo: false },
+    "McDonnell Douglas MD-11": { name: "McDonnell Douglas MD-11",     category: "Legacy", price: 650,  pax: 410, rangeNM: 6725, topSpeedKnots: 503,  minRank: 34, iconSize: 34, img: "https://upload.wikimedia.org/wikipedia/commons/thumb/0/00/McDonnell_Douglas_MD-11P_KLM_PH-KCC.jpg/1280px-McDonnell_Douglas_MD-11P_KLM_PH-KCC.jpg", type: "legacy-plane", isCargo: false },
+
+    // ===== ADDITIONAL LEGACY AIRCRAFT =====
+    "Ford Trimotor":            { name: "Ford Trimotor",            category: "Legacy", price: 30,   pax: 11,  rangeNM: 570,  topSpeedKnots: 130, minRank: 18, isNew: true, iconSize: 26, img: "https://upload.wikimedia.org/wikipedia/commons/d/dc/Ford_Trimotor_EAA.jpg", type: "legacy-plane", isCargo: false },
+    "Boeing 307 Stratoliner":  { name: "Boeing 307 Stratoliner", category: "Legacy", price: 80,  pax: 33,  rangeNM: 3570, topSpeedKnots: 222, minRank: 20, isNew: true, iconSize: 28, img: "https://upload.wikimedia.org/wikipedia/commons/3/34/Boeing_307_Stratoliner%2C_Pan_Am_JP5629675.jpg", type: "legacy-plane", isCargo: false },
+    "Boeing 377 Stratocruiser": { name: "Boeing 377 Stratocruiser", category: "Legacy", price: 140,  pax: 100, rangeNM: 4600, topSpeedKnots: 300, minRank: 21, isNew: true, iconSize: 30, img: "https://historynet.com/wp-content/uploads/2023/10/stratocaster-flight-scaled.jpg", type: "legacy-plane", isCargo: false },
+    "Lockheed Constellation":   { name: "Lockheed Constellation",  category: "Legacy", price: 160,  pax: 100, rangeNM: 5400, topSpeedKnots: 330, minRank: 22, isNew: true, iconSize: 30, img: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSI4dd25jx3qqiuXdXR-wqW6wYj6YDUGEQD3SOrr-_OxdUOjOGJx_QsMBE&s=10", type: "legacy-plane", isCargo: false },
+    "Dornier Do X":             { name: "Dornier Do X",             category: "Legacy", price: 90,   pax: 66,  rangeNM: 1052, topSpeedKnots: 112, minRank: 18, isNew: true, iconSize: 32, img: "https://static.wikia.nocookie.net/aircraft/images/b/b4/Dornier_Do_X.jpg", type: "legacy-plane", isCargo: false, waterOnly: true },
+    "Consolidated PBY Catalina":{ name: "Consolidated PBY Catalina", category: "Legacy", price: 60,  pax: 7,   rangeNM: 2520, topSpeedKnots: 117, minRank: 17, isNew: true, iconSize: 28, img: "https://upload.wikimedia.org/wikipedia/commons/0/07/RIHB_2022_PBY_Catalina.jpg", type: "legacy-plane", isCargo: false, waterOnly: true },
+    "Boeing 737-100":           { name: "Boeing 737-100",           category: "Legacy", price: 100,   pax: 100, rangeNM: 2100, topSpeedKnots: 420, minRank: 19, isNew: true, iconSize: 26, img: "https://www.flugzeuginfo.net/acimages/7371_rees.jpg", type: "legacy-plane", isCargo: false },
+    "Boeing 737-200":           { name: "Boeing 737-200",           category: "Legacy", price: 120,  pax: 130, rangeNM: 2600, topSpeedKnots: 432, minRank: 20, isNew: true, iconSize: 26, img: "https://upload.wikimedia.org/wikipedia/commons/thumb/e/e9/South_African_Airlink_Boeing_737-200_Advanced_Smith.jpg/330px-South_African_Airlink_Boeing_737-200_Advanced_Smith.jpg", type: "legacy-plane", isCargo: false },
+    "Boeing 737-300":           { name: "Boeing 737-300",           category: "Legacy", price: 175,  pax: 149, rangeNM: 2250, topSpeedKnots: 431, minRank: 22, isNew: true, iconSize: 26, img: "https://upload.wikimedia.org/wikipedia/commons/5/5b/Classic_Colors_Southwest_Airlines_N648SW_Boeing_737-3H4_SJC.jpg", type: "legacy-plane", isCargo: false },
+    "McDonnell Douglas DC-9":   { name: "McDonnell Douglas DC-9",   category: "Legacy", price: 180,  pax: 115, rangeNM: 1600, topSpeedKnots: 425, minRank: 23, isNew: true, iconSize: 26, img: "https://upload.wikimedia.org/wikipedia/commons/e/eb/Northwest_N756NW_DC9_%28cropped_16_9%29.JPG", type: "legacy-plane", isCargo: false },
+    "McDonnell Douglas MD-80":  { name: "McDonnell Douglas MD-80",  category: "Legacy", price: 280,  pax: 155, rangeNM: 2800, topSpeedKnots: 489, minRank: 24, isNew: true, iconSize: 28, img: "https://upload.wikimedia.org/wikipedia/commons/3/34/MD83_Aircraft_of_TezJet.jpg", type: "legacy-plane", isCargo: false },
+    "McDonnell Douglas MD-90":  { name: "McDonnell Douglas MD-90",  category: "Legacy", price: 300,  pax: 172, rangeNM: 2800, topSpeedKnots: 489, minRank: 25, isNew: true, iconSize: 28, img: "https://upload.wikimedia.org/wikipedia/commons/6/6d/McDonnell_Douglas_MD-90-30%2C_Japan_Airlines_-_JAL_AN2020984.jpg", type: "legacy-plane", isCargo: false },
+    "Douglas DC-8":             { name: "Douglas DC-8",             category: "Legacy", price: 220,  pax: 189, rangeNM: 5100, topSpeedKnots: 479, minRank: 25, isNew: true, iconSize: 30, img: "https://cdn.airlineratings.com/uploads/DC-8-First-Flight.jpg", type: "legacy-plane", isCargo: false },
+    "Tupolev Tu-154":           { name: "Tupolev Tu-154",           category: "Legacy", price: 340,  pax: 180, rangeNM: 3900, topSpeedKnots: 513, minRank: 27, isNew: true, iconSize: 30, img: "https://upload.wikimedia.org/wikipedia/commons/4/4c/Tupolev_Tu-154M%2C_Iran_Air_Tours_JP6511800.jpg", type: "legacy-plane", isCargo: false },
+    "Lockheed L-1011 TriStar":  { name: "Lockheed L-1011 TriStar",  category: "Legacy", price: 450,  pax: 400, rangeNM: 4400, topSpeedKnots: 526, minRank: 29, isNew: true, iconSize: 32, img: "https://upload.wikimedia.org/wikipedia/commons/a/af/Trans_World_Airlines_Lockheed_L-1011-385-1-15_TriStar_100_Marmet.jpg", type: "legacy-plane", isCargo: false },
+    "Convair XC-99":            { name: "Convair XC-99",            category: "Legacy", price: 380,  pax: 400, rangeNM: 2500, topSpeedKnots: 300, minRank: 28, isNew: true, iconSize: 36, img: "https://upload.wikimedia.org/wikipedia/commons/6/69/Convair_XC-99_in_flight_c1948.jpg", type: "legacy-plane", isCargo: false },
+    "Boeing 707":              { name: "Boeing 707",                  category: "Legacy", price: 200,  pax: 194, rangeNM: 2900, topSpeedKnots: 394,  minRank: 25, iconSize: 30, img: "https://upload.wikimedia.org/wikipedia/commons/0/06/Boeing_707-321B_Pan_Am_Freer.jpg", type: "legacy-plane", isCargo: false },
 };
  
         // ===== SECRET AIRCRAFT (crate drops only) =====
         const secretCatalog = {
-            "Lun-Class Ekranoplan":          { name: "Lun-Class Ekranoplan",       category: "Secret", rarity: "legendary", price: 5000000,  cargo: 137000,   rangeNM: 1025, topSpeedKnots: 297, minRank: 1, iconSize: 34, img: "https://upload.wikimedia.org/wikipedia/commons/thumb/4/43/Lun-class_ekranoplan_%282026-03-18%29_-_0_4.jpg/1920px-Lun-class_ekranoplan_%282026-03-18%29_-_0_4.jpg", type: "plane", isCargo: true },
-            "Lockheed SR-71 Blackbird":      { name: "Lockheed SR-71 Blackbird",   category: "Secret", rarity: "mythic",    price: 15000000, pax: 2,   rangeNM: 2900, topSpeedKnots: 1910,minRank: 1, iconSize: 30, img: "https://upload.wikimedia.org/wikipedia/commons/thumb/2/23/SR-71A_taking_off_with_afterburner_RAF_Mildenhall_1983.JPEG/1920px-SR-71A_taking_off_with_afterburner_RAF_Mildenhall_1983.JPEG", type: "plane" },
-            "Hughes H-4 Hercules":           { name: "Hughes H-4 Hercules",        category: "Secret", rarity: "legendary", price: 8000000,  cargo: 59000, rangeNM: 2600, topSpeedKnots: 204, minRank: 1, iconSize: 42, img: "https://upload.wikimedia.org/wikipedia/commons/thumb/a/ad/H-4_Hercules_2.jpg/1280px-H-4_Hercules_2.jpg", type: "plane", isCargo: true },
-            "Messerschmitt Me 323 Gigant":   { name: "Messerschmitt Me 323",       category: "Secret", rarity: "rare",      price: 4000000,  cargo: 12000, rangeNM: 590,  topSpeedKnots: 153, minRank: 1, iconSize: 40, img: "https://upload.wikimedia.org/wikipedia/commons/2/25/Bundesarchiv_Bild_101I-596-0367-05A%2C_Flugzeug_Me_323_Gigant.jpg", type: "plane", isCargo: true },
-            "Lockheed Martin SR-72":         { name: "Lockheed Martin SR-72",      category: "Secret", rarity: "mythic",    price: 30000000, cargo: 2500, rangeNM: 4500,  topSpeedKnots: 3600, minRank: 1, iconSize: 32, img: "https://upload.wikimedia.org/wikipedia/en/4/4a/Lockheed_Martin_SR-72_concept.png", type: "plane", isCargo: true },
-            "Wright Flyer":                  { name: "Wright Flyer",               category: "Secret", rarity: "legendary", price: 15000,  pax: 1, rangeNM: 0.1,  topSpeedKnots: 26, minRank: 1, iconSize: 24, img: "https://upload.wikimedia.org/wikipedia/commons/thumb/8/86/First_flight2.jpg/1920px-First_flight2.jpg", type: "plane" },
-            "Mil V-12":                      { name: "Mil V-12",                   category: "Secret", rarity: "epic",      price: 5000000,  cargo: 44200, rangeNM: 270,  topSpeedKnots: 140, minRank: 1, iconSize: 42, img: "https://upload.wikimedia.org/wikipedia/commons/6/68/Mil_V-12_prototype.jpg", type: "helicopter", isCargo: true },
-            "Scaled Composites Model 351 Stratolaunch": { name: "Scaled Composites Model 351 Stratolaunch", category: "Secret", rarity: "mythic", price: 15000000, cargo: 250000, rangeNM: 1000, topSpeedKnots: 460, minRank: 1, iconSize: 44, img: "https://upload.wikimedia.org/wikipedia/commons/thumb/b/b6/230113-_Stratolaunch_Talon_Photo_Chase-091.jpg/1280px-230113-_Stratolaunch_Talon_Photo_Chase-091.jpg", type: "plane", isCargo: true },
-            "Kaman K-MAX":                   { name: "Kaman K-MAX",                category: "Secret", rarity: "uncommon",  price: 800000,  cargo: 2342, rangeNM: 300,  topSpeedKnots: 80, minRank: 1, iconSize: 28, img: "https://upload.wikimedia.org/wikipedia/commons/thumb/5/50/Kaman_K-1200_Rotex.jpg/1280px-Kaman_K-1200_Rotex.jpg", type: "helicopter", isCargo: true },
-            "A-90 Orlyonok":                 { name: "A-90 Orlyonok",              category: "Secret", rarity: "epic",      price: 2500000,  cargo: 28000, rangeNM: 810,  topSpeedKnots: 220, minRank: 1, iconSize: 28, img: "https://upload.wikimedia.org/wikipedia/commons/thumb/8/89/A-90_Orlyonok_4.JPG/1280px-A-90_Orlyonok_4.JPG", type: "plane", isCargo: true },
-            "Bartini Beriev VVA-14":         { name: "Bartini Beriev VVA-14",      category: "Secret", rarity: "rare",      price: 7500000,  cargo: 16500, rangeNM: 1320,  topSpeedKnots: 410, minRank: 1, iconSize: 28, img: "https://preview.redd.it/bartini-beriev-vva-14-in-the-ussr-june-1975-1606x1000-v0-4z91nqogi02f1.jpeg?auto=webp&s=8119bfd522d37aa35ef9f05e2a5b6f6dbb9c446b", type: "plane", isCargo: true },
-            "Cessna 172 Skyhawk":            { name: "Cessna 172 Skyhawk",         category: "Secret", rarity: "common",    price: 15000,  pax: 3, rangeNM: 696,  topSpeedKnots: 122, minRank: 1, iconSize: 24, img: "https://upload.wikimedia.org/wikipedia/commons/a/ae/Cessna_172S_Skyhawk_SP%2C_Private_JP6817606.jpg", type: "plane", isCargo: false },
-            "Avro Canada VZ-9 Avrocar":      { name: "Avro Canada VZ-9 Avrocar",   category: "Secret", rarity: "epic",      price: 5000000,  pax: 1, rangeNM: 70,  topSpeedKnots: 30, minRank: 1, iconSize: 24, img: "https://upload.wikimedia.org/wikipedia/commons/thumb/9/90/Colour_avrocar_59.jpg/1280px-Colour_avrocar_59.jpg", type: "helicopter", isCargo: false },
+            "Flying-V":                      { name: "Flying-V",                   category: "Secret", rarity: "exotic",    price: 75000000, pax: 314, rangeNM: 9300, topSpeedKnots: 470, minRank: 1, isNew: true, iconSize: 30, img: "https://cn-community-foundry.s3.eu-west-1.amazonaws.com/portfolio/image/1q29.jpg", type: "plane" },
+            "Lun-Class Ekranoplan":          { name: "Lun-Class Ekranoplan",       category: "Secret", rarity: "legendary", price: 8000000,  cargo: 137000,   rangeNM: 1025, topSpeedKnots: 297, minRank: 1, iconSize: 34, img: "https://upload.wikimedia.org/wikipedia/commons/thumb/4/43/Lun-class_ekranoplan_%282026-03-18%29_-_0_4.jpg/1920px-Lun-class_ekranoplan_%282026-03-18%29_-_0_4.jpg", type: "plane", isCargo: true, waterOnly: true },
+            "Lockheed SR-71 Blackbird":      { name: "Lockheed SR-71 Blackbird",   category: "Secret", rarity: "mythic",    price: 18000000, pax: 2,   rangeNM: 2900, topSpeedKnots: 1910,minRank: 1, iconSize: 30, img: "https://upload.wikimedia.org/wikipedia/commons/thumb/2/23/SR-71A_taking_off_with_afterburner_RAF_Mildenhall_1983.JPEG/1920px-SR-71A_taking_off_with_afterburner_RAF_Mildenhall_1983.JPEG", type: "plane" },
+            "Hughes H-4 Hercules":           { name: "Hughes H-4 Hercules",        category: "Secret", rarity: "legendary", price: 12000000,  cargo: 59000, rangeNM: 2600, topSpeedKnots: 204, minRank: 1, iconSize: 42, img: "https://upload.wikimedia.org/wikipedia/commons/thumb/a/ad/H-4_Hercules_2.jpg/1280px-H-4_Hercules_2.jpg", type: "plane", isCargo: true, waterOnly: true },
+            "Messerschmitt Me 323 Gigant":   { name: "Messerschmitt Me 323",       category: "Secret", rarity: "rare",      price: 3000000,  cargo: 12000, rangeNM: 590,  topSpeedKnots: 153, minRank: 1, iconSize: 40, img: "https://upload.wikimedia.org/wikipedia/commons/2/25/Bundesarchiv_Bild_101I-596-0367-05A%2C_Flugzeug_Me_323_Gigant.jpg", type: "plane", isCargo: true },
+            "Lockheed Martin SR-72":         { name: "Lockheed Martin SR-72",      category: "Secret", rarity: "mythic",    price: 35000000, cargo: 2500, rangeNM: 4500,  topSpeedKnots: 3600, minRank: 1, iconSize: 32, img: "https://upload.wikimedia.org/wikipedia/en/4/4a/Lockheed_Martin_SR-72_concept.png", type: "plane", isCargo: true },
+            "Wright Flyer":                  { name: "Wright Flyer",               category: "Secret", rarity: "legendary", price: 10000,  pax: 1, rangeNM: 0.1,  topSpeedKnots: 26, minRank: 1, iconSize: 24, img: "https://upload.wikimedia.org/wikipedia/commons/thumb/8/86/First_flight2.jpg/1920px-First_flight2.jpg", type: "plane" },
+            "Mil V-12":                      { name: "Mil V-12",                   category: "Secret", rarity: "epic",      price: 7000000,  cargo: 44200, rangeNM: 270,  topSpeedKnots: 140, minRank: 1, iconSize: 42, img: "https://upload.wikimedia.org/wikipedia/commons/6/68/Mil_V-12_prototype.jpg", type: "helicopter", isCargo: true },
+            "Scaled Composites Model 351 Stratolaunch": { name: "Scaled Composites Model 351 Stratolaunch", category: "Secret", rarity: "mythic", price: 20000000, cargo: 250000, rangeNM: 1000, topSpeedKnots: 460, minRank: 1, iconSize: 44, img: "https://upload.wikimedia.org/wikipedia/commons/thumb/b/b6/230113-_Stratolaunch_Talon_Photo_Chase-091.jpg/1280px-230113-_Stratolaunch_Talon_Photo_Chase-091.jpg", type: "plane", isCargo: true },
+            "Kaman K-MAX":                   { name: "Kaman K-MAX",                category: "Secret", rarity: "uncommon",  price: 650000,  cargo: 2342, rangeNM: 300,  topSpeedKnots: 80, minRank: 1, iconSize: 28, img: "https://upload.wikimedia.org/wikipedia/commons/thumb/5/50/Kaman_K-1200_Rotex.jpg/1280px-Kaman_K-1200_Rotex.jpg", type: "helicopter", isCargo: true },
+            "A-90 Orlyonok":                 { name: "A-90 Orlyonok",              category: "Secret", rarity: "epic",      price: 4500000,  cargo: 28000, rangeNM: 810,  topSpeedKnots: 220, minRank: 1, iconSize: 28, img: "https://upload.wikimedia.org/wikipedia/commons/thumb/8/89/A-90_Orlyonok_4.JPG/1280px-A-90_Orlyonok_4.JPG", type: "plane", isCargo: true, waterOnly: true },
+            "Bartini Beriev VVA-14":         { name: "Bartini Beriev VVA-14",      category: "Secret", rarity: "rare",      price: 4000000,  cargo: 16500, rangeNM: 1320,  topSpeedKnots: 410, minRank: 1, iconSize: 28, img: "https://preview.redd.it/bartini-beriev-vva-14-in-the-ussr-june-1975-1606x1000-v0-4z91nqogi02f1.jpeg?auto=webp&s=8119bfd522d37aa35ef9f05e2a5b6f6dbb9c446b", type: "plane", isCargo: true },
+            "Cessna 172 Skyhawk":            { name: "Cessna 172 Skyhawk",         category: "Secret", rarity: "common",    price: 12000,  pax: 3, rangeNM: 696,  topSpeedKnots: 122, minRank: 1, iconSize: 24, img: "https://upload.wikimedia.org/wikipedia/commons/a/ae/Cessna_172S_Skyhawk_SP%2C_Private_JP6817606.jpg", type: "plane", isCargo: false },
+
+            // ===== ADDITIONAL SECRET AIRCRAFT =====
+            "Boeing Pelican ULTRA":     { name: "Boeing Pelican ULTRA",     category: "Secret", rarity: "legendary",    price: 150000000, cargo: 1270000, rangeNM: 10000, topSpeedKnots: 240, minRank: 1, isNew: true, iconSize: 44, img: "https://aviationa2z.com/wp-content/uploads/2025/09/Capture.webp", type: "cargo-plane", isCargo: true, waterOnly: true },
+            "Caproni Ca.60 Noviplano": { name: "Caproni Ca.60 Noviplano",  category: "Secret", rarity: "rare",  price: 500000,  pax: 100, rangeNM: 1,    topSpeedKnots: 75,  minRank: 1, isNew: true, iconSize: 34, img: "https://i.redd.it/1sia9jj0etia1.jpg", type: "plane", waterOnly: true },
+            "Kalinin K-7":             { name: "Kalinin K-7",              category: "Secret", rarity: "rare",      price: 2500000,  pax: 120, rangeNM: 620,  topSpeedKnots: 112, minRank: 1, isNew: true, iconSize: 40, img: "https://preview.redd.it/gaijin-please-kalinin-k-7-v0-750iw9ymz0q31.jpg?width=640&crop=smart&auto=webp&s=acf0358c2c59d7b0c293d91317c51d2333575381", type: "plane" },
+            "Tupolev ANT-20":          { name: "Tupolev ANT-20",           category: "Secret", rarity: "rare",      price: 3500000,  pax: 64,  rangeNM: 900,  topSpeedKnots: 215, minRank: 1, isNew: true, iconSize: 38, img: "https://upload.wikimedia.org/wikipedia/commons/1/1c/Tupolew_ANT-20_1935.jpg", type: "plane" },
+            "Fairey Rotodyne":         { name: "Fairey Rotodyne",          category: "Secret", rarity: "epic",      price: 6000000,  pax: 48,  rangeNM: 400,  topSpeedKnots: 190, minRank: 1, isNew: true, iconSize: 30, img: "https://i.redd.it/britains-fairey-rotodyne-a-late-1950s-then-promising-cross-v0-4heu3r7q63sf1.jpg?width=619&format=pjpg&auto=webp&s=c739089be0024be6176a95d8a491a5f427f4c4b6", type: "helicopter" },
+            "Avro Canada VZ-9 Avrocar":      { name: "Avro Canada VZ-9 Avrocar",   category: "Secret", rarity: "uncommon",      price: 3500000,  pax: 1, rangeNM: 70,  topSpeedKnots: 30, minRank: 1, iconSize: 24, img: "https://upload.wikimedia.org/wikipedia/commons/thumb/9/90/Colour_avrocar_59.jpg/1280px-Colour_avrocar_59.jpg", type: "helicopter", isCargo: false },
         };
  
         // ===== ACHIEVEMENTS =====
         const achievements = {
-            "graduation":       { title: "Flight Academy Graduate",  desc: "Complete the operational training sequence",              unlocked: false, badge: "🎓", rewardDesc: "$150,000 and +25 AeroTokens" },
-            "spinning_around":  { title: "Spinning Around",          desc: "Buy a helicopter for the first time",                    unlocked: false, badge: "🚁", rewardDesc: "$10,000 and +10 AeroTokens" },
+            "graduation":       { title: "Flight Academy Graduate",  desc: "Complete the operational training sequence",              unlocked: false, badge: "🎓", rewardDesc: "$150,000 and +25 AeroTokens", rarity: "Common" },
+            "spinning_around":  { title: "Spinning Around",          desc: "Buy a helicopter for the first time",                    unlocked: false, badge: "🚁", rewardDesc: "$10,000 and +10 AeroTokens", rarity: "Common" },
             "bring_a_jacket":   { title: "Bring a Jacket",           desc: "Unlock Antarctica and complete a flight there",          unlocked: false, badge: "🥶", rewardDesc: "+10 AeroTokens", rarity: "Rare" },
             "globetrotter":     { title: "Globetrotter",             desc: "Unlock every territory worldwide",                       unlocked: false, badge: "🌍", rewardDesc: "$1,000,000 and +500 AeroTokens", rarity: "Legendary" },
             "millionaire":      { title: "Millionaire",              desc: "Exceed a cash treasury balance of $1,000,000",           unlocked: false, badge: "💰", rewardDesc: "+150 AeroTokens", rarity: "Rare" },
             "billionaire":      { title: "Billionaire",              desc: "Exceed a cash treasury balance of $1,000,000,000",       unlocked: false, badge: "🤑", rewardDesc: "+2,000 AeroTokens", rarity: "Legendary" },
-            "fleet_10":         { title: "Growing Fleet",            desc: "Own 10 or more aircraft simultaneously",                 unlocked: false, badge: "✈️", rewardDesc: "$50,000 and +20 AeroTokens" },
+            "fleet_10":         { title: "Growing Fleet",            desc: "Own 10 or more aircraft simultaneously",                 unlocked: false, badge: "✈️", rewardDesc: "$50,000 and +20 AeroTokens", rarity: "Uncommon" },
             "fleet_50":         { title: "Major Carrier",            desc: "Own 50 or more aircraft simultaneously",                 unlocked: false, badge: "🛬", rewardDesc: "$500,000 and +100 AeroTokens", rarity: "Epic" },
             "cargo_king":       { title: "Cargo King",               desc: "Own 5 or more cargo aircraft simultaneously",            unlocked: false, badge: "📦", rewardDesc: "$100,000 and +30 AeroTokens", rarity: "Rare" },
             "route_master":     { title: "Route Master",             desc: "Have 10 or more active routes simultaneously",           unlocked: false, badge: "🗺️", rewardDesc: "$75,000 and +25 AeroTokens", rarity: "Rare" },
-            "rank_5":           { title: "Veteran Operator",         desc: "Reach Rank 5",                                           unlocked: false, badge: "⭐", rewardDesc: "$25,000 and +15 AeroTokens" },
+            "rank_5":           { title: "Veteran Operator",         desc: "Reach Rank 5",                                           unlocked: false, badge: "⭐", rewardDesc: "$25,000 and +15 AeroTokens", rarity: "Common" },
             "rank_10":          { title: "Elite Status",             desc: "Reach Rank 10",                                          unlocked: false, badge: "🌟", rewardDesc: "$75,000 and +25 AeroTokens", rarity: "Rare" },
             "rank_15":          { title: "Industry Legend",          desc: "Reach Rank 15",                                          unlocked: false, badge: "✨", rewardDesc: "$125,000 and +35 AeroTokens", rarity: "Rare" },
             "rank_50":          { title: "Global Aerospace Tycoon",  desc: "Reach Rank 50",                                          unlocked: false, badge: "💫", rewardDesc: "$250,000 and +50 AeroTokens", rarity: "Epic" },
             "rank_100":         { title: "Monarch of the Skies",     desc: "Reach Rank 100",                                         unlocked: false, badge: "🌠", rewardDesc: "$500,000 and +100 AeroTokens", rarity: "Epic" },
             "rank_1000":        { title: "Aviation Immortal",        desc: "Reach Rank 1000",                                        unlocked: false, badge: "🎇", rewardDesc: "$2,500,000 and +500 AeroTokens", rarity: "Legendary" },
             "token_collector":  { title: "Token Hoarder",            desc: "Accumulate 500 AeroTokens at once",                      unlocked: false, badge: "🎫", rewardDesc: "$20,000", rarity: "Rare" },
-            "crate_hunter":     { title: "Crate Hunter",             desc: "Claim 10 supply crates",                                 unlocked: false, badge: "📫", rewardDesc: "+50 AeroTokens" },
-            "boost_collector":  { title: "Speed Junkie",             desc: "Collect a speed boost from a crate",                     unlocked: false, badge: "⚡", rewardDesc: "+20 AeroTokens" },
+            "crate_hunter":     { title: "Crate Hunter",             desc: "Claim 10 supply crates",                                 unlocked: false, badge: "📫", rewardDesc: "+50 AeroTokens", rarity: "Uncommon" },
+            "boost_collector":  { title: "Speed Junkie",             desc: "Collect a speed boost from a crate",                     unlocked: false, badge: "⚡", rewardDesc: "+20 AeroTokens", rarity: "Rare" },
             "lindbergh":        { title: "Charles Lindbergh",        desc: "Have an active route between New York City and Paris",    unlocked: false, badge: "🗽", rewardDesc: "$500,000 and +100 AeroTokens", rarity: "Epic" },
             "continental_drifter": { title: "Continental Drifter",   desc: "Have routes to all 7 continents",                        unlocked: false, badge: "🌐", rewardDesc: "$750,000 and +150 AeroTokens", rarity: "Epic" },
-            "first_crash":      { title: "Oh No...",                 desc: "Experience your first aircraft crash",                   unlocked: false, badge: "💥", rewardDesc: "+5 AeroTokens (small consolation)" },
+            "first_crash":      { title: "Oh No...",                 desc: "Experience your first aircraft crash",                   unlocked: false, badge: "💥", rewardDesc: "+5 AeroTokens (small consolation)", rarity: "Common" },
             "down_under":       { title: "Down Under",               desc: "Unlock all Australian states and territories",           unlocked: false, badge: "🦘", rewardDesc: "$250,000 and +50 AeroTokens", rarity: "Rare" },
             "worldwide_mastermind": { title: "Worldwide Mastermind", desc: "Have an active aircraft flying on a route to every single airport and heliport (hospitals excluded)", unlocked: false, badge: "🧠", rewardDesc: "$5,000,000 and +1,000 AeroTokens", rarity: "Mythic" },
             "syrup_enjoyer":    { title: "Syrup Enjoyer",            desc: "Unlock all available Canadian provinces",                unlocked: false, badge: "🍁", rewardDesc: "$100,000 and +25 AeroTokens", rarity: "Rare" },
             "brit_isles":       { title: "British Isles",            desc: "Unlock all regions in the British Isles",                unlocked: false, badge: "🇬🇧", rewardDesc: "$100,000 and +25 AeroTokens", rarity: "Rare" },
-            "first_refuel":     { title: "Refuels",             desc: "Refuel an aircraft for the first time",                  unlocked: false, badge: "⛽", rewardDesc: "+5 AeroTokens" },
-            "first_repair":     { title: "Repairs",             desc: "Repair an aircraft for the first time",                  unlocked: false, badge: "🔧", rewardDesc: "+5 AeroTokens" },
-            "bad_financial_decision": { title: "Bad Financial Decision", desc: "Open a route to the airport with the lowest global demand", unlocked: false, badge: "📉", rewardDesc: "+10 AeroTokens" },
+            "first_refuel":     { title: "Refuels",             desc: "Refuel an aircraft for the first time",                  unlocked: false, badge: "⛽", rewardDesc: "+5 AeroTokens", rarity: "Common" },
+            "first_repair":     { title: "Repairs",             desc: "Repair an aircraft for the first time",                  unlocked: false, badge: "🔧", rewardDesc: "+5 AeroTokens", rarity: "Common" },
+            "bad_financial_decision": { title: "Bad Financial Decision", desc: "Open a route to the airport with the lowest global demand", unlocked: false, badge: "📉", rewardDesc: "+10 AeroTokens", rarity: "Uncommon" },
             "purchasable_collector": { title: "Standard Fleet Operator", desc: "Own at least one of every purchasable passenger, cargo, and legacy aircraft", unlocked: false, badge: "🛫", rewardDesc: "$1,000,000 and +250 AeroTokens", rarity: "Epic" },
             "mythic_collector": { title: "Mythic Aviator",           desc: "Own at least one of every mythical secret aircraft (SR-71, SR-72, and Stratolaunch)", unlocked: false, badge: "🔥", rewardDesc: "$5,000,000 and +500 AeroTokens", rarity: "Mythic" },
             "wright_flyer_collector": { title: "Wright Brothers",    desc: "Collect the legendary Wright Flyer from a crate",        unlocked: false, badge: "📜", rewardDesc: "$50,000 and +100 AeroTokens", rarity: "Legendary" },
@@ -2583,24 +2702,31 @@ z-index:99999;
             "route_cn_ns":      { title: "North to South - CN",      desc: "Have a route from the northernmost Chinese airport to the southernmost",    unlocked: false, badge: "🇨🇳", rewardDesc: "$50,000 and +20 AeroTokens", rarity: "Rare" },
             "route_af_we":      { title: "West to East - AF",        desc: "Have a route from the westernmost Afghan airport to the easternmost",       unlocked: false, badge: "🇦🇫", rewardDesc: "$50,000 and +20 AeroTokens", rarity: "Rare" },
             "route_it_ns":      { title: "North to South - IT",      desc: "Have a route from the northernmost Italian airport to the southernmost",    unlocked: false, badge: "🇮🇹", rewardDesc: "$50,000 and +20 AeroTokens", rarity: "Rare" },
-            "first_common":     { title: "Common Collecting",        desc: "Get a common reward from a crate for the first time",    unlocked: false, badge: "🩶", rewardDesc: "+2 AeroTokens" },
-            "first_uncommon":   { title: "Uncommon Collecting",      desc: "Get an uncommon reward from a crate for the first time", unlocked: false, badge: "💚", rewardDesc: "+5 AeroTokens" },
+            "first_common":     { title: "Common Collecting",        desc: "Get a common reward from a crate for the first time",    unlocked: false, badge: "🩶", rewardDesc: "+2 AeroTokens", rarity: "Common" },
+            "first_uncommon":   { title: "Uncommon Collecting",      desc: "Get an uncommon reward from a crate for the first time", unlocked: false, badge: "💚", rewardDesc: "+5 AeroTokens", rarity: "Uncommon" },
             "first_rare":       { title: "Rare Collecting",          desc: "Get a rare reward from a crate for the first time",      unlocked: false, badge: "💙", rewardDesc: "+10 AeroTokens", rarity: "Rare" },
             "first_epic":       { title: "Epic Collecting",          desc: "Get an epic reward from a crate for the first time",     unlocked: false, badge: "💜", rewardDesc: "+20 AeroTokens", rarity: "Epic" },
             "first_legendary":  { title: "Legendary Collecting",     desc: "Get a legendary reward from a crate for the first time", unlocked: false, badge: "💛", rewardDesc: "+35 AeroTokens", rarity: "Legendary" },
             "first_mythic":     { title: "Mythic Collecting",        desc: "Get a mythical reward from a crate for the first time",  unlocked: false, badge: "❤️‍🔥", rewardDesc: "+75 AeroTokens", rarity: "Mythic" },
+            "hidden_exotic":    { title: "Hidden Achievement",       desc: "Unlock this achievement to see the description",  revealTitle: "Exotic Aviator", revealDesc: "Get an Exotic aircraft from a crate", unlocked: false, badge: "❓", revealBadge: "🌈", rewardDesc: "+200 AeroTokens", rarity: "Exotic" },
             "hub_network":      { title: "Hub Network",              desc: "Establish 5 hubs across your airline",                   unlocked: false, badge: "🏗️", rewardDesc: "$200,000 and +50 AeroTokens", rarity: "Rare" },
             "long_haul":        { title: "Long Hauler",              desc: "Open a route longer than 8,000 NM",                     unlocked: false, badge: "🌏", rewardDesc: "$300,000 and +75 AeroTokens", rarity: "Epic" },
             "budget_carrier":   { title: "Budget Carrier",           desc: "Have 25 or more active routes simultaneously",          unlocked: false, badge: "📋", rewardDesc: "$500,000 and +100 AeroTokens", rarity: "Epic" },
             "fleet_commander":  { title: "Fleet Commander",          desc: "Own 50 aircraft across all types",                      unlocked: false, badge: "🎖️", rewardDesc: "$1,000,000 and +200 AeroTokens", rarity: "Legendary" },
             "refuel_veteran":   { title: "Fuel Hoarder",             desc: "Refuel aircraft 50 times total",                        unlocked: false, badge: "🛢️", rewardDesc: "$50,000 and +25 AeroTokens", rarity: "Rare" },
             "crash_veteran":    { title: "Crash Test Dummy",         desc: "Experience 5 aircraft crashes",                         unlocked: false, badge: "💀", rewardDesc: "+15 AeroTokens (it's something)", rarity: "Rare" },
-            "secret_collector": { title: "Area 51 Escapee",          desc: "Own all secret aircraft (Avrocar, SR-71, SR-72, Stratolaunch, Kaman K-MAX, Mil V-12, Sikorsky Skycrane)", unlocked: false, badge: "👽", rewardDesc: "$10,000,000 and +2,000 AeroTokens", rarity: "Mythic" },
+            "secret_collector": { title: "Secret Collector",          desc: "Own all secret aircraft", unlocked: false, badge: "🛸", rewardDesc: "$10,000,000 and +2,000 AeroTokens", rarity: "Mythic" },
             "crate_addict":     { title: "Crate Addict",             desc: "Open 50 supply crates",                                 unlocked: false, badge: "📦", rewardDesc: "$100,000 and +100 AeroTokens", rarity: "Epic" },
             "old_faithful":     { title: "Old Faithful",             desc: "Fly a legacy aircraft on a route for 10 minutes",       unlocked: false, badge: "🕰️", rewardDesc: "$75,000 and +30 AeroTokens", rarity: "Rare" },
             "transcontinental": { title: "Transcontinental",         desc: "Have a route longer than 5,000 NM",                     unlocked: false, badge: "🗺️", rewardDesc: "$100,000 and +30 AeroTokens", rarity: "Rare" },
             "monopoly":         { title: "Monopoly",                 desc: "Establish 10 hubs across your airline network", unlocked: false, badge: "🎩", rewardDesc: "$500,000 and +150 AeroTokens", rarity: "Epic" },
             "hub_every_airport":{ title: "Everywhere At Once",        desc: "Make every airport and heliport a hub",          unlocked: false, badge: "🌐", rewardDesc: "$10,000,000 and +5,000 AeroTokens", rarity: "Mythic" },
+            "fleet_titan":      { title: "Fleet Titan",                desc: "Own 500 or more aircraft simultaneously",                unlocked: false, badge: "🛩️", rewardDesc: "$5,000,000 and +750 AeroTokens", rarity: "Legendary" },
+            "trillionaire":     { title: "Trillionaire",               desc: "Exceed a cash treasury balance of $1,000,000,000,000",   unlocked: false, badge: "👑", rewardDesc: "+5,000 AeroTokens", rarity: "Mythic" },
+            "jack_of_all_trades": { title: "Jack of All Trades",      desc: "Simultaneously own a passenger, a cargo, and a legacy aircraft", unlocked: false, badge: "🧰", rewardDesc: "$150,000 and +40 AeroTokens", rarity: "Rare" },
+            "speed_demon":      { title: "Speed Demon",               desc: "Own an aircraft capable of supersonic flight (900+ knots top speed)", unlocked: false, badge: "💨", rewardDesc: "$200,000 and +50 AeroTokens", rarity: "Epic" },
+            "making_a_splash":  { title: "Making a Splash",           desc: "Own an aircraft that can only operate from water",      unlocked: false, badge: "🌊", rewardDesc: "$100,000 and +30 AeroTokens", rarity: "Rare" },
+            "helicopter_squadron": { title: "Helicopter Squadron",    desc: "Own 5 or more helicopters simultaneously",               unlocked: false, badge: "🚁", rewardDesc: "$75,000 and +25 AeroTokens", rarity: "Rare" },
         };
         const DEFAULT_STATE = {
             cash: 0, tokens: 0, rank: 1, xp: 0, airlineName: "", primaryHub: "",
@@ -2677,80 +2803,61 @@ document.addEventListener('visibilitychange', () => {
 });
 // ===== REEL PRIZE TABLE =====
         const reelPrizes = [
-            // COMMON
-            { id: "cash_500",    label: "$500",           icon: "💵", rarity: "common",    rarityLabel: "COMMON",   weight: 80, apply: (gs) => { gs.cash += 500; } },
-            { id: "cash_1k",     label: "$1,000",         icon: "💵", rarity: "common",    rarityLabel: "COMMON",   weight: 70, apply: (gs) => { gs.cash += 1000; } },
-            { id: "cash_2k",     label: "$2,000",         icon: "💵", rarity: "common",    rarityLabel: "COMMON",   weight: 60, apply: (gs) => { gs.cash += 2000; } },
-            { id: "xp_500",      label: "500 XP",         icon: "⭐", rarity: "common",    rarityLabel: "COMMON",   weight: 75, apply: (gs) => { gs.xp += 500; } },
-            { id: "tokens_2",    label: "2 Tokens",       icon: "✈", rarity: "common",    rarityLabel: "COMMON",   weight: 65, apply: (gs) => { gs.tokens += 2; } },
-            { id: "Cessna 172 Skyhawk",  label: "Cessna 172 Skyhawk",  icon: "🛩️", rarity: "common",    rarityLabel: "COMMON",   weight: 55,apply: (gs) => { gs.hangar["Cessna 172 Skyhawk"] = (gs.hangar["Cessna 172 Skyhawk"]||0)+1; } },
-            // UNCOMMON
-            { id: "cash_5k",     label: "$5,000",         icon: "💴", rarity: "uncommon",  rarityLabel: "UNCOMMON", weight: 40, apply: (gs) => { gs.cash += 5000; } },
-            { id: "cash_10k",    label: "$10,000",        icon: "💴", rarity: "uncommon",  rarityLabel: "UNCOMMON", weight: 35, apply: (gs) => { gs.cash += 10000; } },
-            { id: "xp_2k",       label: "2,000 XP",      icon: "⭐", rarity: "uncommon",  rarityLabel: "UNCOMMON", weight: 38, apply: (gs) => { gs.xp += 2000; } },
-            { id: "tokens_5",    label: "5 Tokens",       icon: "✈", rarity: "uncommon",  rarityLabel: "UNCOMMON", weight: 36, apply: (gs) => { gs.tokens += 5; } },
-            { id: "cessna_drop", label: "Cessna Caravan", icon: "🛩️", rarity: "uncommon",  rarityLabel: "UNCOMMON", weight: 30, apply: (gs) => { gs.hangar["Cessna 208 Caravan"] = (gs.hangar["Cessna 208 Caravan"]||0)+1; } },
-            // RARE
-            { id: "cash_25k",    label: "$25,000",        icon: "💰", rarity: "rare",      rarityLabel: "RARE",     weight: 18, apply: (gs) => { gs.cash += 25000; } },
-            { id: "cash_50k",    label: "$50,000",        icon: "💰", rarity: "rare",      rarityLabel: "RARE",     weight: 12, apply: (gs) => { gs.cash += 50000; } },
-            { id: "xp_10k",      label: "10,000 XP",     icon: "⭐", rarity: "rare",      rarityLabel: "RARE",     weight: 15, apply: (gs) => { gs.xp += 10000; } },
-            { id: "tokens_15",   label: "15 Tokens",      icon: "✈", rarity: "rare",      rarityLabel: "RARE",     weight: 14, apply: (gs) => { gs.tokens += 15; } },
-            { id: "boost_30",    label: "2x Speed 30min", icon: "⚡", rarity: "rare",      rarityLabel: "RARE",     weight: 10, apply: (gs) => { gs.speedBoostEndTime = Date.now() + 30*60*1000; } },
-            { id: "crate_luck_2x", label: "2x Crate Luck 30min", icon: "🍀", rarity: "rare", rarityLabel: "RARE", weight: 6, apply: (gs) => { gs.crateLuckMultiplier = mergeMultiplier(gs.crateLuckMultiplier, 2); gs.crateLuckEndTime = extendBoostDuration(gs.crateLuckEndTime, 30*60*1000); } },
-            { id: "crate_spawn_2x", label: "2x Crate Spawn 30min", icon: "🛩️", rarity: "rare", rarityLabel: "RARE", weight: 6, apply: (gs) => {
-                // Spawn a crate immediately, then halve all future intervals for 30 min
-                if (typeof spawnCrate === 'function') spawnCrate();
-                const endTime = Date.now() + 30*60*1000;
-                gs._crateBoostEnd2x = endTime;
-                // Halve the time until the next scheduled crate
-                if (window._nextCrateSpawnAt) {
-                    const remaining = Math.max(0, window._nextCrateSpawnAt - Date.now());
-                    window._nextCrateSpawnAt = Date.now() + Math.round(remaining / 2);
-                }
-            } },
-            { id: "atr_drop",    label: "ATR 72-600",     icon: "🛫", rarity: "rare",      rarityLabel: "RARE",     weight: 8,  apply: (gs) => { gs.hangar["ATR 72-600"] = (gs.hangar["ATR 72-600"]||0)+1; } },
-            // EPIC
-            { id: "cash_100k",   label: "$100,000",       icon: "💎", rarity: "epic",      rarityLabel: "EPIC",     weight: 5,  apply: (gs) => { gs.cash += 100000; } },
-            { id: "cash_200k",   label: "$200,000",       icon: "💎", rarity: "epic",      rarityLabel: "EPIC",     weight: 3,  apply: (gs) => { gs.cash += 200000; } },
-            { id: "tokens_50",   label: "50 Tokens",      icon: "✈", rarity: "epic",      rarityLabel: "EPIC",     weight: 4,  apply: (gs) => { gs.tokens += 50; } },
-            { id: "boost_60",    label: "2x Speed 1hr",   icon: "⚡", rarity: "epic",      rarityLabel: "EPIC",     weight: 3,  apply: (gs) => { gs.speedBoostEndTime = Date.now() + 60*60*1000; } },
-            { id: "a350-900_drop",   label: "Airbus A350-900", icon: "✈", rarity: "epic",      rarityLabel: "EPIC",     weight: 3,  apply: (gs) => { gs.hangar["Airbus A350-900"] = (gs.hangar["Airbus A350-900"]||0)+1; } },
-            { id: "region_drop", label: "Random Region!", icon: "🗺️", rarity: "epic",      rarityLabel: "EPIC",     weight: 4,  apply: (gs) => { unlockRandomRegion(); } },
-            // LEGENDARY
-            { id: "cash_500k",   label: "$500,000",       icon: "🏆", rarity: "legendary", rarityLabel: "LEGENDARY",weight: 1.5,apply: (gs) => { gs.cash += 500000; } },
-            { id: "tokens_150",  label: "150 Tokens",     icon: "✈", rarity: "legendary", rarityLabel: "LEGENDARY",weight: 1,  apply: (gs) => { gs.tokens += 150; } },
-            { id: "a380_drop",   label: "Airbus A380",    icon: "🛫", rarity: "legendary", rarityLabel: "LEGENDARY",weight: 1,  apply: (gs) => { gs.hangar["Airbus A380"] = (gs.hangar["Airbus A380"]||0)+1; } },
-            { id: "wright_drop",   label: "Wright Flyer",    icon: "🛫", rarity: "legendary", rarityLabel: "LEGENDARY",weight: 1,  apply: (gs) => { gs.hangar["Wright Flyer"] = (gs.hangar["Wright Flyer"]||0)+1; } },
-            { id: "crate_luck_4x", label: "4x Crate Luck 30min", icon: "🍀", rarity: "legendary", rarityLabel: "LEGENDARY", weight: 1.5, apply: (gs) => { gs.crateLuckMultiplier = mergeMultiplier(gs.crateLuckMultiplier, 4); gs.crateLuckEndTime = extendBoostDuration(gs.crateLuckEndTime, 30*60*1000); } },
-            { id: "crate_spawn_4x", label: "4x Crate Spawn 30min", icon: "🛩️", rarity: "legendary", rarityLabel: "LEGENDARY", weight: 1.5, apply: (gs) => {
-                // Spawn a crate immediately, then quarter all future intervals for 30 min
-                if (typeof spawnCrate === 'function') spawnCrate();
-                const endTime = Date.now() + 30*60*1000;
-                gs._crateBoostEnd4x = endTime;
-                // Quarter the time until the next scheduled crate
-                if (window._nextCrateSpawnAt) {
-                    const remaining = Math.max(0, window._nextCrateSpawnAt - Date.now());
-                    window._nextCrateSpawnAt = Date.now() + Math.round(remaining / 4);
-                }
-            } },
-            // MYTHIC (the absolute best secret aircraft)
-            { id: "sr71_drop",   label: "Lockheed SR-71 Blackbird",icon: "🔥", rarity: "mythic",    rarityLabel: "MYTHIC",   weight: 0.3,apply: (gs) => { gs.hangar["Lockheed SR-71 Blackbird"] = (gs.hangar["Lockheed SR-71 Blackbird"]||0)+1; } },
-            { id: "sr72_drop",   label: "Lockheed Martin SR-72",   icon: "🔥", rarity: "mythic",    rarityLabel: "MYTHIC",   weight: 0.15,apply: (gs) => { gs.hangar["Lockheed Martin SR-72"] = (gs.hangar["Lockheed Martin SR-72"]||0)+1; } },
-            { id: "strato_drop", label: "Scaled Composites Stratolaunch",icon: "🔥", rarity: "mythic", rarityLabel: "MYTHIC", weight: 0.2, apply: (gs) => { gs.hangar["Scaled Composites Model 351 Stratolaunch"] = (gs.hangar["Scaled Composites Model 351 Stratolaunch"]||0)+1; } },
-            // LEGENDARY (strong but not supreme)
-            { id: "lun_drop",    label: "Lun-Class Ekranoplan",    icon: "⚓", rarity: "legendary", rarityLabel: "LEGENDARY",weight: 0.8, apply: (gs) => { gs.hangar["Lun-Class Ekranoplan"] = (gs.hangar["Lun-Class Ekranoplan"]||0)+1; } },
-            { id: "h4_drop",     label: "Hughes H-4 Hercules",     icon: "🛥️", rarity: "legendary", rarityLabel: "LEGENDARY",weight: 0.7, apply: (gs) => { gs.hangar["Hughes H-4 Hercules"] = (gs.hangar["Hughes H-4 Hercules"]||0)+1; } },
-            // EPIC (notable but mid-tier)
-            { id: "milv12_drop", label: "Mil V-12",                icon: "🚁", rarity: "epic",      rarityLabel: "EPIC",     weight: 2,   apply: (gs) => { gs.hangar["Mil V-12"] = (gs.hangar["Mil V-12"]||0)+1; } },
-            { id: "orlyonok_drop",label: "A-90 Orlyonok",          icon: "🌊", rarity: "epic",      rarityLabel: "EPIC",     weight: 2.5, apply: (gs) => { gs.hangar["A-90 Orlyonok"] = (gs.hangar["A-90 Orlyonok"]||0)+1; } },
-            // RARE (interesting but limited)
-            { id: "vva14_drop",  label: "Bartini Beriev VVA-14",   icon: "🐢", rarity: "rare",      rarityLabel: "RARE",     weight: 5,   apply: (gs) => { gs.hangar["Bartini Beriev VVA-14"] = (gs.hangar["Bartini Beriev VVA-14"]||0)+1; } },
-            { id: "me323_drop",  label: "Messerschmitt Me 323 Gigant", icon: "🛩️", rarity: "rare",  rarityLabel: "RARE",     weight: 6,   apply: (gs) => { gs.hangar["Messerschmitt Me 323 Gigant"] = (gs.hangar["Messerschmitt Me 323 Gigant"]||0)+1; } },
-            // UNCOMMON (weak but collectable)
-            { id: "kmax_drop",   label: "Kaman K-MAX",             icon: "🚁", rarity: "uncommon",  rarityLabel: "UNCOMMON", weight: 18,  apply: (gs) => { gs.hangar["Kaman K-MAX"] = (gs.hangar["Kaman K-MAX"]||0)+1; } },
-            // COMMON (novelty, basically useless — pure collection fodder)
-            { id: "avrocar_drop",label: "Avro Canada VZ-9 Avrocar",icon: "🛸", rarity: "epic",      rarityLabel: "EPIC",     weight: 2.5, apply: (gs) => { gs.hangar["Avro Canada VZ-9 Avrocar"] = (gs.hangar["Avro Canada VZ-9 Avrocar"]||0)+1; } },
-            
+            // ── COMMON ──────────────────────────────────────────────────────
+            { id:"cash_500",       label:"$500",                           icon:"💵", rarity:"common",    rarityLabel:"COMMON",    weight:80,   apply:(gs)=>{gs.cash+=500;} },
+            { id:"cash_1k",        label:"$1,000",                         icon:"💵", rarity:"common",    rarityLabel:"COMMON",    weight:70,   apply:(gs)=>{gs.cash+=1000;} },
+            { id:"cash_2k",        label:"$2,000",                         icon:"💵", rarity:"common",    rarityLabel:"COMMON",    weight:60,   apply:(gs)=>{gs.cash+=2000;} },
+            { id:"xp_500",         label:"500 XP",                         icon:"⭐", rarity:"common",    rarityLabel:"COMMON",    weight:75,   apply:(gs)=>{gs.xp+=500;} },
+            { id:"tokens_2",       label:"2 Tokens",                       icon:"✈", rarity:"common",    rarityLabel:"COMMON",    weight:65,   apply:(gs)=>{gs.tokens+=2;} },
+            { id:"c172_drop",      label:"Cessna 172 Skyhawk",             icon:"🛩️", rarity:"common",    rarityLabel:"COMMON",    weight:50,   apply:(gs)=>{gs.hangar["Cessna 172 Skyhawk"]=(gs.hangar["Cessna 172 Skyhawk"]||0)+1;} },
+            // ── UNCOMMON ────────────────────────────────────────────────────
+            { id:"cash_5k",        label:"$5,000",                         icon:"💴", rarity:"uncommon",  rarityLabel:"UNCOMMON",  weight:40,   apply:(gs)=>{gs.cash+=5000;} },
+            { id:"cash_10k",       label:"$10,000",                        icon:"💴", rarity:"uncommon",  rarityLabel:"UNCOMMON",  weight:35,   apply:(gs)=>{gs.cash+=10000;} },
+            { id:"xp_2k",          label:"2,000 XP",                       icon:"⭐", rarity:"uncommon",  rarityLabel:"UNCOMMON",  weight:38,   apply:(gs)=>{gs.xp+=2000;} },
+            { id:"tokens_5",       label:"5 Tokens",                       icon:"✈", rarity:"uncommon",  rarityLabel:"UNCOMMON",  weight:36,   apply:(gs)=>{gs.tokens+=5;} },
+            { id:"cessna_drop",    label:"Cessna 208 Caravan",             icon:"🛩️", rarity:"uncommon",  rarityLabel:"UNCOMMON",  weight:28,   apply:(gs)=>{gs.hangar["Cessna 208 Caravan"]=(gs.hangar["Cessna 208 Caravan"]||0)+1;} },
+            { id:"kmax_drop",      label:"Kaman K-MAX",                    icon:"🚁", rarity:"uncommon",  rarityLabel:"UNCOMMON",  weight:20,   apply:(gs)=>{gs.hangar["Kaman K-MAX"]=(gs.hangar["Kaman K-MAX"]||0)+1;} },
+            { id:"avrocar_drop",   label:"Avro Canada VZ-9 Avrocar",       icon:"🛸", rarity:"uncommon",  rarityLabel:"UNCOMMON",  weight:18,   apply:(gs)=>{gs.hangar["Avro Canada VZ-9 Avrocar"]=(gs.hangar["Avro Canada VZ-9 Avrocar"]||0)+1;} },
+            // ── RARE ────────────────────────────────────────────────────────
+            { id:"cash_25k",       label:"$25,000",                        icon:"💰", rarity:"rare",      rarityLabel:"RARE",      weight:18,   apply:(gs)=>{gs.cash+=25000;} },
+            { id:"cash_50k",       label:"$50,000",                        icon:"💰", rarity:"rare",      rarityLabel:"RARE",      weight:12,   apply:(gs)=>{gs.cash+=50000;} },
+            { id:"xp_10k",         label:"10,000 XP",                      icon:"⭐", rarity:"rare",      rarityLabel:"RARE",      weight:15,   apply:(gs)=>{gs.xp+=10000;} },
+            { id:"tokens_15",      label:"15 Tokens",                      icon:"✈", rarity:"rare",      rarityLabel:"RARE",      weight:14,   apply:(gs)=>{gs.tokens+=15;} },
+            { id:"boost_30",       label:"2x Speed 30min",                 icon:"⚡", rarity:"rare",      rarityLabel:"RARE",      weight:10,   apply:(gs)=>{gs.speedBoostEndTime=Date.now()+30*60*1000;} },
+            { id:"crate_luck_2x",  label:"2x Crate Luck 30min",            icon:"🍀", rarity:"rare",      rarityLabel:"RARE",      weight:8,    apply:(gs)=>{gs.crateLuckMultiplier=mergeMultiplier(gs.crateLuckMultiplier,2);gs.crateLuckEndTime=extendBoostDuration(gs.crateLuckEndTime,30*60*1000);} },
+            { id:"crate_spawn_2x", label:"2x Crate Spawn 30min",           icon:"📦", rarity:"rare",      rarityLabel:"RARE",      weight:6,    apply:(gs)=>{ if(typeof spawnCrate==='function')spawnCrate(); const endTime=Date.now()+30*60*1000; gs._crateBoostEnd2x=endTime; if(window._nextCrateSpawnAt){const remaining=Math.max(0,window._nextCrateSpawnAt-Date.now());window._nextCrateSpawnAt=Date.now()+Math.round(remaining/2);} } },
+            { id:"atr_drop",       label:"ATR 72-600",                     icon:"🛫", rarity:"rare",      rarityLabel:"RARE",      weight:8,    apply:(gs)=>{gs.hangar["ATR 72-600"]=(gs.hangar["ATR 72-600"]||0)+1;} },
+            { id:"caproni_drop",   label:"Caproni Ca.60 Noviplano",        icon:"🛥️", rarity:"rare",      rarityLabel:"RARE",      weight:7,    apply:(gs)=>{gs.hangar["Caproni Ca.60 Noviplano"]=(gs.hangar["Caproni Ca.60 Noviplano"]||0)+1;} },
+            { id:"kalinin_drop",   label:"Kalinin K-7",                    icon:"🛩️", rarity:"rare",      rarityLabel:"RARE",      weight:6,    apply:(gs)=>{gs.hangar["Kalinin K-7"]=(gs.hangar["Kalinin K-7"]||0)+1;} },
+            { id:"ant20_drop",     label:"Tupolev ANT-20",                 icon:"✈", rarity:"rare",      rarityLabel:"RARE",      weight:6,    apply:(gs)=>{gs.hangar["Tupolev ANT-20"]=(gs.hangar["Tupolev ANT-20"]||0)+1;} },
+            { id:"vva14_drop",     label:"Bartini Beriev VVA-14",          icon:"🐢", rarity:"rare",      rarityLabel:"RARE",      weight:5,    apply:(gs)=>{gs.hangar["Bartini Beriev VVA-14"]=(gs.hangar["Bartini Beriev VVA-14"]||0)+1;} },
+            { id:"me323_drop",     label:"Messerschmitt Me 323 Gigant",    icon:"🛩️", rarity:"rare",      rarityLabel:"RARE",      weight:6,    apply:(gs)=>{gs.hangar["Messerschmitt Me 323 Gigant"]=(gs.hangar["Messerschmitt Me 323 Gigant"]||0)+1;} },
+            // ── EPIC ────────────────────────────────────────────────────────
+            { id:"cash_100k",      label:"$100,000",                       icon:"💎", rarity:"epic",      rarityLabel:"EPIC",      weight:5,    apply:(gs)=>{gs.cash+=100000;} },
+            { id:"cash_200k",      label:"$200,000",                       icon:"💎", rarity:"epic",      rarityLabel:"EPIC",      weight:3,    apply:(gs)=>{gs.cash+=200000;} },
+            { id:"tokens_50",      label:"50 Tokens",                      icon:"✈", rarity:"epic",      rarityLabel:"EPIC",      weight:4,    apply:(gs)=>{gs.tokens+=50;} },
+            { id:"boost_60",       label:"2x Speed 1hr",                   icon:"⚡", rarity:"epic",      rarityLabel:"EPIC",      weight:3,    apply:(gs)=>{gs.speedBoostEndTime=Date.now()+60*60*1000;} },
+            { id:"region_drop",    label:"Random Region!",                 icon:"🗺️", rarity:"epic",      rarityLabel:"EPIC",      weight:4,    apply:(gs)=>{unlockRandomRegion();} },
+            { id:"a350_drop",      label:"Airbus A350-900",                icon:"✈", rarity:"epic",      rarityLabel:"EPIC",      weight:3,    apply:(gs)=>{gs.hangar["Airbus A350-900"]=(gs.hangar["Airbus A350-900"]||0)+1;} },
+            { id:"milv12_drop",    label:"Mil V-12",                       icon:"🚁", rarity:"epic",      rarityLabel:"EPIC",      weight:2.5,  apply:(gs)=>{gs.hangar["Mil V-12"]=(gs.hangar["Mil V-12"]||0)+1;} },
+            { id:"orlyonok_drop",  label:"A-90 Orlyonok",                  icon:"🌊", rarity:"epic",      rarityLabel:"EPIC",      weight:2.5,  apply:(gs)=>{gs.hangar["A-90 Orlyonok"]=(gs.hangar["A-90 Orlyonok"]||0)+1;} },
+            { id:"rotodyne_drop",  label:"Fairey Rotodyne",                icon:"🚁", rarity:"epic",      rarityLabel:"EPIC",      weight:2,    apply:(gs)=>{gs.hangar["Fairey Rotodyne"]=(gs.hangar["Fairey Rotodyne"]||0)+1;} },
+            // ── LEGENDARY ───────────────────────────────────────────────────
+            { id:"cash_500k",      label:"$500,000",                       icon:"🏆", rarity:"legendary", rarityLabel:"LEGENDARY",  weight:1.5,  apply:(gs)=>{gs.cash+=500000;} },
+            { id:"tokens_150",     label:"150 Tokens",                     icon:"✈", rarity:"legendary", rarityLabel:"LEGENDARY",  weight:1.2,  apply:(gs)=>{gs.tokens+=150;} },
+            { id:"a380_drop",      label:"Airbus A380",                    icon:"🛫", rarity:"legendary", rarityLabel:"LEGENDARY",  weight:1,    apply:(gs)=>{gs.hangar["Airbus A380"]=(gs.hangar["Airbus A380"]||0)+1;} },
+            { id:"wright_drop",    label:"Wright Flyer",                   icon:"🛸", rarity:"legendary", rarityLabel:"LEGENDARY",  weight:0.8,  apply:(gs)=>{gs.hangar["Wright Flyer"]=(gs.hangar["Wright Flyer"]||0)+1;} },
+            { id:"crate_luck_4x",  label:"4x Crate Luck 30min",            icon:"🍀", rarity:"legendary", rarityLabel:"LEGENDARY",  weight:1.5,  apply:(gs)=>{gs.crateLuckMultiplier=mergeMultiplier(gs.crateLuckMultiplier,4);gs.crateLuckEndTime=extendBoostDuration(gs.crateLuckEndTime,30*60*1000);} },
+            { id:"crate_spawn_4x", label:"4x Crate Spawn 30min",           icon:"📦", rarity:"legendary", rarityLabel:"LEGENDARY",  weight:1.5,  apply:(gs)=>{ if(typeof spawnCrate==='function')spawnCrate(); const endTime=Date.now()+30*60*1000; gs._crateBoostEnd4x=endTime; if(window._nextCrateSpawnAt){const remaining=Math.max(0,window._nextCrateSpawnAt-Date.now());window._nextCrateSpawnAt=Date.now()+Math.round(remaining/4);} } },
+            { id:"lun_drop",       label:"Lun-Class Ekranoplan",           icon:"⚓", rarity:"legendary", rarityLabel:"LEGENDARY",  weight:0.8,  apply:(gs)=>{gs.hangar["Lun-Class Ekranoplan"]=(gs.hangar["Lun-Class Ekranoplan"]||0)+1;} },
+            { id:"h4_drop",        label:"Hughes H-4 Hercules",            icon:"🛥️", rarity:"legendary", rarityLabel:"LEGENDARY",  weight:0.7,  apply:(gs)=>{gs.hangar["Hughes H-4 Hercules"]=(gs.hangar["Hughes H-4 Hercules"]||0)+1;} },
+            { id:"pelican_drop",   label:"Boeing Pelican ULTRA",           icon:"🦅", rarity:"legendary", rarityLabel:"LEGENDARY",  weight:0.5,  apply:(gs)=>{gs.hangar["Boeing Pelican ULTRA"]=(gs.hangar["Boeing Pelican ULTRA"]||0)+1;} },
+            // ── MYTHIC ──────────────────────────────────────────────────────
+            { id:"sr71_drop",      label:"Lockheed SR-71 Blackbird",       icon:"🔥", rarity:"mythic",    rarityLabel:"MYTHIC",     weight:0.3,  apply:(gs)=>{gs.hangar["Lockheed SR-71 Blackbird"]=(gs.hangar["Lockheed SR-71 Blackbird"]||0)+1;} },
+            { id:"sr72_drop",      label:"Lockheed Martin SR-72",          icon:"🔥", rarity:"mythic",    rarityLabel:"MYTHIC",     weight:0.15, apply:(gs)=>{gs.hangar["Lockheed Martin SR-72"]=(gs.hangar["Lockheed Martin SR-72"]||0)+1;} },
+            { id:"strato_drop",    label:"Scaled Composites Stratolaunch", icon:"🔥", rarity:"mythic",    rarityLabel:"MYTHIC",     weight:0.2,  apply:(gs)=>{gs.hangar["Scaled Composites Model 351 Stratolaunch"]=(gs.hangar["Scaled Composites Model 351 Stratolaunch"]||0)+1;} },
+            // ── EXOTIC ──────────────────────────────────────────────────────
+            { id:"flyingv_drop",   label:"Flying-V",                       icon:"🌈", rarity:"exotic",    rarityLabel:"EXOTIC",     weight:0.05, apply:(gs)=>{gs.hangar["Flying-V"]=(gs.hangar["Flying-V"]||0)+1;} },
         ];
  
         function unlockSecretAchievement(id) {
@@ -3184,7 +3291,7 @@ container.innerHTML += `
 
         function weightedRandomPrize() {
             const luck = getEffectiveCrateLuckMultiplier();
-            const boostedRarities = ["rare", "epic", "legendary", "mythic"];
+            const boostedRarities = ["rare", "epic", "legendary", "mythic", "exotic"];
             const totalWeight = reelPrizes.reduce((s, p) => s + ((boostedRarities.includes(p.rarity) ? p.weight * luck : p.weight)), 0);
             let r = Math.random() * totalWeight;
             for (const prize of reelPrizes) {
@@ -3266,9 +3373,9 @@ container.innerHTML += `
         function closeReelModal() {
             const modal = document.getElementById('reel-modal');
             modal.style.display = 'none';
-            modal.classList.remove('mythic-bg','legendary-bg','epic-bg');
+            modal.classList.remove('mythic-bg','legendary-bg','epic-bg','exotic-bg');
             const box = modal.querySelector('.reel-box');
-            if (box) { box.classList.remove('reel-box-shake'); const p=box.querySelector('.mythic-particles'); if(p)p.remove(); }
+            if (box) { box.classList.remove('reel-box-shake','reel-box-shake-exotic'); const p=box.querySelector('.mythic-particles'); if(p)p.remove(); const ep=box.querySelector('.exotic-particles'); if(ep)ep.remove(); }
             if (reelInterval) clearInterval(reelInterval);
             reelSpinning = false;
         }
@@ -3276,11 +3383,11 @@ container.innerHTML += `
         function buildReelTrack(items) {
             const track = document.getElementById('reel-track');
             track.innerHTML = '';
-            const rarityColors = { common:'#94a3b8', uncommon:'#10b981', rare:'#06b6d4', epic:'#a855f7', legendary:'#eab308', mythic:'#ef4444' };
+            const rarityColors = { common:'#94a3b8', uncommon:'#10b981', rare:'#06b6d4', epic:'#a855f7', legendary:'#eab308', mythic:'#ef4444', exotic:'#00d4ff' };
             items.forEach(p => {
                 const div = document.createElement('div');
-                div.className = 'reel-item';
-                div.style.color = rarityColors[p.rarity] || '#fff';
+                div.className = p.rarity === 'exotic' ? 'reel-item reel-text-rainbow' : 'reel-item';
+                if (p.rarity !== 'exotic') div.style.color = rarityColors[p.rarity] || '#fff';
                 div.innerHTML = `<span class="reel-icon">${p.icon}</span><span>${p.label}</span>`;
                 track.appendChild(div);
             });
@@ -3326,20 +3433,39 @@ container.innerHTML += `
         }
  
         function showReelResult(prize) {
-            const rarityColors = { common:'#94a3b8', uncommon:'#10b981', rare:'#06b6d4', epic:'#a855f7', legendary:'#eab308', mythic:'#ef4444' };
+            const rarityColors = { common:'#94a3b8', uncommon:'#10b981', rare:'#06b6d4', epic:'#a855f7', legendary:'#eab308', mythic:'#ef4444', exotic:'#00d4ff' };
             const color = rarityColors[prize.rarity] || '#fff';
             const modal = document.getElementById('reel-modal');
             const box   = modal.querySelector('.reel-box');
  
             // Reset modal classes
-            modal.classList.remove('mythic-bg','legendary-bg','epic-bg');
-            box.classList.remove('reel-box-shake');
+            modal.classList.remove('mythic-bg','legendary-bg','epic-bg','exotic-bg');
+            box.classList.remove('reel-box-shake','reel-box-shake-exotic');
             // Remove old particles
             const oldP = box.querySelector('.mythic-particles');
             if (oldP) oldP.remove();
+            const oldEP = box.querySelector('.exotic-particles');
+            if (oldEP) oldEP.remove();
  
             // Rarity-specific modal effects
-            if (prize.rarity === 'mythic') {
+            if (prize.rarity === 'exotic') {
+                modal.classList.add('exotic-bg');
+                setTimeout(() => box.classList.add('reel-box-shake-exotic'), 200);
+                const particles = document.createElement('div');
+                particles.className = 'exotic-particles';
+                const emojis = ['🌈','⚡','💫','✨','🔥','💎','🌟','⭐','💥','🛸'];
+                for (let i = 0; i < 32; i++) {
+                    const p = document.createElement('span');
+                    p.className = 'exotic-particle';
+                    p.innerText = emojis[Math.floor(Math.random()*emojis.length)];
+                    p.style.left  = (Math.random()*90+5)+'%';
+                    p.style.top   = (Math.random()*80+10)+'%';
+                    p.style.animationDelay = (Math.random()*0.9)+'s';
+                    p.style.fontSize = (14+Math.random()*22)+'px';
+                    particles.appendChild(p);
+                }
+                box.appendChild(particles);
+            } else if (prize.rarity === 'mythic') {
                 modal.classList.add('mythic-bg');
                 setTimeout(() => box.classList.add('reel-box-shake'), 200);
                 // Spawn particles
@@ -3368,9 +3494,10 @@ container.innerHTML += `
             const revealClass = `rarity-reveal-${prize.rarity}`;
             resultDiv.innerHTML = `
                 <div class="${revealClass}" style="display:flex;flex-direction:column;align-items:center;gap:5px;">
-                    <div style="font-size:${prize.rarity==='mythic'?52:prize.rarity==='legendary'?44:34}px;margin-bottom:3px;filter:${prize.rarity==='mythic'?'drop-shadow(0 0 12px #ef4444)':prize.rarity==='legendary'?'drop-shadow(0 0 10px #eab308)':'none'};">${prize.icon}</div>
-                    <div style="font-size:${prize.rarity==='mythic'?20:prize.rarity==='legendary'?18:16}px;font-weight:bold;color:${color};">${prize.label}</div>
+                    <div style="font-size:${prize.rarity==='exotic'?68:prize.rarity==='mythic'?52:prize.rarity==='legendary'?44:34}px;margin-bottom:3px;filter:${prize.rarity==='exotic'?'drop-shadow(0 0 20px #00d4ff) drop-shadow(0 0 34px #ff0080)':prize.rarity==='mythic'?'drop-shadow(0 0 12px #ef4444)':prize.rarity==='legendary'?'drop-shadow(0 0 10px #eab308)':'none'};">${prize.icon}</div>
+                    <div class="${prize.rarity==='exotic'?'reel-text-rainbow':''}" style="font-size:${prize.rarity==='exotic'?24:prize.rarity==='mythic'?20:prize.rarity==='legendary'?18:16}px;font-weight:bold;${prize.rarity==='exotic'?'':`color:${color};`}">${prize.label}</div>
                     <span class="rarity-badge rarity-${prize.rarity}">${prize.rarityLabel}</span>
+                    ${prize.rarity==='exotic'   ? '<div class="reel-text-rainbow" style="font-size:13px;margin-top:4px;font-weight:900;letter-spacing:3px;text-transform:uppercase;">✦✦✦ BEYOND MYTHIC ✦✦✦</div>' : ''}
                     ${prize.rarity==='mythic'   ? '<div style="font-size:11px;color:#ef4444;margin-top:4px;font-weight:bold;letter-spacing:2px;text-transform:uppercase;">⚡ UNBELIEVABLE PULL ⚡</div>' : ''}
                     ${prize.rarity==='legendary'? '<div style="font-size:11px;color:#eab308;margin-top:4px;font-weight:bold;letter-spacing:1px;text-transform:uppercase;">★ LEGENDARY FIND ★</div>' : ''}
                     ${prize.rarity==='epic'     ? '<div style="font-size:11px;color:#a855f7;margin-top:4px;font-weight:bold;">✦ Epic Drop ✦</div>' : ''}
@@ -3410,6 +3537,15 @@ if (rarityData && !achievements[rarityData.id].unlocked) {
     triggerMilestonePopupNotification(
         achievements[rarityData.id].title,
         achievements[rarityData.id].rewardDesc
+    );
+}
+
+if (prize.rarity === 'exotic' && !achievements['hidden_exotic'].unlocked) {
+    achievements['hidden_exotic'].unlocked = true;
+    gameState.tokens += 200;
+    triggerMilestonePopupNotification(
+        achievements['hidden_exotic'].revealTitle,
+        achievements['hidden_exotic'].revealDesc
     );
 }
  
@@ -4683,7 +4819,7 @@ const hub =
 
         function openSpecialContractModal(contract) {
             if (!contract) return;
-            const rarityColors = { common: '#94a3b8', uncommon: '#10b981', rare: '#06b6d4', epic: '#a855f7', legendary: '#eab308', mythic: '#ef4444' };
+            const rarityColors = { common: '#94a3b8', uncommon: '#10b981', rare: '#06b6d4', epic: '#a855f7', legendary: '#eab308', mythic: '#ef4444', exotic: '#00d4ff' };
             const rarity = contract.rarity || 'common';
             const rarityEl = document.getElementById('contract-rarity');
             rarityEl.innerText = (rarity || 'STANDARD').toUpperCase();
@@ -5015,6 +5151,14 @@ const hub =
                             htmlContent = `<img src="${CONCORDE_ICON_B64}" style="${imgStyle}">`;
                         } else if (f.type === "Boeing 727-200") {
                             htmlContent = `<img src="${WHISPERJET_ICON_B64}" style="${imgStyle}">`;
+                        } else if (f.type === "Boeing 717") {
+                            htmlContent = `<img src="${WHISPERJET_ICON_B64}" style="${imgStyle}">`;
+                        } else if (f.type === "McDonnell Douglas DC-9") {
+                            htmlContent = `<img src="${WHISPERJET_ICON_B64}" style="${imgStyle}">`;
+                        } else if (f.type === "McDonnell Douglas MD-90") {
+                            htmlContent = `<img src="${WHISPERJET_ICON_B64}" style="${imgStyle}">`;
+                        } else if (f.type === "McDonnell Douglas MD-80") {
+                            htmlContent = `<img src="${WHISPERJET_ICON_B64}" style="${imgStyle}">`;
                         } else if (f.type === "Bell 407 Helicopter") {
                             htmlContent = `<img src="${HELICOPTER_ICON_B64}" style="${imgStyle}">`;
                         } else if (f.type === "Mil V-12") {
@@ -5022,6 +5166,14 @@ const hub =
                         } else if (f.type === "Sikorsky S-64 Skycrane") {
                             htmlContent = `<img src="${HELICOPTER_ICON_B64}" style="${imgStyle}">`;
                         } else if (f.type === "Kaman K-MAX") {
+                            htmlContent = `<img src="${HELICOPTER_ICON_B64}" style="${imgStyle}">`;
+                        } else if (f.type === "Airbus Helicopters H135") {
+                            htmlContent = `<img src="${HELICOPTER_ICON_B64}" style="${imgStyle}">`;
+                        } else if (f.type === "Airbus Helicopters EC160") {
+                            htmlContent = `<img src="${HELICOPTER_ICON_B64}" style="${imgStyle}">`;
+                        } else if (f.type === "Boeing-Vertol H-47 Chinook") {
+                            htmlContent = `<img src="${HELICOPTER_ICON_B64}" style="${imgStyle}">`;
+                        } else if (f.type === "Mil Mi-6") {
                             htmlContent = `<img src="${HELICOPTER_ICON_B64}" style="${imgStyle}">`;
                         } else if (f.type === "McDonnell Douglas DC-10") {
                             htmlContent = `<img src="${COFFIN_ICON_B64}" style="${imgStyle}">`;
@@ -5032,6 +5184,8 @@ const hub =
                         } else if (f.type === "Boeing 747-8" && route.contractLabel && route.contractLabel.includes('5th Engine')) {
                             htmlContent = `<img src="${FIFTH_ENGINE_ICON_B64}" style="${imgStyle}">`;
                         } else if (f.type === "Boeing 747-8") {
+                            htmlContent = `<img src="${KING_ICON_B64}" style="${imgStyle}">`;
+                        } else if (f.type === "Boeing 747-4") {
                             htmlContent = `<img src="${KING_ICON_B64}" style="${imgStyle}">`;
                         } else if (f.type === "Antonov An-124 Ruslan") {
                             htmlContent = `<img src="${KING_ICON_B64}" style="${imgStyle}">`;
@@ -5069,10 +5223,20 @@ const hub =
                             htmlContent = `<img src="${SAAB_ICON_B64}" style="${imgStyle}">`;
                         } else if (f.type === "ATR 72-600") {
                             htmlContent = `<img src="${SAAB_ICON_B64}" style="${imgStyle}">`;
-                        } else if (f.type === "Bombardier Q400") {
+                        } else if (f.type === "Beechcraft 1900") {
+                            htmlContent = `<img src="${SAAB_ICON_B64}" style="${imgStyle}">`;
+                        } else if (f.type === "Beechcraft 1900") {
+                            htmlContent = `<img src="${SAAB_ICON_B64}" style="${imgStyle}">`;
+                        } else if (f.type === "Beechcraft King Air") {
                             htmlContent = `<img src="${Q400_ICON_B64}" style="${imgStyle}">`;
                         } else if (f.type === "Avro Canada VZ-9 Avrocar") {
                             htmlContent = `<img src="${AVROCAR_ICON_B64}" style="${imgStyle}">`;
+                        } else if (f.type === "Antonov An-2") {
+                            htmlContent = `<img src="${AN2_ICON_B64}" style="${imgStyle}">`;
+                        } else if (f.type === "Flying-V") {
+                            htmlContent = `<img src="${FLYINGV_ICON_B64}" style="${imgStyle}">`;
+                        } else if (f.type === "Short 360") {
+                            htmlContent = `<img src="${SHORT360_ICON_B64}" style="${imgStyle}">`;
                         } else {
                             let glyph = isHeli ? `<img src="${HELICOPTER_ICON_B64}` : (isCargo ? '✈' : '✈');
                             let color = isHeli ? '#c084fc' : (isCargo ? '#f97316' : '#eab308');
@@ -5415,6 +5579,7 @@ triggerMilestonePopupNotification(`🛫 Route Opened`, `${orig.split(' (')[0]} �
     "Boeing 707":                               8000,   // Early jetliner
  
     // ===== SECRET AIRCRAFT =====
+    "Flying-V":                                 6900,   // Sized to match a standard civilian airliner
     "Lun-Class Ekranoplan":                     0,      // Ground effect vehicle - uses water surface
     "Lockheed SR-71 Blackbird":                 8000,   // Long takeoff run at high fuel weight
     "Hughes H-4 Hercules":                      0,      // Flying boat - uses water, no runway
@@ -5427,6 +5592,54 @@ triggerMilestonePopupNotification(`🛫 Route Opened`, `${orig.split(' (')[0]} �
     "A-90 Orlyonok":                            0,      // Ekranoplan - uses water surface
     "Bartini Beriev VVA-14":                    0,      // Amphibious WIG craft - uses water
     "Cessna 172 Skyhawk":                       1000,   // Classic GA trainer, short-field capable
+
+    // ===== ADDITIONAL PASSENGER AIRCRAFT =====
+    "Airbus Helicopters H135":          0,      // Helicopter - no runway needed
+    "Airbus Helicopters EC160":         0,      // Helicopter - no runway needed
+    "Mil Mi-6":                         0,      // Helicopter - no runway needed
+    "Boeing-Vertol H-47 Chinook":       0,      // Helicopter - no runway needed
+    "Beechcraft King Air":              3500,   // Short-field turboprop
+    "Beechcraft 1900":                  4100,   // Commuter turboprop
+    "Short 360":                        4200,   // Short commuter turboprop
+    "Antonov An-2":                     1000,   // Legendary STOL biplane
+    "Boeing 717":                       5800,   // Regional jet
+    "Airbus A318":                      5000,   // Shortest A320 family, steep-approach capable
+    "Airbus A319":                      6100,   // Short A320 family
+    "Boeing 737-700":                   6300,   // Next-gen narrowbody
+    "Boeing 737 MAX 8":                 6900,   // Same class as 737-800
+    "Airbus A330":                      9500,   // Widebody
+    "Airbus A340":                      10200,  // Quadjet widebody, heavier than A330
+    "Boeing 747-400":                   11000,  // Classic jumbo
+    // ===== ADDITIONAL CARGO AIRCRAFT =====
+    "Antonov An-12":                    5000,   // Soviet tactical airlifter, rough-strip capable
+    "Lockheed C-130 Hercules":          3600,   // STOL military transport
+    "Boeing C-17 Globemaster III":      3500,   // Short-field military transport
+    "Lockheed C-5 Galaxy":              8000,   // Heavy strategic airlifter
+    "Airbus Beluga":                    9500,   // Modified A300, same runway as A300
+    "Airbus BelugaXL":                  11000,  // Modified A330, heavier than Beluga ST
+    // ===== ADDITIONAL LEGACY AIRCRAFT =====
+    "Ford Trimotor":                    1500,   // Short-field pioneer airliner
+    "Boeing C-75 Stratoliner":          5000,   // First pressurized airliner
+    "Boeing 377 Stratocruiser":         6000,   // Post-war piston double-bubble
+    "Lockheed Constellation":           6500,   // Triple-tail legend
+    "Dornier Do X":                     0,      // Flying boat - water only
+    "Consolidated PBY Catalina":        0,      // Flying boat/amphibian - water only
+    "Boeing 737-100":                   5500,   // Early 737 original
+    "Boeing 737-200":                   5200,   // Slightly improved original
+    "Boeing 737-300":                   6000,   // Classic 737 second gen
+    "McDonnell Douglas DC-9":           6500,   // Classic twin-jet
+    "McDonnell Douglas MD-80":          7500,   // DC-9 stretch family
+    "McDonnell Douglas MD-90":          7800,   // IAE-engined MD-80 evolution
+    "Douglas DC-8":                     9000,   // First Douglas jetliner
+    "Tupolev Tu-154":                   8200,   // Soviet trijet
+    "Lockheed L-1011 TriStar":          9500,   // Trijet widebody
+    "Convair XC-99":                    8000,   // Heavy military transport
+    // ===== ADDITIONAL SECRET AIRCRAFT =====
+    "Boeing Pelican ULTRA":             8000,   // Ground-effect/conventional capable
+    "Caproni Ca.60 Noviplano":          0,      // Flying boat - water only (crashed on first flight)
+    "Kalinin K-7":                      3000,   // Giant Soviet experimental
+    "Tupolev ANT-20":                   4000,   // Maxim Gorky propaganda plane
+    "Fairey Rotodyne":                  0,      // VTOL gyrodyne - no runway needed
     "Avro Canada VZ-9 Avrocar":                 0,      // Saucer-shaped VTOL - no runway needed
 };
         function assignAircraftToRoute(routeId, type) {
@@ -5442,6 +5655,14 @@ if (requiredRunway) {
         (destAp.runwayLength || 0) < requiredRunway
     ) {
         alert(`${type} requires a longer runway.`);
+        return;
+    }
+}
+// Flying boats and water-only aircraft require coastal airports at both ends
+const allCraftsForCheck = { ...aircraftCatalog, ...cargoCatalog, ...legacyAircraftCatalog, ...secretCatalog };
+if (allCraftsForCheck[type] && allCraftsForCheck[type].waterOnly) {
+    if (!origAp.isCoastal || !destAp.isCoastal) {
+        alert(`${type} is a flying boat or ekranoplan and can only operate between coastal airports.`);
         return;
     }
 }
@@ -6231,6 +6452,7 @@ if (requiredRunway) {
             document.getElementById('market-modal-stats').innerHTML = `
                 <div class="flex-row"><span>Unlock Req:</span><span style="color:${gameState.rank>=spec.minRank?'var(--money-color)':'#ef4444'};font-weight:bold;">Rank ${spec.minRank}</span></div>
                 <div class="flex-row"><span>Req Runway Length:</span><span>${formatRunwayLength(runwayRequirements[spec.name] || 0) || '0 ft'}</span></div>
+                ${spec.waterOnly ? `<div class="flex-row"><span>Restriction:</span><span style="color:#38bdf8;font-weight:bold;">🌊 Coastal Airports Only</span></div>` : ''}
                 <div class="flex-row"><span>${unitLabel.split(':')[0]}:</span><span style="color:var(--text-color);font-weight:bold;">${unitLabel.split(': ')[1]}</span></div>
                 <div class="flex-row"><span>Range:</span><span>${convertDistance(spec.rangeNM)}</span></div>
                 <div class="flex-row"><span>Speed:</span><span style="color:var(--token-color);font-weight:bold;">${convertSpeed(spec.topSpeedKnots)}</span></div>
@@ -6251,7 +6473,7 @@ if (requiredRunway) {
 </div>
                 ${spec.isCargo ? `<div style="font-size:10px;color:var(--cargo-color);margin-top:6px;font-weight:bold;">📦 CARGO: Earns per KG per NM — high value routes!</div>` : ''}
                 ${spec.type === 'legacy-plane' ? `<div style="font-size:10px;color:#a855f7;margin-top:6px;font-weight:bold;">🕰️ LEGACY: Iconic retired airliner!</div>` : ''}
-                ${spec.rarity ? (() => { const rColors = { mythic:'#ef4444', legendary:'#eab308', epic:'#a855f7', rare:'#06b6d4', uncommon:'#10b981', common:'#94a3b8' }; return `<div style="margin-top:6px;"><span class="rarity-tag rarity-${spec.rarity}">${spec.rarity.toUpperCase()}</span> <span style="font-size:10px;color:${rColors[spec.rarity]};">Secret aircraft — crate drop only</span></div>`; })() : ''}`;
+                ${spec.rarity ? (() => { const rColors = { mythic:'#ef4444', legendary:'#eab308', epic:'#a855f7', rare:'#06b6d4', uncommon:'#10b981', common:'#94a3b8', exotic:'#00d4ff' }; return `<div style="margin-top:6px;"><span class="rarity-tag rarity-${spec.rarity}">${spec.rarity.toUpperCase()}</span> <span style="font-size:10px;color:${rColors[spec.rarity]};">Secret aircraft — crate drop only</span></div>`; })() : ''}`;
             document.getElementById('market-modal-qty').value = 1;
             const btn = document.getElementById('market-modal-buy-btn');
             if (gameState.rank < spec.minRank) { btn.disabled = true; btn.innerText = "Rank Too Low"; }
@@ -6558,6 +6780,9 @@ if (requiredRunway) {
             ? `<img src="${r.flag}" style="width:18px;height:14px;border-radius:2px;object-fit:cover;vertical-align:middle;margin-right:4px;">`
             : `<span style="margin-right:4px;">${r.flag}</span>`;
 
+        // Strip trailing country code suffix like " (US)", " (AU)" from the display name
+        const regionDisplayName = key.replace(/\s*\([A-Z]{2,3}\)\s*$/, '').trim();
+
         const regionConnected = r.airports.filter(ap => routedSet.has(ap.name)).length;
         const regionTotal     = r.airports.length;
         const regionPct       = Math.round((regionConnected / regionTotal) * 100);
@@ -6591,7 +6816,7 @@ if (requiredRunway) {
         html += `<div class="card" style="margin-bottom:8px;padding:10px;">
             <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:6px;">
                 <div style="display:flex;align-items:center;gap:4px;font-size:13px;font-weight:bold;">
-                    ${flagHtml}<span>${r.nation}</span>
+                    ${flagHtml}<span>${regionDisplayName}</span><span style="font-size:10px;color:#64748b;font-weight:400;margin-left:2px;">| ${r.nation}</span>
                     ${hubsInRegion.length ? `<span style="font-size:10px;color:#eab308;margin-left:4px;">🏢×${hubsInRegion.length}</span>` : ''}
                 </div>
                 <div style="font-size:10px;color:#64748b;text-align:right;">
@@ -6919,7 +7144,7 @@ if (!achievements.route_it_ns.unlocked && routeExists("Bolzano Airport", "Lamped
 
             // Secret Collector: own all 7 secret aircraft
             if (!achievements.secret_collector.unlocked) {
-                const secretNames = ["Avro Canada VZ-9 Avrocar","Lockheed SR-71 Blackbird","Lockheed Martin SR-72","Scaled Composites Model 351 Stratolaunch","Kaman K-MAX","Mil V-12","Sikorsky Skycrane"];
+                const secretNames = ["Avro Canada VZ-9 Avrocar","Lockheed SR-71 Blackbird","Lockheed Martin SR-72","Scaled Composites Model 351 Stratolaunch","Kaman K-MAX","Mil V-12","Lun-Class Ekranoplan","Messerschmitt Me 323 Gigant","Wright Flyer","A-90 Orlyonok","Bartini Beriev VVA-14","Cessna 172 Skyhawk","Boeing Pelican ULTRA","Caproni Ca.60 Noviplano","Kalinin K-7","Tupolev ANT-20","Fairey Rotodyne"];
                 const owned2 = new Set(Object.keys(gameState.hangar).filter(k => gameState.hangar[k] > 0));
                 gameState.routes.forEach(r => { if (r.fleet) r.fleet.forEach(f => owned2.add(f.type)); });
                 if (secretNames.every(n => owned2.has(n))) {
@@ -6960,6 +7185,71 @@ if (!achievements.route_it_ns.unlocked && routeExists("Bolzano Airport", "Lamped
                     gameState.cash += 10000000; gameState.tokens += 5000;
                     triggerMilestonePopupNotification(achievements.hub_every_airport.title, achievements.hub_every_airport.rewardDesc);
                 }
+            }
+
+            // ── Additional achievements ──────────────────────────────
+
+            const allCraftsSpecs = { ...aircraftCatalog, ...cargoCatalog, ...legacyAircraftCatalog, ...secretCatalog };
+            const ownedTypes = new Set(Object.keys(gameState.hangar).filter(k => gameState.hangar[k] > 0));
+            gameState.routes.forEach(r => { if (r.fleet) r.fleet.forEach(f => ownedTypes.add(f.type)); });
+
+            let ownedTotal = 0;
+            const helicopterCounts = {};
+            for (const [type, count] of Object.entries(gameState.hangar)) {
+                ownedTotal += count;
+                if (allCraftsSpecs[type]?.type === 'helicopter') helicopterCounts[type] = (helicopterCounts[type] || 0) + count;
+            }
+            gameState.routes.forEach(r => { if (r.fleet) r.fleet.forEach(f => {
+                ownedTotal++;
+                if (allCraftsSpecs[f.type]?.type === 'helicopter') helicopterCounts[f.type] = (helicopterCounts[f.type] || 0) + 1;
+            }); });
+            const totalHelicopters = Object.values(helicopterCounts).reduce((s, c) => s + c, 0);
+
+            // Fleet Titan: own 500+ aircraft simultaneously
+            if (!achievements.fleet_titan.unlocked && ownedTotal >= 500) {
+                achievements.fleet_titan.unlocked = true; gameState.cash += 5000000; gameState.tokens += 750;
+                triggerMilestonePopupNotification(achievements.fleet_titan.title, achievements.fleet_titan.rewardDesc);
+            }
+
+            // Trillionaire: cash treasury exceeds $1,000,000,000,000
+            if (!achievements.trillionaire.unlocked && gameState.cash >= 1000000000000) {
+                achievements.trillionaire.unlocked = true; gameState.tokens += 5000;
+                triggerMilestonePopupNotification(achievements.trillionaire.title, achievements.trillionaire.rewardDesc);
+            }
+
+            // Jack of All Trades: own a passenger, a cargo, and a legacy aircraft at the same time
+            if (!achievements.jack_of_all_trades.unlocked) {
+                const hasPassenger = [...ownedTypes].some(t => aircraftCatalog[t]);
+                const hasCargo = [...ownedTypes].some(t => cargoCatalog[t]);
+                const hasLegacy = [...ownedTypes].some(t => legacyAircraftCatalog[t]);
+                if (hasPassenger && hasCargo && hasLegacy) {
+                    achievements.jack_of_all_trades.unlocked = true; gameState.cash += 150000; gameState.tokens += 40;
+                    triggerMilestonePopupNotification(achievements.jack_of_all_trades.title, achievements.jack_of_all_trades.rewardDesc);
+                }
+            }
+
+            // Speed Demon: own an aircraft with a top speed of 900+ knots
+            if (!achievements.speed_demon.unlocked) {
+                const hasSupersonic = [...ownedTypes].some(t => (allCraftsSpecs[t]?.topSpeedKnots || 0) >= 900);
+                if (hasSupersonic) {
+                    achievements.speed_demon.unlocked = true; gameState.cash += 200000; gameState.tokens += 50;
+                    triggerMilestonePopupNotification(achievements.speed_demon.title, achievements.speed_demon.rewardDesc);
+                }
+            }
+
+            // Making a Splash: own an aircraft that can only operate from water
+            if (!achievements.making_a_splash.unlocked) {
+                const hasWaterOnly = [...ownedTypes].some(t => allCraftsSpecs[t]?.waterOnly);
+                if (hasWaterOnly) {
+                    achievements.making_a_splash.unlocked = true; gameState.cash += 100000; gameState.tokens += 30;
+                    triggerMilestonePopupNotification(achievements.making_a_splash.title, achievements.making_a_splash.rewardDesc);
+                }
+            }
+
+            // Helicopter Squadron: 5+ helicopters owned/assigned simultaneously
+            if (!achievements.helicopter_squadron.unlocked && totalHelicopters >= 5) {
+                achievements.helicopter_squadron.unlocked = true; gameState.cash += 75000; gameState.tokens += 25;
+                triggerMilestonePopupNotification(achievements.helicopter_squadron.title, achievements.helicopter_squadron.rewardDesc);
             }
         }
  
@@ -7221,8 +7511,8 @@ if (groundAllBtn) {
                     const rarityOf = type => {
                         const allForSort = { ...aircraftCatalog, ...cargoCatalog, ...legacyAircraftCatalog, ...secretCatalog };
                         const r = allForSort[type]?.rarity;
-                        // Order: Mythic=6, Legendary=5, Epic=4, Rare=3, Uncommon=2, Common=1, unrated=0
-                        const map = { mythic:6, legendary:5, epic:4, rare:3, uncommon:2, common:1 };
+                        // Order: Exotic=7, Mythic=6, Legendary=5, Epic=4, Rare=3, Uncommon=2, Common=1, unrated=0
+                        const map = { exotic:7, mythic:6, legendary:5, epic:4, rare:3, uncommon:2, common:1 };
                         if (r) return map[r.toLowerCase()] ?? 0;
                         // Fallback for aircraft without explicit rarity field
                         if (type === 'Airbus A380' || type === 'Boeing 747-8') return 5;
@@ -7269,11 +7559,12 @@ if (groundAllBtn) {
                     type === 'ATR 72-600' ? 'rare' :
                     type === 'Cessna 208 Caravan' ? 'uncommon' : null
                 );
-                const rarityLabels = { mythic: 'MYTHIC', legendary: 'LEGENDARY', epic: 'EPIC', rare: 'RARE', uncommon: 'UNCOMMON', common: 'COMMON' };
+                const rarityLabels = { exotic: 'EXOTIC', mythic: 'MYTHIC', legendary: 'LEGENDARY', epic: 'EPIC', rare: 'RARE', uncommon: 'UNCOMMON', common: 'COMMON' };
                 const rarityTag = craftRarity ? `<span class="rarity-tag rarity-${craftRarity}">${rarityLabels[craftRarity]}</span>` : '';
                 if (isCargo) btn.style.borderColor = 'var(--cargo-color)';
                 if (categoryColor) btn.style.boxShadow = `0 0 0 1px ${categoryColor}33`;
                 btn.innerHTML = `
+                    ${spec.isNew ? `<div class="new-badge">★ NEW</div>` : ''}
                     <div class="aircraft-img" style="background-image:url('${spec.img}')"></div>
                     <div style="display:flex;align-items:center;justify-content:center;gap:6px;flex-wrap:wrap;"><div class="label">${type}</div>${rarityTag}</div>
                     <div class="sub-label" style="color:${categoryColor || '#94a3b8'};">${routeInfo || (data.flight > 0 ? 'In flight' : 'Idle in hangar')}</div>
@@ -7296,6 +7587,7 @@ if (groundAllBtn) {
                 if (gameState.rank < plane.minRank) item.classList.add('locked');
                 item.onclick = () => openMarketModal(id, false, 'passenger');
                 item.innerHTML = `
+                    ${plane.isNew ? `<div class="new-badge">★ NEW</div>` : ''}
                     <div class="market-item-img" style="background-image:url('${plane.img}')"></div>
                     <div style="font-size:12px;font-weight:bold;margin-bottom:4px;">${plane.name}</div>
                     <div style="font-size:11px;color:${gameState.cash>=getInflatedPrice(plane.price)?'var(--money-color)':'#ef4444'};">$${getInflatedPrice(plane.price).toLocaleString()}</div>
@@ -7316,6 +7608,7 @@ if (groundAllBtn) {
                     if (gameState.rank < plane.minRank) item.classList.add('locked');
                     item.onclick = () => openMarketModal(id, false, 'cargo');
                     item.innerHTML = `
+                        ${plane.isNew ? `<div class="new-badge">★ NEW</div>` : ''}
                         <div class="market-item-img" style="background-image:url('${plane.img}')"></div>
                         <div style="font-size:11px;font-weight:bold;margin-bottom:2px;color:var(--cargo-color);">📦 ${plane.name}</div>
                         <div style="font-size:10px;color:#94a3b8;margin-bottom:3px;">${plane.cargo?.toLocaleString()}kg</div>
@@ -7338,6 +7631,7 @@ if (groundAllBtn) {
                     item.style.borderColor = '#a855f7';
                     item.onclick = () => openMarketModal(id, false, 'legacy');
                     item.innerHTML = `
+                        ${plane.isNew ? `<div class="new-badge">★ NEW</div>` : ''}
                         <div class="market-item-img" style="background-image:url('${plane.img}')"></div>
                         <div style="font-size:11px;font-weight:bold;margin-bottom:2px;color:#a855f7;">🕰️ ${plane.name}</div>
                         <div style="font-size:10px;color:#94a3b8;margin-bottom:3px;">${plane.pax} Seats</div>
@@ -7356,7 +7650,7 @@ if (groundAllBtn) {
             const unlockedCount = Object.values(achievements).filter(a => a.unlocked).length;
             const totalCount = Object.keys(achievements).length;
             const achPercent = Math.round((unlockedCount / totalCount) * 100);
-            const rarityOrder = { Mythic: 0, Legendary: 1, Epic: 2, Rare: 3, Uncommon: 4, Common: 5 };
+            const rarityOrder = { Exotic: -1, Mythic: 0, Legendary: 1, Epic: 2, Rare: 3, Uncommon: 4, Common: 5 };
             const currentFilter = window._achFilter || 'all';
 
             // Stats row: unlocked + rarity counts
@@ -7398,7 +7692,7 @@ if (groundAllBtn) {
                 const r = (ach.rarity || '').toLowerCase();
                 if (currentFilter === 'unlocked' && !ach.unlocked) continue;
                 if (currentFilter === 'locked' && ach.unlocked) continue;
-                if (['mythic','legendary','epic','rare'].includes(currentFilter) && r !== currentFilter) continue;
+                if (['exotic','mythic','legendary','epic','rare','uncommon','common'].includes(currentFilter) && r !== currentFilter) continue;
                 visibleCount++;
 
                 const item = document.createElement('div');
@@ -7406,25 +7700,26 @@ if (groundAllBtn) {
                 if (!ach.unlocked) { item.style.opacity = '0.38'; item.style.filter = 'grayscale(80%)'; }
 
                 // Rarity tag HTML
-                const rarityLabels = { mythic:'MYTHIC', legendary:'LEGENDARY', epic:'EPIC', rare:'RARE', uncommon:'UNCOMMON', common:'COMMON' };
+                const rarityLabels = { exotic:'EXOTIC', mythic:'MYTHIC', legendary:'LEGENDARY', epic:'EPIC', rare:'RARE', uncommon:'UNCOMMON', common:'COMMON' };
                 const rarityTagHtml = r && rarityLabels[r] ? `<span class="rarity-tag rarity-${r}" style="margin-left:0;">${rarityLabels[r]}</span>` : '';
 
                 // Badge glow for unlocked high-rarity
-                const badgeGlow = ach.unlocked && r === 'mythic' ? 'filter:drop-shadow(0 0 6px #ef4444);'
+                const badgeGlow = ach.unlocked && r === 'exotic' ? 'filter:drop-shadow(0 0 6px #00d4ff) drop-shadow(0 0 6px #ff0080);'
+                    : ach.unlocked && r === 'mythic' ? 'filter:drop-shadow(0 0 6px #ef4444);'
                     : ach.unlocked && r === 'legendary' ? 'filter:drop-shadow(0 0 5px #f59e0b);'
                     : ach.unlocked && r === 'epic' ? 'filter:drop-shadow(0 0 5px #a855f7);'
                     : '';
 
                 item.innerHTML = `
                     <div style="display:flex;gap:12px;align-items:center;">
-                        <span style="font-size:26px;flex-shrink:0;${badgeGlow}">${ach.badge}</span>
+                        <span style="font-size:26px;flex-shrink:0;${badgeGlow}">${ach.unlocked && ach.revealBadge ? ach.revealBadge : ach.badge}</span>
                         <div style="flex:1;min-width:0;">
                             <div style="display:flex;align-items:center;gap:6px;flex-wrap:wrap;margin-bottom:2px;">
-                                <h4 style="margin:0;color:${ach.unlocked ? 'var(--achievement-color)' : 'var(--text-color)'}">${ach.title}</h4>
+                                <h4 style="margin:0;color:${ach.unlocked ? 'var(--achievement-color)' : 'var(--text-color)'}">${ach.unlocked && ach.revealTitle ? ach.revealTitle : ach.title}</h4>
                                 ${rarityTagHtml}
                                 ${ach.unlocked ? '<span style="font-size:10px;color:#10b981;font-weight:700;">✓ UNLOCKED</span>' : ''}
                             </div>
-                            <p style="font-size:11px;color:#94a3b8;margin:0 0 3px;">${ach.desc}</p>
+                            <p style="font-size:11px;color:#94a3b8;margin:0 0 3px;">${ach.unlocked && ach.revealDesc ? ach.revealDesc : ach.desc}</p>
                             <p style="font-size:10px;color:#64748b;font-style:italic;margin:0;">🎁 ${ach.rewardDesc}</p>
                         </div>
                     </div>`;
@@ -7773,6 +8068,7 @@ if (groundAllBtn) {
                 <tr><td>Total Owned</td><td>${totalCount}</td></tr>
                 <tr><td>${isCargo ? 'Capacity' : 'Seats'}</td><td>${unitLabel}</td></tr>
                 <tr><td>Min Runway Requirement</td><td>${formatRunwayLength(runwayRequirements[spec.name] || 0) || '0 ft'}</td></tr>
+                ${spec.waterOnly ? `<tr><td>Restriction</td><td style="color:#38bdf8;font-weight:bold;">🌊 Coastal Only</td></tr>` : ''}
                 <tr><td>Range</td><td>${convertDistance(spec.rangeNM)}</td></tr>
                 <tr><td>Speed</td><td>${convertSpeed(spec.topSpeedKnots)}</td></tr>
                 <tr><td>Sell Value (each)</td><td style="color:var(--money-color)">$${sellPrice.toLocaleString()}</td></tr>
@@ -8019,7 +8315,7 @@ if (groundAllBtn) {
             const ev = { ...template, endTime, targetName, instanceId: Date.now() + Math.random() };
             activeWorldEvents.push(ev);
             // Show event popup modal
-            const rarityColors = { common:'#94a3b8', uncommon:'#38bdf8', rare:'#06b6d4', epic:'#a855f7', legendary:'#f59e0b', mythic:'#ef4444' };
+            const rarityColors = { common:'#94a3b8', uncommon:'#38bdf8', rare:'#06b6d4', epic:'#a855f7', legendary:'#f59e0b', mythic:'#ef4444', exotic:'#00d4ff' };
             const color = rarityColors[ev.rarity] || '#6366f1';
             const modal = document.getElementById('event-popup-modal');
             const box   = document.getElementById('event-popup-box');
@@ -8108,7 +8404,7 @@ if (groundAllBtn) {
             const secToNext = Math.max(0, Math.round(EVENT_SPAWN_INTERVAL_S - eventSpawnTimer));
             if (timerEl) timerEl.textContent = `Next check: ${secToNext}s`;
 
-            const rarityColors = { common:'#94a3b8', uncommon:'#38bdf8', rare:'#06b6d4', epic:'#a855f7', legendary:'#f59e0b', mythic:'#ef4444' };
+            const rarityColors = { common:'#94a3b8', uncommon:'#38bdf8', rare:'#06b6d4', epic:'#a855f7', legendary:'#f59e0b', mythic:'#ef4444', exotic:'#00d4ff' };
 
             if (activeWorldEvents.length === 0) {
                 activeEl.innerHTML = `<div style="text-align:center;color:#475569;padding:20px;font-size:12px;">No active events right now.</div>`;
