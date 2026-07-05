@@ -762,6 +762,20 @@ z-index:99999;
     </label>
 </div>
             <div class="settings-row">
+    <span>Auto Refuel & Repair <span style="color:#94a3b8;font-size:9px;">(below 40%, while cash allows)</span></span>
+    <label class="switch">
+        <input type="checkbox" id="auto-maintenance-checkbox" onchange="toggleAutoMaintenance(this.checked)">
+        <span class="slider"></span>
+    </label>
+</div>
+            <div class="settings-row">
+    <span>Continue Flying Offline <span style="color:#94a3b8;font-size:9px;">(simulated when you return, up to 24h)</span></span>
+    <label class="switch">
+        <input type="checkbox" id="continue-flying-offline-checkbox" onchange="toggleContinueFlyingOffline(this.checked)">
+        <span class="slider"></span>
+    </label>
+</div>
+            <div class="settings-row">
     <span>Layout Mode</span>
     <div class="unit-toggle-bar">
         <button id="layout-pc-btn" class="unit-btn active" onclick="setLayoutMode('pc')">🖥 PC</button>
@@ -780,6 +794,37 @@ z-index:99999;
                 <p style="font-size:11px; color:#94a3b8; margin-bottom:10px; text-align:left;">Resetting your airline sets you back to the start.</p>
                 <button class="btn btn-danger" style="margin:0;" onclick="openResetScreen()">Reset Account</button>
             </div>
+        </div>
+    </div>
+ 
+    <!-- LOGIN STREAK / CALENDAR SCREEN -->
+    <div id="streak-screen" class="overlay-screen" style="display:none;">
+        <div class="modal-box" style="max-width: 420px; text-align:left;">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px;">
+                <h3>📅 Login Streak</h3>
+                <button style="background:none; border:none; color:var(--text-color); font-size:20px; cursor:pointer;" onclick="closeStreakScreen()">✕</button>
+            </div>
+            <p style="font-size:12px; color:#94a3b8; margin-bottom:14px;">Log in AND complete at least one Daily Quest to climb the reward streak. Miss a day — or clear zero quests — and it resets to Day 1.</p>
+            <div style="text-align:center; margin-bottom:14px;">
+                <div id="streak-current-count" style="font-size:30px; font-weight:900; color:var(--achievement-color);">0</div>
+                <div style="font-size:11px; color:#94a3b8;">day streak</div>
+            </div>
+            <div id="streak-calendar-grid" style="display:grid; grid-template-columns:repeat(7,1fr); gap:6px; margin-bottom:14px;"></div>
+            <div id="streak-status-text" style="font-size:12px; text-align:center; color:#94a3b8;"></div>
+        </div>
+    </div>
+ 
+    <!-- DAILY QUESTS SCREEN -->
+    <div id="quests-screen" class="overlay-screen" style="display:none;">
+        <div class="modal-box" style="max-width: 440px; text-align:left;">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px;">
+                <h3>🎯 Daily Quests</h3>
+                <button style="background:none; border:none; color:var(--text-color); font-size:20px; cursor:pointer;" onclick="closeQuestsScreen()">✕</button>
+            </div>
+            <p style="font-size:12px; color:#94a3b8; margin-bottom:6px;">Three standard objectives, plus two Hard challenges each with their own countdown — miss the window and it re-rolls. Finish all five for a bonus payout.</p>
+            <div id="quests-refresh-timer" style="font-size:10px; color:#64748b; margin-bottom:12px; text-align:right;"></div>
+            <div id="quests-list" style="display:flex; flex-direction:column; gap:10px;"></div>
+            <div id="quests-bonus-row" style="margin-top:14px; padding-top:12px; border-top:2px dashed var(--card-border); text-align:center; font-size:12px; color:#94a3b8;"></div>
         </div>
     </div>
  
@@ -808,6 +853,8 @@ z-index:99999;
                 <span id="xp-display">0 XP</span>
                 <div class="xp-bar-outer"><div class="xp-bar-inner" id="xp-bar" style="width:0%"></div></div>
             </div>
+            <button class="gear-btn" onclick="openStreakScreen()" title="Login Streak" style="font-size:16px;">📅<span id="streak-badge-count" style="font-size:9px;font-weight:800;margin-left:2px;color:var(--achievement-color);"></span></button>
+            <button class="gear-btn" onclick="openQuestsScreen()" title="Daily Quests" style="font-size:16px;">🎯<span id="quests-badge-count" style="font-size:9px;font-weight:800;margin-left:2px;color:var(--achievement-color);"></span></button>
             <button class="gear-btn" onclick="openSettingsScreen()" title="Settings">⚙</button>
         </div>
     </header>
@@ -1674,7 +1721,7 @@ z-index:99999;
                     { name: "Norman Manley International Airport (KIN)", lat: 17.9357, lng: -76.7875, isHub: false, baseDemand: 78, type: "airport", isCoastal: true, runwayLength: 8500 },
                     { name: "Ian Fleming International Airport (OCJ)", lat: 18.4042, lng: -76.9696, isHub: false, baseDemand: 44, type: "airport", isCoastal: true, runwayLength: 5700 }
                 ]
-            },
+            }, 
             "Cayman Islands": { unlocked: false, baseCost: 45, continent: "North America", nation: "Cayman Islands", flag: "🇰🇾", isSplit: false,
                 polygon: [[19.4, -81.39],[19.85, -79.67],[19.7, -79.72],[19.28, -81.08],[19.23, -81.43],[19.37, -81.46]],
                 airports: [
@@ -1841,7 +1888,7 @@ z-index:99999;
                 ]
             },
             "Brazil": { unlocked: false, baseCost: 72, continent: "South America", nation: "Brazil", flag: "🇧🇷", isSplit: false,
-                polygon: [[4.43,-51.52],[2.25,-60.85],[1.15,-67.00],[-7.40,-73.80],[-11.00,-71.10],[-10.40,-65.40],[-16.40,-57.40],[-22.50,-58.00],[-22.90,-53.50],[-27.35,-53.70],[-30.15,-57.50],[-33.74,-53.30],[-28.50,-48.80],[-22.90,-43.20],[-19,-38.20],[-13.00,-36.8],[-5.50,-35.60],[-2.50,-44.30],[1.30,-48.90],[4.43,-51.52],],
+                polygon: [[2.19, -52.89],[2.31, -54.6],[2.51, -55.98],[1.84, -55.93],[1.95, -57.35],[1.17, -58.82],[1.85, -59.75],[5.25, -60.13],[3.68, -62.75],[4.27, -64.78],[1.621, -64.09],[0.65, -65.56],[1.15,-67.00],[-7.40,-73.80],[-11.00,-71.10],[-10.40,-65.40],[-16.40,-57.40],[-22.50,-58.00],[-22.90,-53.50],[-27.35,-53.70],[-30.15,-57.50],[-33.74,-53.30],[-28.50,-48.80],[-22.90,-43.20],[-19,-38.20],[-13.00,-36.8],[-5.50,-35.60],[-2.50,-44.30],[1.30,-48.90],[4.43,-51.52],],
                 airports: [
                     { name: "Eurico de Aguiar Salles International Airport (VIX)", lat: -20.2581, lng: -40.2864, isHub: false, baseDemand: 48, type: "airport", isCoastal: true, runwayLength: 8202 },
                     { name: "Galeão Intl (GIG)", lat: -22.8100, lng: -43.2506, isHub: false, baseDemand: 91, type: "airport", isCoastal: true, runwayLength: 13123 },
@@ -2572,7 +2619,91 @@ z-index:99999;
                     { name: "Wolfs Fang Runway (AQ-0011)", lat: -71.5303, lng: 8.8003, isHub: false, baseDemand: 12, type: "airport", runwayLength: 13123 },
                     { name: "Orcadas Base Heliport (SAYO)", lat: -60.7378, lng: -44.7383, isHub: false, baseDemand: 5, type: "heliport", isCoastal: true , runwayLength: 0 }
                 ]
-            }
+            },
+            "Tokelau": { unlocked: false, baseCost: 22, continent: "Oceania", nation: "Tokelau", flag: "🇹🇰", isSplit: false,
+    polygon: [[-8.5, -172.5], [-8.3, -171.8], [-9.0, -171.7], [-9.4, -172.0], [-9.2, -172.6]],
+    airports: [
+    ]
+},
+
+"Costa Rica": { unlocked: false, baseCost: 52, continent: "North America", nation: "Costa Rica", flag: "🇨🇷", isSplit: false,
+    polygon: [[11.2, -85.7],[10.94, -84.91],[11.08, -84.68],[10.7, -83.92],[10.82, -83.66],[10.95, -83.69],[10.93, -83.67],[10.92, -83.67],[10.93, -83.66],[9.57, -82.56],[9.49, -82.63],[9.61, -82.86],[9.5, -82.84],[9.47, -82.93],[9.07, -82.93],[8.92, -82.71],[8.82, -82.88],[8.81, -82.86],[8.75, -82.92],[8.63, -82.83],[8.47, -82.83],[8.42, -82.93],[8.33, -83.05],[8.27, -82.98],[8.27, -82.94],[8.17, -82.91],[8.0, -82.9], [8.2, -83.6], [10.21, -86.36], [11.2, -85.7]],
+    airports: [
+        { name: "Juan Santamaría International (SJO)", lat: 9.9939, lng: -84.2088, isHub: false, baseDemand: 85, type: "airport", runwayLength: 9843 },
+        { name: "Daniel Oduber Quirós (LIR)", lat: 10.5933, lng: -85.5442, isHub: false, baseDemand: 68, type: "airport", isCoastal: true, runwayLength: 9000 },
+        { name: "Limón International Airport (LIO)", lat: 9.9570, lng: -83.0220, isHub: false, baseDemand: 48, type: "airport", isCoastal: true, runwayLength: 5900 },
+{ name: "México Hospital Heliport (CR-0004)", lat: 9.9500, lng: -84.0800, isHub: false, baseDemand: 12, type: "heliport", isCoastal: false, runwayLength: 0 },
+{ name: "Tobías Bolaños International Airport (SYQ)", lat: 9.9570, lng: -84.1400, isHub: false, baseDemand: 42, type: "airport", isCoastal: false, runwayLength: 5900 },
+{ name: "Puerto Jimenez Airport (PJM)", lat: 8.5333, lng: -83.3000, isHub: false, baseDemand: 35, type: "airport", isCoastal: true, runwayLength: 3300 }
+    ]
+},
+
+"Honduras": { unlocked: false, baseCost: 42, continent: "North America", nation: "Honduras", flag: "🇭🇳", isSplit: false,
+      polygon: [[15.9, -83.1], [15.01, -83.07],[15, -83.5],[14.75, -83.92],[14.61, -84.47],[14.7, -84.73],[14.83, -84.82],[14.27, -85.17],[13.84, -85.8],[13.99, -86.04],[14.07, -86.01],[14.03, -86.15],[13.76, -86.35],[13.77, -86.74],[13.29, -86.72],[13.3, -86.85],[13.06, -86.95],[12.98, -87.39],[13.14, -87.56],[13.32, -87.73],[13.5, -87.8],[13.81, -87.71],[13.92, -87.8],[13.85, -88.48],[14.42, -89.35],[14.63, -89.14],[14.88, -89.23],[16.08, -87.91],[16.62, -86.02]],
+    airports: [
+        { name: "Toncontín International (TGU)", lat: 14.0609, lng: -87.2194, isHub: false, baseDemand: 65, type: "airport", runwayLength: 7200 },
+        { name: "Ramón Villeda Morales (SAP)", lat: 15.4524, lng: -87.9239, isHub: false, baseDemand: 55, type: "airport", runwayLength: 9843 },
+        { name: "Juan Manuel Gálvez International Airport (RTB)", lat: 16.3167, lng: -86.5231, isHub: false, baseDemand: 65, type: "airport", isCoastal: true, runwayLength: 8202 },
+{ name: "Toncontín Airport (TGU)", lat: 14.0609, lng: -87.2194, isHub: false, baseDemand: 65, type: "airport", isCoastal: false, runwayLength: 7200 },
+{ name: "Las Lomas Heliport (MHLL)", lat: 14.0500, lng: -87.2300, isHub: false, baseDemand: 10, type: "heliport", isCoastal: false, runwayLength: 0 },
+{ name: "Golosón International Airport (LCE)", lat: 15.7422, lng: -86.8528, isHub: false, baseDemand: 58, type: "airport", isCoastal: true, runwayLength: 9843 }
+    ]
+},
+
+
+"Vanuatu": { unlocked: false, baseCost: 35, continent: "Oceania", nation: "Vanuatu", flag: "🇻🇺", isSplit: false,
+    polygon: [[-12.95, 166.51], [-13.45, 168.1], [-19.54, 170.34], [-20.4, 169.85],[-14.74, 165.75]],
+    airports: [
+        { name: "Bauerfield International (VLI)", lat: -17.6993, lng: 168.3200, isHub: false, baseDemand: 48, type: "airport", isCoastal: true, runwayLength: 8202 }
+    ]
+},
+
+"Maldives": { unlocked: false, baseCost: 58, continent: "Asia", nation: "Maldives", flag: "🇲🇻", isSplit: false,
+    polygon: [[7.27, 72.73], [-0.88, 73.15], [-0.7, 73.4], [6.5, 73.8]],
+    airports: [
+        { name: "Velana International (MLE)", lat: 4.1918, lng: 73.5290, isHub: false, baseDemand: 88, type: "airport", isCoastal: true, runwayLength: 10499 },
+        { name: "Gan International Airport (GAN)", lat: -0.6933, lng: 73.1556, isHub: false, baseDemand: 55, type: "airport", isCoastal: true, runwayLength: 9843 },
+{ name: "Hanimaadhoo International Airport (HAQ)", lat: 6.3081, lng: 73.1703, isHub: false, baseDemand: 45, type: "airport", isCoastal: true, runwayLength: 8202 },
+{ name: "Maafaru International Airport (NMF)", lat: 5.8167, lng: 73.4333, isHub: false, baseDemand: 42, type: "airport", isCoastal: true, runwayLength: 8202 }
+    ]
+},
+"British Indian Ocean Territory": { unlocked: false, baseCost: 40, continent: "Asia", nation: "British Indian Ocean Territory", flag: "🇮🇴", isSplit: false,
+    polygon: [[-5.12, 71.69], [-6.37, 71.11], [-7.63, 72.22], [-7.51, 72.58],[-7.19, 72.59],[-6.35, 71.42],[-5.2, 72.44]],
+    airports: [
+        { name: "Naval Support Facility Diego Garcia (NKW)", lat: -7.3133, lng: 72.4244, isHub: false, baseDemand: 35, type: "airport", isCoastal: true, runwayLength: 12000 }
+    ]
+},
+"Timor-Leste": { unlocked: false, baseCost: 30, continent: "Asia", nation: "Timor-Leste", flag: "🇹🇱", isSplit: false,
+    polygon: [
+      [[-8.59, 124.95],[-9.05, 124.95],[-9.02, 125.18],[-9.15, 125.19],[-9.19, 124.98],[-9.57, 125.12],[-8.44, 127.38],[-8.24, 127.35]],[[-9.32, 124.03],[-9.42, 124.13],[-9.36, 124.21],[-9.43, 124.28],[-9.5, 124.27],[-9.48, 124.35],[-9.33, 124.4],[-9.3, 124.45],[-9.14, 124.47]]
+    ],
+    airports: [
+        { name: "Presidente Nicolau Lobato International (DIL)", lat: -8.5467, lng: 125.5247, isHub: false, baseDemand: 48, type: "airport", isCoastal: true, runwayLength: 8202 },
+        { name: "Oecusse Route of the Sandalwood International Airport (OEC)", lat: -9.198419, lng: 124.337873, isHub: false, baseDemand: 38, type: "airport", isCoastal: true, runwayLength: 8202 },
+{ name: "Baucau Airport (BCH)", lat: 	-8.486479, lng: 126.399981, isHub: false, baseDemand: 25, type: "airport", isCoastal: false, runwayLength: 8200 },
+{ name: "Commander in Chief of FALINTIL, Kay Rala Xanana Gusmão, International Airport (UAI)", lat: -9.301856, lng: 125.286302, isHub: false, baseDemand: 48, type: "airport", isCoastal: true, runwayLength: 8202 }
+    ]
+},
+"French Guiana": { unlocked: false, baseCost: 45, continent: "South America", nation: "French Guiana", flag: "🇬🇫", isSplit: false,
+    polygon: [[4.89, -54.47],[4.17, -54.37],[3.6, -53.98],[2.31, -54.6],[2.19, -52.89],[4.43,-51.52],[5.53, -52.96],[5.8, -54.0]],
+    airports: [
+        { name: "Cayenne-Félix Eboué (CAY)", lat: 4.8222, lng: -52.3603, isHub: false, baseDemand: 58, type: "airport", isCoastal: true, runwayLength: 10499 },
+        { name: "Rosemond Hospital Helipad (GF-0008)", lat: 4.9200, lng: -52.3300, isHub: false, baseDemand: 12, type: "heliport", isCoastal: false, runwayLength: 0 },
+        { name: "Maripasoula Airport (MPY)", lat: 3.6422, lng: -54.0375, isHub: false, baseDemand: 22, type: "airport", isCoastal: false, runwayLength: 4000 },
+{ name: "Île Royale Heliport (GF-0007)", lat: 4.8800, lng: -52.3400, isHub: false, baseDemand: 10, type: "heliport", isCoastal: true, runwayLength: 0 }
+    ]
+},
+
+"Suriname": { unlocked: false, baseCost: 38, continent: "South America", nation: "Suriname", flag: "🇸🇷", isSplit: false,
+    polygon: [[2.51, -55.98],[1.84, -55.93],[2.01, -56.68],[3.39, -57.3],[3.36, -57.65],[4.12, -58.07],[4.92, -57.86],[5.02, -57.3],[5.97, -57.13],[6.04, -54.99],[5.8, -54.0],[4.89, -54.47],[4.17, -54.37],[3.6, -53.98],[2.31, -54.6],],
+    airports: [
+        { name: "Johan Adolf Pengel International (PBM)", lat: 5.4528, lng: -55.1878, isHub: false, baseDemand: 52, type: "airport", isCoastal: false, runwayLength: 11483 },
+        { name: "Gummels Heliport (SMHP)", lat: 5.8500, lng: -55.1500, isHub: false, baseDemand: 15, type: "heliport", isCoastal: true, runwayLength: 0 },
+{ name: "Eduard Alexander Gummels Airport (EAX)", lat: 5.8000, lng: -55.2000, isHub: false, baseDemand: 35, type: "airport", isCoastal: true, runwayLength: 6500 },
+        { name: "Kwamalasoemoetoe Airport (SMSM)", lat: 2.3500, lng: -56.8000, isHub: false, baseDemand: 18, type: "airport", isCoastal: false, runwayLength: 3200 },
+{ name: "Nieuw Nickerie - Major Henk Fernandes Airport (ICK)", lat: 5.9556, lng: -56.9911, isHub: false, baseDemand: 32, type: "airport", isCoastal: true, runwayLength: 5900 }
+    ]
+}
         };
  
  
@@ -2658,12 +2789,12 @@ z-index:99999;
  
         // ===== SECRET AIRCRAFT (crate drops only) =====
         const secretCatalog = {
-            "Flying-V":                      { name: "Flying-V",                   category: "Secret", rarity: "exotic",    price: 750000000, pax: 314, rangeNM: 9300, topSpeedKnots: 470, minRank: 1, iconSize: 30, img: "https://cn-community-foundry.s3.eu-west-1.amazonaws.com/portfolio/image/1q29.jpg", type: "plane" },
+            "Flying-V":                      { name: "Flying-V",                   category: "Secret", rarity: "exotic",    price: 750000000, pax: 314, rangeNM: 9300, topSpeedKnots: 470, minRank: 1, iconSize: 35, img: "https://cn-community-foundry.s3.eu-west-1.amazonaws.com/portfolio/image/1q29.jpg", type: "plane" },
             "Lun-Class Ekranoplan":          { name: "Lun-Class Ekranoplan",       category: "Secret", rarity: "legendary", price: 8000000,  cargo: 137000,   rangeNM: 1025, topSpeedKnots: 297, minRank: 1, iconSize: 34, img: "https://upload.wikimedia.org/wikipedia/commons/thumb/4/43/Lun-class_ekranoplan_%282026-03-18%29_-_0_4.jpg/1920px-Lun-class_ekranoplan_%282026-03-18%29_-_0_4.jpg", type: "plane", isCargo: true, waterOnly: true },
             "Lockheed SR-71 Blackbird":      { name: "Lockheed SR-71 Blackbird",   category: "Secret", rarity: "mythic",    price: 18000000, pax: 2,   rangeNM: 2900, topSpeedKnots: 1910,minRank: 1, iconSize: 30, img: "https://upload.wikimedia.org/wikipedia/commons/thumb/2/23/SR-71A_taking_off_with_afterburner_RAF_Mildenhall_1983.JPEG/1920px-SR-71A_taking_off_with_afterburner_RAF_Mildenhall_1983.JPEG", type: "plane" },
             "Hughes H-4 Hercules":           { name: "Hughes H-4 Hercules",        category: "Secret", rarity: "legendary", price: 12000000,  cargo: 59000, rangeNM: 2600, topSpeedKnots: 204, minRank: 1, iconSize: 42, img: "https://upload.wikimedia.org/wikipedia/commons/thumb/a/ad/H-4_Hercules_2.jpg/1280px-H-4_Hercules_2.jpg", type: "plane", isCargo: true, waterOnly: true },
             "Messerschmitt Me 323 Gigant":   { name: "Messerschmitt Me 323",       category: "Secret", rarity: "rare",      price: 3000000,  cargo: 12000, rangeNM: 590,  topSpeedKnots: 153, minRank: 1, iconSize: 40, img: "https://upload.wikimedia.org/wikipedia/commons/2/25/Bundesarchiv_Bild_101I-596-0367-05A%2C_Flugzeug_Me_323_Gigant.jpg", type: "plane", isCargo: true },
-            "Lockheed Martin SR-72":         { name: "Lockheed Martin SR-72",      category: "Secret", rarity: "mythic",    price: 35000000, cargo: 2500, rangeNM: 4500,  topSpeedKnots: 3600, minRank: 1, iconSize: 32, img: "https://upload.wikimedia.org/wikipedia/en/4/4a/Lockheed_Martin_SR-72_concept.png", type: "plane", isCargo: true },
+            "Lockheed Martin SR-72":         { name: "Lockheed Martin SR-72",      category: "Secret", rarity: "exotic",    price: 35000000, cargo: 2500, rangeNM: 4500,  topSpeedKnots: 3600, minRank: 1, iconSize: 32, img: "https://upload.wikimedia.org/wikipedia/en/4/4a/Lockheed_Martin_SR-72_concept.png", type: "plane", isCargo: true },
             "Wright Flyer":                  { name: "Wright Flyer",               category: "Secret", rarity: "legendary", price: 10000,  pax: 1, rangeNM: 0.1,  topSpeedKnots: 26, minRank: 1, iconSize: 24, img: "https://upload.wikimedia.org/wikipedia/commons/thumb/8/86/First_flight2.jpg/1920px-First_flight2.jpg", type: "plane" },
             "Mil V-12":                      { name: "Mil V-12",                   category: "Secret", rarity: "epic",      price: 7000000,  cargo: 44200, rangeNM: 270,  topSpeedKnots: 140, minRank: 1, iconSize: 42, img: "https://upload.wikimedia.org/wikipedia/commons/6/68/Mil_V-12_prototype.jpg", type: "helicopter", isCargo: true },
             "Scaled Composites Model 351 Stratolaunch": { name: "Scaled Composites Model 351 Stratolaunch", category: "Secret", rarity: "mythic", price: 20000000, cargo: 250000, rangeNM: 1000, topSpeedKnots: 460, minRank: 1, iconSize: 44, img: "https://upload.wikimedia.org/wikipedia/commons/thumb/b/b6/230113-_Stratolaunch_Talon_Photo_Chase-091.jpg/1280px-230113-_Stratolaunch_Talon_Photo_Chase-091.jpg", type: "plane", isCargo: true },
@@ -2696,7 +2827,7 @@ z-index:99999;
             "LZ 127 Graf Zeppelin":    { name: "LZ 127 Graf Zeppelin",    category: "Airship", price: 4000000,  pax: 24, rangeNM: 10000, topSpeedKnots: 73, minRank: 25, isNew: true,iconSize: 40, img: "https://commons.wikimedia.org/wiki/Special:FilePath/Graf%20Zeppelin%20LZ127.jpg", type: "airship" },
             "LZ 129 Hindenburg":       { name: "LZ 129 Hindenburg",       category: "Airship", price: 11000000,  pax: 72, rangeNM: 8000,  topSpeedKnots: 78, minRank: 36, isNew: true,iconSize: 42, img: "https://commons.wikimedia.org/wiki/Special:FilePath/Hindenburg%20over%20New%20York%201937.jpg", type: "airship" },
             "Zeppelin NT":             { name: "Zeppelin NT",             category: "Airship", price: 3000000,  pax: 12, rangeNM: 500,  topSpeedKnots: 70, minRank: 22, isNew: true,iconSize: 30, img: "https://commons.wikimedia.org/wiki/Special:FilePath/Zeppellin%20NT%20amk.JPG", type: "airship" },
-            "Airlander 10":            { name: "Airlander 10",            category: "Airship", price: 8000000,  pax: 90,  rangeNM: 4300, topSpeedKnots: 90, minRank: 32, isNew: true, iconSize: 38, img: "https://www.airport-technology.com/wp-content/uploads/sites/14/2023/07/first-flight-original2-e1689173259484.jpg", type: "airship" }, 
+            "Airlander 10":            { name: "Airlander 10",            category: "Airship", price: 8000000,  pax: 90,  rangeNM: 4300, topSpeedKnots: 90, minRank: 32, isNew: true, iconSize: 42, img: "https://www.airport-technology.com/wp-content/uploads/sites/14/2023/07/first-flight-original2-e1689173259484.jpg", type: "airship" }, 
             "USS Akron (ZRS-4)":       { name: "USS Akron (ZRS-4)",       category: "Airship", price: 6500000, pax: 40,  rangeNM: 8200, topSpeedKnots: 74, minRank: 30, isNew: true, iconSize: 30, img: "https://www.airships.net/wp-content/uploads/macon-flight-web-crop-1200x630.jpg", type: "airship" },
         }; 
 
@@ -2742,7 +2873,7 @@ z-index:99999;
             "first_repair":     { title: "Repairs",             desc: "Repair an aircraft for the first time",                  unlocked: false, badge: "🔧", rewardDesc: "+5 AeroTokens", rarity: "Common" },
             "bad_financial_decision": { title: "Bad Financial Decision", desc: "Open a route to the airport with the lowest global demand", unlocked: false, badge: "📉", rewardDesc: "+10 AeroTokens", rarity: "Uncommon" },
             "purchasable_collector": { title: "Standard Fleet Operator", desc: "Own at least one of every purchasable passenger, cargo, and legacy aircraft", unlocked: false, badge: "🛫", rewardDesc: "$1,000,000 and +250 AeroTokens", rarity: "Epic" },
-            "mythic_collector": { title: "Mythic Aviator",           desc: "Own at least one of every mythical secret aircraft (SR-71, SR-72, and Stratolaunch)", unlocked: false, badge: "🔥", rewardDesc: "$5,000,000 and +500 AeroTokens", rarity: "Mythic" },
+            "mythic_collector": { title: "Mythic Aviator",           desc: "Own at least one of every mythical secret aircraft", unlocked: false, badge: "🔥", rewardDesc: "$5,000,000 and +500 AeroTokens", rarity: "Mythic" },
             "wright_flyer_collector": { title: "Wright Brothers",    desc: "Collect the legendary Wright Flyer from a crate",        unlocked: false, badge: "📜", rewardDesc: "$50,000 and +100 AeroTokens", rarity: "Legendary" },
             "route_ca_ns":      { title: "North to South - CA",      desc: "Have a route from the northernmost Canadian airport to the southernmost",   unlocked: false, badge: "🇨🇦", rewardDesc: "$50,000 and +20 AeroTokens", rarity: "Rare" },
             "route_au_ns":      { title: "North to South - AU",      desc: "Have a route from the northernmost Australian airport to the southernmost", unlocked: false, badge: "🇦🇺", rewardDesc: "$50,000 and +20 AeroTokens", rarity: "Rare" },
@@ -2758,25 +2889,31 @@ z-index:99999;
             "first_epic":       { title: "Epic Collecting",          desc: "Get an epic reward from a crate for the first time",     unlocked: false, badge: "💜", rewardDesc: "+20 AeroTokens", rarity: "Epic" },
             "first_legendary":  { title: "Legendary Collecting",     desc: "Get a legendary reward from a crate for the first time", unlocked: false, badge: "💛", rewardDesc: "+35 AeroTokens", rarity: "Legendary" },
             "first_mythic":     { title: "Mythic Collecting",        desc: "Get a mythical reward from a crate for the first time",  unlocked: false, badge: "❤️‍🔥", rewardDesc: "+75 AeroTokens", rarity: "Mythic" },
-            "hidden_exotic":    { title: "Hidden Achievement",       desc: "Unlock this achievement to see the description",  revealTitle: "Exotic Aviator", revealDesc: "Get an Exotic aircraft from a crate", unlocked: false, badge: "❓", revealBadge: "🌈", rewardDesc: "+200 AeroTokens", rarity: "Exotic" },
+            "hidden_exotic":    { title: "Hidden Achievement",       desc: "Unlock this achievement to see the description",  revealTitle: "Exotic Collecting", revealDesc: "Get an exotic reward from a crate for the first time", unlocked: false, badge: "❓", revealBadge: "🌈", rewardDesc: "+20,000 AeroTokens", rarity: "Exotic" },
+            "hidden_exotic_2":    { title: "Hidden Achievement 2",       desc: "Unlock this achievement to see the description",  revealTitle: "Exotic Collector", revealDesc: "Get all exotic rewards from crates", unlocked: false, badge: "❓", revealBadge: "🌈", rewardDesc: "+40,000 AeroTokens", rarity: "Exotic" },
             "hub_network":      { title: "Hub Network",              desc: "Establish 5 hubs across your airline",                   unlocked: false, badge: "🏗️", rewardDesc: "$200,000 and +50 AeroTokens", rarity: "Rare" },
             "long_haul":        { title: "Long Hauler",              desc: "Open a route longer than 8,000 NM",                     unlocked: false, badge: "🌏", rewardDesc: "$300,000 and +75 AeroTokens", rarity: "Epic" },
             "budget_carrier":   { title: "Budget Carrier",           desc: "Have 25 or more active routes simultaneously",          unlocked: false, badge: "📋", rewardDesc: "$500,000 and +100 AeroTokens", rarity: "Epic" },
             "fleet_commander":  { title: "Fleet Commander",          desc: "Own 50 aircraft across all types",                      unlocked: false, badge: "🎖️", rewardDesc: "$1,000,000 and +200 AeroTokens", rarity: "Legendary" },
             "refuel_veteran":   { title: "Fuel Hoarder",             desc: "Refuel aircraft 50 times total",                        unlocked: false, badge: "🛢️", rewardDesc: "$50,000 and +25 AeroTokens", rarity: "Rare" },
             "crash_veteran":    { title: "Crash Test Dummy",         desc: "Experience 5 aircraft crashes",                         unlocked: false, badge: "💀", rewardDesc: "+15 AeroTokens (it's something)", rarity: "Rare" },
-            "secret_collector": { title: "Secret Collector",          desc: "Own all secret aircraft", unlocked: false, badge: "🛸", rewardDesc: "$10,000,000 and +2,000 AeroTokens", rarity: "Mythic" },
+            "secret_collector": { title: "Secret Collector",          desc: "Own all secret aircraft", unlocked: false, badge: "🛸", rewardDesc: "$10,000,000 and +2,000 AeroTokens", rarity: "Exotic" },
             "crate_addict":     { title: "Crate Addict",             desc: "Open 50 supply crates",                                 unlocked: false, badge: "📦", rewardDesc: "$100,000 and +100 AeroTokens", rarity: "Epic" },
             "old_faithful":     { title: "Old Faithful",             desc: "Fly a legacy aircraft on a route for 10 minutes",       unlocked: false, badge: "🕰️", rewardDesc: "$75,000 and +30 AeroTokens", rarity: "Rare" },
             "transcontinental": { title: "Transcontinental",         desc: "Have a route longer than 5,000 NM",                     unlocked: false, badge: "🗺️", rewardDesc: "$100,000 and +30 AeroTokens", rarity: "Rare" },
             "monopoly":         { title: "Monopoly",                 desc: "Establish 10 hubs across your airline network", unlocked: false, badge: "🎩", rewardDesc: "$500,000 and +150 AeroTokens", rarity: "Epic" },
-            "hub_every_airport":{ title: "Everywhere At Once",        desc: "Make every airport and heliport a hub",          unlocked: false, badge: "🌐", rewardDesc: "$10,000,000 and +5,000 AeroTokens", rarity: "Mythic" },
+            "hub_every_airport":{ title: "Everywhere At Once",        desc: "Make every airport and heliport a hub",          unlocked: false, badge: "🌐", rewardDesc: "$10,000,000 and +5,000 AeroTokens", rarity: "Exotic" },
             "fleet_titan":      { title: "Fleet Titan",                desc: "Own 500 or more aircraft simultaneously",                unlocked: false, badge: "🛩️", rewardDesc: "$5,000,000 and +750 AeroTokens", rarity: "Legendary" },
             "trillionaire":     { title: "Trillionaire",               desc: "Exceed a cash treasury balance of $1,000,000,000,000",   unlocked: false, badge: "👑", rewardDesc: "+5,000 AeroTokens", rarity: "Mythic" },
             "jack_of_all_trades": { title: "Jack of All Trades",      desc: "Simultaneously own a passenger, a cargo, and a legacy aircraft", unlocked: false, badge: "🧰", rewardDesc: "$150,000 and +40 AeroTokens", rarity: "Rare" },
             "speed_demon":      { title: "Speed Demon",               desc: "Own an aircraft capable of supersonic flight (900+ knots top speed)", unlocked: false, badge: "💨", rewardDesc: "$200,000 and +50 AeroTokens", rarity: "Epic" },
             "making_a_splash":  { title: "Making a Splash",           desc: "Own an aircraft that can only operate from water",      unlocked: false, badge: "🌊", rewardDesc: "$100,000 and +30 AeroTokens", rarity: "Rare" },
             "helicopter_squadron": { title: "Helicopter Squadron",    desc: "Own 5 or more helicopters simultaneously",               unlocked: false, badge: "🚁", rewardDesc: "$75,000 and +25 AeroTokens", rarity: "Rare" },
+            "hidden_ghost_region": { title: "Hidden Achievement 3",     desc: "Unlock this achievement to see the description",  revealTitle: "Ghost Town", revealDesc: "Unlock a region with no airports or heliports", unlocked: false, badge: "❓", revealBadge: "🕸️", rewardDesc: "$100,000 and +50 AeroTokens", rarity: "Exotic" },
+            "completionist":    { title: "Hidden Achievement 4",       desc: "Unlock this achievement to see the description",  revealTitle: "The Completionist", revealDesc: "Unlock every other achievement", unlocked: false, badge: "❓", revealBadge: "🏆", rewardDesc: "$25,000,000 and +10,000 AeroTokens", rarity: "Exotic" },
+            "up_up_and_away":   { title: "Up, Up and Away",          desc: "Purchase an airship or blimp for the first time", unlocked: false, badge: "🎈", rewardDesc: "$25,000 and +15 AeroTokens", rarity: "Rare" },
+            "top_gun":          { title: "Top Gun",                  desc: "Purchase a military aircraft for the first time", unlocked: false, badge: "🎖️", rewardDesc: "$50,000 and +20 AeroTokens", rarity: "Rare" },
+            "old_school":       { title: "Old School",               desc: "Purchase a legacy aircraft for the first time",   unlocked: false, badge: "🕰️", rewardDesc: "$25,000 and +15 AeroTokens", rarity: "Uncommon" },
         };
         const DEFAULT_STATE = {
             cash: 0, tokens: 0, rank: 1, xp: 0, airlineName: "", primaryHub: "",
@@ -2792,11 +2929,57 @@ z-index:99999;
             voluntarilyGrounded: {}, // set of fleet ids that the player manually grounded
             pendingGround: {},
             aircraftRegistrations: {}, // keyed by fleet id: registration string
-            hangarPool: []             // array of { id, type } — idle aircraft with persistent IDs
+            hangarPool: [],            // array of { id, type } — idle aircraft with persistent IDs
+            lastLoginDate: null, loginStreak: 0, lastQuestCompletionDate: null,
+            autoMaintenance: false,
+            dailyQuests: [], questsDate: null, questsBonusClaimed: false,
+            totalFlightLegs: 0, totalContractsCompleted: 0,
+            totalAircraftPurchased: 0, totalRoutesCreated: 0, lifetimeTokensSpent: 0, totalHubsPurchased: 0,
+            totalRepairs: 0, totalAircraftSold: 0, lifetimeTokensEarned: 0, totalDistanceFlownNM: 0,
+            totalLegacyPurchased: 0, totalCargoPurchased: 0, totalHelicopterPurchased: 0, totalMilitaryPurchased: 0,
+            totalCashSpent: 0, totalInternationalRoutes: 0, continueFlyingOffline: false
         };
         let uiUpdatePending = false;
         let _lastUiRender = 0;
         let gameState = {};
+        // Wraps gameState.cash in an accessor so ANY positive cash gain (crates, contracts,
+        // achievements, flight income, aircraft sales, etc.) is automatically counted toward
+        // lifetimeEarnings — used by the "earn $X" daily quest. Spending (negative deltas) is ignored.
+        function attachCashTracking(gs) {
+            if (!gs) return gs;
+            let _cash = gs.cash || 0;
+            delete gs.cash;
+            Object.defineProperty(gs, 'cash', {
+                get() { return _cash; },
+                set(v) {
+                    const delta = v - _cash;
+                    if (delta > 0) gs.lifetimeEarnings = (gs.lifetimeEarnings || 0) + delta;
+                    if (delta < 0) gs.totalCashSpent = (gs.totalCashSpent || 0) - delta;
+                    _cash = v;
+                },
+                enumerable: true, configurable: true
+            });
+            return gs;
+        }
+        // Wraps gameState.tokens to track both directions of movement: upward moves feed the
+        // "earn N AeroTokens" easy quest, downward moves (routes, repairs, legacy aircraft,
+        // event cancellations, etc.) feed the "spend N AeroTokens" hard quest.
+        function attachTokenSpendTracking(gs) {
+            if (!gs) return gs;
+            let _tokens = gs.tokens || 0;
+            delete gs.tokens;
+            Object.defineProperty(gs, 'tokens', {
+                get() { return _tokens; },
+                set(v) {
+                    const delta = v - _tokens;
+                    if (delta > 0) gs.lifetimeTokensEarned = (gs.lifetimeTokensEarned || 0) + delta;
+                    if (delta < 0) gs.lifetimeTokensSpent = (gs.lifetimeTokensSpent || 0) - delta;
+                    _tokens = v;
+                },
+                enumerable: true, configurable: true
+            });
+            return gs;
+        }
         let globalGroundState = false;
         let hangarCategoryFilter = "";
         let map, baseMapLayer = null, regionLayers = {};
@@ -2851,9 +3034,12 @@ z-index:99999;
     });
 });
 
-window.addEventListener('blur', () => isTabFocused = false);
+window.addEventListener('blur', () => {
+    isTabFocused = false;
+});
 document.addEventListener('visibilitychange', () => {
     isTabFocused = !document.hidden;
+    if (document.hidden && !gameState.autoMaintenance && !gameState.continueFlyingOffline && typeof forceLandAirborneFleet === 'function') forceLandAirborneFleet();
 });
 // ===== REEL PRIZE TABLE =====
         const reelPrizes = [
@@ -2908,7 +3094,7 @@ document.addEventListener('visibilitychange', () => {
             { id:"pelican_drop",   label:"Boeing Pelican ULTRA",           icon:"🦅", rarity:"legendary", rarityLabel:"LEGENDARY",  weight:0.5,  apply:(gs)=>{gs.hangar["Boeing Pelican ULTRA"]=(gs.hangar["Boeing Pelican ULTRA"]||0)+1;} },
             // ── MYTHIC ──────────────────────────────────────────────────────
             { id:"sr71_drop",      label:"Lockheed SR-71 Blackbird",       icon:"🔥", rarity:"mythic",    rarityLabel:"MYTHIC",     weight:0.3,  apply:(gs)=>{gs.hangar["Lockheed SR-71 Blackbird"]=(gs.hangar["Lockheed SR-71 Blackbird"]||0)+1;} },
-            { id:"sr72_drop",      label:"Lockheed Martin SR-72",          icon:"🔥", rarity:"mythic",    rarityLabel:"MYTHIC",     weight:0.15, apply:(gs)=>{gs.hangar["Lockheed Martin SR-72"]=(gs.hangar["Lockheed Martin SR-72"]||0)+1;} },
+            { id:"sr72_drop",      label:"Lockheed Martin SR-72",          icon:"🌈", rarity:"exotic",    rarityLabel:"EXOTIC",     weight:0.05, apply:(gs)=>{gs.hangar["Lockheed Martin SR-72"]=(gs.hangar["Lockheed Martin SR-72"]||0)+1;} },
             { id:"strato_drop",    label:"Scaled Composites Stratolaunch", icon:"🔥", rarity:"mythic",    rarityLabel:"MYTHIC",     weight:0.2,  apply:(gs)=>{gs.hangar["Scaled Composites Model 351 Stratolaunch"]=(gs.hangar["Scaled Composites Model 351 Stratolaunch"]||0)+1;} },
             // ── EXOTIC ──────────────────────────────────────────────────────
             { id:"flyingv_drop",   label:"Flying-V",                       icon:"🌈", rarity:"exotic",    rarityLabel:"EXOTIC",     weight:0.05, apply:(gs)=>{gs.hangar["Flying-V"]=(gs.hangar["Flying-V"]||0)+1;} },
@@ -2963,6 +3149,7 @@ document.addEventListener('visibilitychange', () => {
             if (gameState.cash < cashCost || gameState.tokens < tokenCost) { alert("Insufficient funds or tokens!"); return; }
             gameState.cash   -= cashCost;
             gameState.tokens -= tokenCost;
+            gameState.totalHubsPurchased = (gameState.totalHubsPurchased || 0) + 1;
  
             // Mark as hub in regions data
             for (const r of Object.values(regions)) {
@@ -3262,6 +3449,7 @@ const repairEvMod = (typeof getGlobalRepairMod === 'function') ? getGlobalRepair
 const cost = Math.ceil(needed * dynamicRepairCost * repairEvMod);
             if (gameState.cash < cost) { alert(`Insufficient funds. Need $${cost.toLocaleString()} to repair.`); return; }
             gameState.cash -= cost;
+            gameState.totalRepairs = (gameState.totalRepairs || 0) + 1;
             if (!achievements.first_repair.unlocked) {
         achievements.first_repair.unlocked = true;
         gameState.tokens += 5;
@@ -3596,7 +3784,7 @@ if (rarityData && !achievements[rarityData.id].unlocked) {
 
 if (prize.rarity === 'exotic' && !achievements['hidden_exotic'].unlocked) {
     achievements['hidden_exotic'].unlocked = true;
-    gameState.tokens += 200;
+    gameState.tokens += 20000;
     triggerMilestonePopupNotification(
         achievements['hidden_exotic'].revealTitle,
         achievements['hidden_exotic'].revealDesc
@@ -3617,6 +3805,20 @@ if (prize.rarity === 'exotic' && !achievements['hidden_exotic'].unlocked) {
                     // undo the one the prize.apply just did, then re-do via helper
                     gameState.hangar[droppedType] = Math.max(0, (gameState.hangar[droppedType] || 1) - 1);
                     addAircraftToHangar(droppedType, gameState.primaryHub || '');
+                }
+            }
+
+            // Exotic Collector — obtain all exotic crate rewards
+            if (!achievements['hidden_exotic_2'].unlocked) {
+                const hasSR72 = (gameState.hangar["Lockheed Martin SR-72"] || 0) > 0;
+                const hasFlyingV = (gameState.hangar["Flying-V"] || 0) > 0;
+                if (hasSR72 && hasFlyingV) {
+                    achievements['hidden_exotic_2'].unlocked = true;
+                    gameState.tokens += 40000;
+                    triggerMilestonePopupNotification(
+                        achievements['hidden_exotic_2'].revealTitle,
+                        achievements['hidden_exotic_2'].revealDesc
+                    );
                 }
             }
 
@@ -3663,6 +3865,7 @@ if (prize.rarity === 'exotic' && !achievements['hidden_exotic'].unlocked) {
                 initSimulationEngine();
             } else {
                 gameState = JSON.parse(JSON.stringify(DEFAULT_STATE));
+                attachCashTracking(gameState); attachTokenSpendTracking(gameState);
                 document.getElementById('setup-screen').style.display = 'flex';
             }
         };
@@ -3875,6 +4078,7 @@ if (prize.rarity === 'exotic' && !achievements['hidden_exotic'].unlocked) {
     if (!parsed || !parsed.gameState) return false;
 
     gameState = parsed.gameState;
+    attachCashTracking(gameState); attachTokenSpendTracking(gameState);
     // Restore events
     if (parsed.activeWorldEvents) { activeWorldEvents = parsed.activeWorldEvents.filter(e => Date.now() < e.endTime); }
     if (parsed.eventHistory) { eventHistory = parsed.eventHistory; }
@@ -3898,14 +4102,59 @@ if (prize.rarity === 'exotic' && !achievements['hidden_exotic'].unlocked) {
     if (!gameState.pendingGround) gameState.pendingGround = {};
     if (!gameState.aircraftRegistrations) gameState.aircraftRegistrations = {};
     if (!gameState.hangarPool) gameState.hangarPool = [];
-    // Migrate legacy save: if hangar has counts but hangarPool is empty, populate pool
-    if (gameState.hangarPool.length === 0 && gameState.hangar && Object.keys(gameState.hangar).some(k => gameState.hangar[k] > 0)) {
-        for (const [type, count] of Object.entries(gameState.hangar)) {
-            for (let i = 0; i < (count || 0); i++) {
-                const pid = createUniqueId();
-                gameState.hangarPool.push({ id: pid, type });
+    if (!gameState.loginStreak) gameState.loginStreak = 0;
+    if (gameState.lastLoginDate === undefined) gameState.lastLoginDate = null;
+    if (gameState.lastQuestCompletionDate === undefined) gameState.lastQuestCompletionDate = null;
+    if (gameState.autoMaintenance === undefined) gameState.autoMaintenance = false;
+    if (!gameState.dailyQuests) gameState.dailyQuests = [];
+    if (gameState.questsDate === undefined) gameState.questsDate = null;
+    if (gameState.questsBonusClaimed === undefined) gameState.questsBonusClaimed = false;
+    if (!gameState.totalFlightLegs) gameState.totalFlightLegs = 0;
+    if (!gameState.totalContractsCompleted) gameState.totalContractsCompleted = 0;
+    if (!gameState.totalAircraftPurchased) gameState.totalAircraftPurchased = 0;
+    if (!gameState.totalRoutesCreated) gameState.totalRoutesCreated = 0;
+    if (!gameState.lifetimeTokensSpent) gameState.lifetimeTokensSpent = 0;
+    if (!gameState.totalHubsPurchased) gameState.totalHubsPurchased = 0;
+    if (!gameState.totalRepairs) gameState.totalRepairs = 0;
+    if (!gameState.totalAircraftSold) gameState.totalAircraftSold = 0;
+    if (!gameState.lifetimeTokensEarned) gameState.lifetimeTokensEarned = 0;
+    if (!gameState.totalDistanceFlownNM) gameState.totalDistanceFlownNM = 0;
+    if (!gameState.totalLegacyPurchased) gameState.totalLegacyPurchased = 0;
+    if (!gameState.totalCargoPurchased) gameState.totalCargoPurchased = 0;
+    if (!gameState.totalHelicopterPurchased) gameState.totalHelicopterPurchased = 0;
+    if (!gameState.totalMilitaryPurchased) gameState.totalMilitaryPurchased = 0;
+    if (!gameState.totalCashSpent) gameState.totalCashSpent = 0;
+    if (!gameState.totalInternationalRoutes) gameState.totalInternationalRoutes = 0;
+    if (gameState.continueFlyingOffline === undefined) gameState.continueFlyingOffline = false;
+    // Reconcile hangarPool against hangar counts per aircraft type. Older saves (and the
+    // sellAircraft bug prior to this fix) can leave hangarPool with more, fewer, or zero
+    // entries than the actual owned count — this repairs any mismatch either direction.
+    if (gameState.hangar) {
+        const poolCountByType = {};
+        for (const p of gameState.hangarPool) poolCountByType[p.type] = (poolCountByType[p.type] || 0) + 1;
+        for (const [type, ownedCount] of Object.entries(gameState.hangar)) {
+            const have = poolCountByType[type] || 0;
+            const need = ownedCount || 0;
+            if (have < need) {
+                for (let i = 0; i < need - have; i++) {
+                    gameState.hangarPool.push({ id: createUniqueId(), type });
+                }
+            } else if (have > need) {
+                let toRemove = have - need;
+                for (let i = gameState.hangarPool.length - 1; i >= 0 && toRemove > 0; i--) {
+                    if (gameState.hangarPool[i].type === type) {
+                        const [removed] = gameState.hangarPool.splice(i, 1);
+                        if (removed) {
+                            if (gameState.aircraftRegistrations) delete gameState.aircraftRegistrations[removed.id];
+                            if (gameState.aircraftStats) delete gameState.aircraftStats[removed.id];
+                        }
+                        toRemove--;
+                    }
+                }
             }
         }
+        // Also drop any pool entries whose type no longer exists in the hangar at all
+        gameState.hangarPool = gameState.hangarPool.filter(p => (gameState.hangar[p.type] || 0) > 0);
     }
 
     // Safeguard regions block if structure updates
@@ -3954,126 +4203,182 @@ if (prize.rarity === 'exotic' && !achievements['hidden_exotic'].unlocked) {
     const lastSave = parsed.lastSaveTime || Date.now();
     const now = Date.now();
     const rawElapsedMs = now - lastSave;
-    // Cap offline catchup to 5 minutes — prevents massive money from closing the app overnight.
-    const MAX_OFFLINE_MS = 5 * 60 * 1000; // 5 minutes
+    const offlineFlyingEnabled = !!gameState.continueFlyingOffline;
+    // Without the setting: only a brief 5-minute "tabbed away" catch-up applies (legacy behavior).
+    // With it enabled: simulate up to 24 real hours of offline flying, leg by leg.
+    const MAX_OFFLINE_MS = offlineFlyingEnabled ? (24 * 60 * 60 * 1000) : (5 * 60 * 1000);
     const elapsedMs = Math.min(rawElapsedMs, MAX_OFFLINE_MS);
-    const ticksPassed = Math.floor(elapsedMs / 100);
     // Offline earnings are heavily reduced (10% of normal) — being away shouldn't print money
     const OFFLINE_EARN_RATIO = 0.10;
 
-    if (ticksPassed > 0 && gameState.routes) {
+    if (elapsedMs > 100 && gameState.routes) {
         let earnedCash = 0, earnedTokens = 0, earnedXp = 0;
-        
+        let anyGrounded = false;
+
         gameState.routes.forEach(route => {
             if (!route.fleet || route.fleet.length === 0) return;
-            const routeDemandMod = getRouteDemandMod(route, 0);
-            
+
             for (let i = route.fleet.length - 1; i >= 0; i--) {
-                let f = route.fleet[i];
+                const f = route.fleet[i];
+                if (isVoluntarilyGrounded(f.id) || isInCooldown(f.id)) continue; // already grounded/cooling — leave it alone
                 const ac = allCrafts[f.type];
-                if (ac) f.speed = (ac.topSpeedKnots / route.distanceNM) * SPEED_SCALE_FACTOR;
-                
-                
-                
-                f.progress += (f.speed || 0.1) * ticksPassed;
-                let completedLegs = Math.floor(f.progress / 100);
-                
-                f.progress = f.progress % 100;
-                
-                if (completedLegs > 0 && (getAircraftStat(f.id, 'fuel') <= 0 || getAircraftStat(f.id, 'condition') <= 0)) {
-                    gameState.voluntarilyGrounded[f.id] = true;
-                    setAircraftStat(f.id, 'cooldownTicks', COOLDOWN_TICKS);
-                    if (true) {
-                        gameState.pendingGround[f.id] = true;
+                if (!ac) continue;
+                if (route.distanceNM > 0) f.speed = (ac.topSpeedKnots / route.distanceNM) * SPEED_SCALE_FACTOR;
+
+                let remainingMs = elapsedMs;
+                let legsCompleted = 0;
+                let grounded = false;
+                let removedFromFleet = false;
+                let iterations = 0;
+
+                // Advance leg-by-leg (never in fractional "mid-air" jumps across a leg boundary),
+                // charging fuel/condition exactly as the live tick does, and stopping cleanly at
+                // an airport (progress reset to 0) the moment the NEXT leg can't be afforded —
+                // never grounding an aircraft while it's still mid-route.
+                while (remainingMs > 0 && iterations < 20000 && !removedFromFleet) {
+                    iterations++;
+                    const progressPerTick = f.speed || 0.1;
+                    const ticksAvailable = remainingMs / 100;
+                    const progressNeeded = 100 - f.progress;
+                    const ticksToFinishLeg = progressNeeded / progressPerTick;
+                    const legDistanceNM = route.distanceNM || 0;
+                    const rangeNM = ac.rangeNM || 1;
+
+                    if (ticksAvailable < ticksToFinishLeg) {
+                        // This leg won't finish before offline time runs out — advance partial
+                        // progress only, charging fuel/condition proportionally.
+                        const progressAdded = progressPerTick * ticksAvailable;
+                        const fuelCost = progressAdded * (legDistanceNM / rangeNM) * 0.5;
+                        const condCost = fuelCost * 0.15;
+                        const fuelNow = getAircraftStat(f.id, 'fuel'), condNow = getAircraftStat(f.id, 'condition');
+                        if (fuelNow - fuelCost > 0 && condNow - condCost > 0) {
+                            setAircraftStat(f.id, 'fuel', fuelNow - fuelCost);
+                            setAircraftStat(f.id, 'condition', condNow - condCost);
+                            f.progress += progressAdded;
+                        }
+                        // If it can't even cover this partial stretch, leave it exactly where it is —
+                        // still mid-flight — and let the live tick resolve fuel-out consequences
+                        // normally once the player returns (matches real-time crash behavior).
+                        break;
                     }
-                }
-                if (completedLegs % 2 !== 0) f.directionForward = !f.directionForward;
-                
-                if (gameState.voluntarilyGrounded[f.id]) { completedLegs = 0; continue; }
-                
-                if (completedLegs > 0) {
+
+                    // This leg completes within the offline window — pay its full fuel/condition cost.
+                    const fuelCostLeg = progressNeeded * (legDistanceNM / rangeNM) * 0.5;
+                    const condCostLeg = fuelCostLeg * 0.15;
+                    const fuelBefore = getAircraftStat(f.id, 'fuel'), condBefore = getAircraftStat(f.id, 'condition');
+                    if (fuelBefore - fuelCostLeg <= 0 || condBefore - condCostLeg <= 0) {
+                        // Can't complete even this leg — leave it flying; resolved live on return.
+                        break;
+                    }
+                    setAircraftStat(f.id, 'fuel', fuelBefore - fuelCostLeg);
+                    setAircraftStat(f.id, 'condition', condBefore - condCostLeg);
+                    remainingMs -= ticksToFinishLeg * 100;
+                    f.progress = 0;
+                    legsCompleted++;
+
                     if (route.isSpecialContract) {
                         if (route.contractLegs && route.contractLegs.length > 0) {
-                            let legIdx = (route.currentLegIndex || 0) + completedLegs;
+                            const legIdx = (route.currentLegIndex || 0) + 1;
                             if (legIdx >= route.contractLegs.length) {
                                 earnedCash += Math.round(route.rewardCash * OFFLINE_EARN_RATIO);
-                                addAircraftToHangar(f.type, route.origin, String(f.id), getAircraftStat(f.id,'fuel'), getAircraftStat(f.id,'condition'));
+                                addAircraftToHangar(f.type, route.origin, String(f.id), getAircraftStat(f.id, 'fuel'), getAircraftStat(f.id, 'condition'));
                                 route.fleet.splice(i, 1);
                                 earnedXp += Math.round(route.distanceNM);
+                                removedFromFleet = true;
                             } else {
                                 const nextLeg = route.contractLegs[legIdx];
-                                
-                                // THE CRITICAL UPDATE PROTECTION: 
-                                // Checks if the updated waypoint structure layout exists before evaluation
                                 if (nextLeg && nextLeg.lat !== undefined && nextLeg.lng !== undefined && route.destLat !== undefined) {
                                     route.origLat = route.destLat; route.origLng = route.destLng;
                                     route.destination = nextLeg.name || `Waypoint ${legIdx + 1}`;
                                     route.destLat = nextLeg.lat; route.destLng = nextLeg.lng;
                                     route.currentLegIndex = legIdx;
-                                    
                                     try {
                                         const newDist = Math.max(10, Math.round(L.latLng(route.origLat, route.origLng).distanceTo(L.latLng(route.destLat, route.destLng)) / 1852));
                                         route.distanceNM = newDist;
                                         if (ac) f.speed = (ac.topSpeedKnots / newDist) * SPEED_SCALE_FACTOR;
-                                    } catch(err) {
+                                    } catch (err) {
                                         console.warn("Leaflet sync skipped due to map update restructuring:", err);
                                     }
                                 } else {
-                                    // Soft-reset leg indexing if structural arrays shifted out of boundaries
                                     route.currentLegIndex = 0;
                                 }
-                                f.progress = 0; f.directionForward = true;
+                                f.directionForward = true;
                             }
                         } else {
                             earnedCash += Math.round(route.rewardCash * OFFLINE_EARN_RATIO);
-                            addAircraftToHangar(f.type, route.origin, String(f.id), getAircraftStat(f.id,'fuel'), getAircraftStat(f.id,'condition'));
+                            addAircraftToHangar(f.type, route.origin, String(f.id), getAircraftStat(f.id, 'fuel'), getAircraftStat(f.id, 'condition'));
                             route.fleet.splice(i, 1);
                             earnedXp += Math.round(route.distanceNM);
+                            removedFromFleet = true;
                         }
                     } else {
+                        f.directionForward = !f.directionForward;
                         const isCargo = ac && ac.isCargo;
                         const mult = isCargo ? CARGO_EARNINGS_MULTIPLIER : EARNINGS_MULTIPLIER;
-                        const fUnit = isCargo ? (ac.cargo || 0) : ((ac.pax || 0));
-                        const evMods = (typeof getEventModsForRoute === 'function') ? getEventModsForRoute(route) : { earningsMod:0, demandMod:0 };
+                        const fUnit = isCargo ? (ac.cargo || 0) : (ac.pax || 0);
+                        const evMods = (typeof getEventModsForRoute === 'function') ? getEventModsForRoute(route) : { earningsMod: 0, demandMod: 0 };
                         const effectiveDemandMod = getRouteDemandMod(route, evMods.demandMod);
                         let baseCash;
                         if (!isCargo && fUnit > 0) {
                             const tickResult = calcTicketingResult(route, fUnit, effectiveDemandMod, 1);
-                            baseCash = tickResult.revenue * completedLegs;
+                            baseCash = tickResult.revenue;
                         } else {
-                            baseCash = Math.round(route.distanceNM * mult * fUnit * effectiveDemandMod * (1 + evMods.earningsMod)) * completedLegs;
+                            baseCash = Math.round(route.distanceNM * mult * fUnit * effectiveDemandMod * (1 + evMods.earningsMod));
                         }
                         earnedCash += Math.round(baseCash * OFFLINE_EARN_RATIO);
-                        earnedXp += Math.round(route.distanceNM) * completedLegs;
+                        earnedXp += Math.round(route.distanceNM);
                         const tokenOdds = Math.min(0.98, route.distanceNM / 1500 + 0.25);
-                        for (let k = 0; k < completedLegs; k++) if (Math.random() < tokenOdds) earnedTokens += Math.max(1, Math.floor(route.distanceNM / 1000));
+                        if (Math.random() < tokenOdds) earnedTokens += Math.max(1, Math.floor(route.distanceNM / 1000));
+                    }
+
+                    // Before starting the next leg, make sure it's actually affordable — if not,
+                    // ground the aircraft right here, at the airport it just landed at.
+                    if (!removedFromFleet && remainingMs > 0) {
+                        const nextDistanceNM = route.distanceNM || 0;
+                        const nextRangeNM = ac.rangeNM || 1;
+                        const nextFuelCost = 100 * (nextDistanceNM / nextRangeNM) * 0.5;
+                        const nextCondCost = nextFuelCost * 0.15;
+                        const fuelAfter = getAircraftStat(f.id, 'fuel'), condAfter = getAircraftStat(f.id, 'condition');
+                        if (fuelAfter - nextFuelCost <= 0 || condAfter - nextCondCost <= 0) {
+                            grounded = true;
+                            break;
+                        }
                     }
                 }
+
+                if (grounded && !removedFromFleet) {
+                    gameState.voluntarilyGrounded[f.id] = true;
+                    gameState.pendingGround[f.id] = true;
+                    setAircraftStat(f.id, 'cooldownTicks', COOLDOWN_TICKS);
+                    anyGrounded = true;
+                }
+                if (legsCompleted > 0) gameState.totalFlightLegs = (gameState.totalFlightLegs || 0) + legsCompleted;
             }
         });
+
         gameState.routes = gameState.routes.filter(r => !r.isSpecialContract || (r.fleet && r.fleet.length > 0));
         gameState.cash += earnedCash;
-        gameState.lifetimeEarnings = (gameState.lifetimeEarnings || 0) + earnedCash;
         gameState.tokens += earnedTokens;
         gameState.xp += earnedXp;
         if (typeof checkRankUp === "function") checkRankUp();
 
         // Show away-earnings summary if player was gone >60s
-        if (rawElapsedMs > 60000 && earnedCash > 0) {
+        if (rawElapsedMs > 60000 && (earnedCash > 0 || anyGrounded)) {
             const awayMins = Math.round(rawElapsedMs / 60000);
             const cappedMins = Math.round(MAX_OFFLINE_MS / 60000);
             const wasCapped = rawElapsedMs > MAX_OFFLINE_MS;
             setTimeout(() => {
-                const msg = wasCapped
+                let msg = wasCapped
                     ? `Away for ${awayMins} min — earned $${earnedCash.toLocaleString()} (capped at ${cappedMins} min offline)`
                     : `Away for ${awayMins} min — earned $${earnedCash.toLocaleString()}`;
+                if (anyGrounded) msg += ' · Some aircraft grounded (out of fuel/condition)';
                 if (typeof triggerMilestonePopupNotification === 'function') {
                     triggerMilestonePopupNotification('✈ Welcome Back!', msg);
                 }
             }, 2000);
         }
     }
-    
+
     lastTickTime = Date.now();
     document.body.classList.toggle('light-theme', !!gameState.lightTheme);
     if (typeof checkMilestones === "function") checkMilestones();
@@ -4129,6 +4434,7 @@ if (prize.rarity === 'exotic' && !achievements['hidden_exotic'].unlocked) {
         function executeAccountReset() {
             localStorage.removeItem('am81_savegame_pro');
             gameState = JSON.parse(JSON.stringify(DEFAULT_STATE));
+            attachCashTracking(gameState); attachTokenSpendTracking(gameState);
             for (const r of Object.values(regions))  { r.unlocked = false; r.airports.forEach(a => a.isHub = false); }
             for (const key in achievements)           { achievements[key].unlocked = false; }
             Object.values(activeFlightMarkers).forEach(m => map && map.removeLayer(m));
@@ -4180,9 +4486,13 @@ if (prize.rarity === 'exotic' && !achievements['hidden_exotic'].unlocked) {
             mapEl.appendChild(indicator);
  
             if (gameState.tutorialActive && !achievements.graduation.unlocked) renderCurrentTutorialStep();
+            checkDailyLoginBonus();
+            refreshDailyQuestsIfNeeded();
             lastTickTime = Date.now();
             setInterval(gameSimulationTick, 100);
             setInterval(rollContractChance, 120000);
+            setInterval(autoMaintenanceScan, 5000);
+            setInterval(refreshDailyQuestsIfNeeded, 30000); // catches the midnight rollover (normal + hard quests together) during long sessions
  
              // Crate spawning — timestamp-based, checked every second
             window._nextCrateSpawnAt = Date.now() + 120000; // first crate 2 min after load
@@ -4252,6 +4562,116 @@ if (prize.rarity === 'exotic' && !achievements['hidden_exotic'].unlocked) {
             }
             saveProgress();
         }
+        function toggleAutoMaintenance(enabled) {
+            gameState.autoMaintenance = enabled;
+            saveProgress();
+            if (enabled) {
+                triggerMilestonePopupNotification('🔧 Auto-Maintenance Enabled', 'Landed aircraft below 40% fuel or condition will be refuelled/repaired automatically when funds allow.');
+                autoMaintenanceScan();
+            }
+        }
+        function toggleContinueFlyingOffline(enabled) {
+            gameState.continueFlyingOffline = enabled;
+            saveProgress();
+            if (enabled) {
+                triggerMilestonePopupNotification('✈ Continue Flying Offline Enabled', 'Your fleet keeps flying and earning while you\'re away (up to 24h). Aircraft that run low on fuel or condition will land and ground themselves safely.');
+            }
+        }
+        // Instantly completes the current leg for any aircraft that's actively airborne
+        // (not just-departed, not already grounded). Used when the tab goes unfocused so
+        // planes don't get stranded mid-flight while the player is away.
+        function forceLandAirborneFleet() {
+            if (!gameState.routes) return false;
+            let changed = false;
+            gameState.routes.forEach(route => {
+                if (!route.fleet) return;
+                route.fleet.forEach(f => {
+                    const inCooldown = isInCooldown(f.id);
+                    const voluntGrnd = isVoluntarilyGrounded(f.id);
+                    if (inCooldown || voluntGrnd) return; // already grounded, nothing to do
+                    if (f.progress >= 2 && f.progress < 100) {
+                        f.progress = 100; // next tick's normal arrival logic brings it in to land
+                        changed = true;
+                    }
+                });
+            });
+            if (changed) saveProgress();
+            return changed;
+        }
+        function autoMaintenanceScan() {
+            if (!gameState.routes) return;
+            const allCrafts = { ...aircraftCatalog, ...cargoCatalog, ...legacyAircraftCatalog, ...secretCatalog, ...helicopterCatalog, ...airshipCatalog, ...militaryCatalog };
+            const AUTO_MAINTENANCE_THRESHOLD = 40;
+            let anyChange = false;
+            // While the tab is unfocused and auto-maintenance is on, keep airborne aircraft flying
+            // as long as the player can plausibly afford to service them — only force an early
+            // landing once cash can no longer cover a worst-case refuel + repair for that aircraft.
+            if (document.hidden && gameState.autoMaintenance) {
+                gameState.routes.forEach(route => {
+                    if (!route.fleet) return;
+                    route.fleet.forEach(f => {
+                        const inCooldown = isInCooldown(f.id);
+                        const voluntGrnd = isVoluntarilyGrounded(f.id);
+                        if (inCooldown || voluntGrnd) return;
+                        if (f.progress >= 2 && f.progress < 100) {
+                            const craftSpec = allCrafts[f.type];
+                            if (!craftSpec) return;
+                            const worstCaseServiceCost = craftSpec.price * 0.1; // full refuel (100 × 0.00025) + full repair (100 × 0.00075)
+                            if (gameState.cash < worstCaseServiceCost) {
+                                f.progress = 100;
+                                anyChange = true;
+                            }
+                        }
+                    });
+                });
+            }
+            if (!gameState.autoMaintenance) { if (anyChange) { updateUI(); saveProgress(); } return; }
+            gameState.routes.forEach(route => {
+                if (!route.fleet) return;
+                route.fleet.forEach(f => {
+                    const craftSpec = allCrafts[f.type];
+                    if (!craftSpec) return;
+                    const inCooldown = isInCooldown(f.id);
+                    const voluntGrnd = isVoluntarilyGrounded(f.id);
+                    const isLanded = inCooldown || voluntGrnd || f.progress < 2;
+                    if (!isLanded) return;
+                    const fuelEvMod = (typeof getGlobalFuelMod === 'function') ? getGlobalFuelMod() : 1;
+                    const repairEvMod = (typeof getGlobalRepairMod === 'function') ? getGlobalRepairMod() : 1;
+                    const fuel = getAircraftStat(f.id, 'fuel');
+                    if (fuel < AUTO_MAINTENANCE_THRESHOLD) {
+                        const needed = 100 - fuel;
+                        const cost = Math.ceil(needed * Math.max(1, craftSpec.price * 0.00025) * fuelEvMod);
+                        if (gameState.cash >= cost) {
+                            gameState.cash -= cost;
+                            setAircraftStat(f.id, 'fuel', 100);
+                            gameState.totalRefuels = (gameState.totalRefuels || 0) + 1;
+                            anyChange = true;
+                        }
+                    }
+                    const cond = getAircraftStat(f.id, 'condition');
+                    if (cond < AUTO_MAINTENANCE_THRESHOLD) {
+                        const needed = 100 - cond;
+                        const cost = Math.ceil(needed * Math.max(1, craftSpec.price * 0.00075) * repairEvMod);
+                        if (gameState.cash >= cost) {
+                            gameState.cash -= cost;
+                            setAircraftStat(f.id, 'condition', 100);
+                            anyChange = true;
+                        }
+                    }
+                    // Auto-resume maintenance-grounded aircraft once it's fit to fly again
+                    if (gameState.voluntarilyGrounded[f.id] === "maintenance") {
+                        const reqFuel = 100 * (route.distanceNM / craftSpec.rangeNM);
+                        const reqCond = reqFuel * 0.2;
+                        if (getAircraftStat(f.id, 'fuel') > reqFuel && getAircraftStat(f.id, 'condition') > reqCond) {
+                            delete gameState.voluntarilyGrounded[f.id];
+                            setAircraftStat(f.id, 'cooldownTicks', COOLDOWN_TICKS);
+                            anyChange = true;
+                        }
+                    }
+                });
+            });
+            if (anyChange) { updateUI(); saveProgress(); }
+        }
         function setLayoutMode(mode) {
             // mode: 'pc' | 'auto' | 'mobile'
             gameState.layoutMode = mode;
@@ -4302,6 +4722,8 @@ if (prize.rarity === 'exotic' && !achievements['hidden_exotic'].unlocked) {
             document.getElementById('route-line-checkbox').checked = gameState.showRouteLines;
             document.getElementById('hospital-marker-checkbox').checked = gameState.showHospitals !== false;
             document.getElementById('contracts-disabled-checkbox').checked = !!gameState.contractsDisabled;
+            document.getElementById('auto-maintenance-checkbox').checked = !!gameState.autoMaintenance;
+            document.getElementById('continue-flying-offline-checkbox').checked = !!gameState.continueFlyingOffline;
             const layoutMode = gameState.layoutMode || 'auto';
             ['pc','auto','mobile'].forEach(m => {
                 const btn = document.getElementById('layout-' + m + '-btn');
@@ -4948,8 +5370,11 @@ const hub =
             }
             const hasBoost = gameState.speedBoostEndTime && now < gameState.speedBoostEndTime;
             const simSpeed = hasBoost ? ((gameState.tutorialActive && gameState.tutorialFastForward) ? 100 : 2) : ((gameState.tutorialActive && gameState.tutorialFastForward) ? 50 : 1);
-            // Cap tab-away elapsed time to 30 seconds of ticks — prevents huge catch-up burst when returning
-            const cappedElapsedMs = isTabFocused ? elapsedMs : Math.min(elapsedMs, 30000);
+            // Cap tab-away elapsed time to 30 seconds of ticks — prevents huge catch-up burst when
+            // returning. Aircraft under Auto Refuel & Repair are allowed to fly uncapped while the
+            // tab is backgrounded (autoMaintenanceScan grounds them early if funds run out), since
+            // the whole point of that setting is to let flights actually continue unattended.
+            const cappedElapsedMs = (isTabFocused || gameState.autoMaintenance || gameState.continueFlyingOffline) ? elapsedMs : Math.min(elapsedMs, 30000);
           const deltaTicks = (cappedElapsedMs / 100) * simSpeed;
             // A tick is "live" (crash-eligible) only when actively playing in real-time:
             // tab is focused AND elapsed time is small (not a catch-up after sleep/background)
@@ -5233,6 +5658,7 @@ const hub =
                         const craftSpec = allCrafts[f.type];
                         const isHeli = craftSpec && craftSpec.type === "helicopter";
                         const isCargo = craftSpec && craftSpec.isCargo;
+                        const isAirship = craftSpec && craftSpec.type === "airship";
                         const angle = isHeli ? (bearing + 90) : (bearing - 90);
                         const iconScale = gameState.aircraftIconScale || gameState.mapIconScale || 1;
                         window.__aircraftIconScale = iconScale;
@@ -5335,18 +5761,13 @@ const hub =
                             htmlContent = `<img src="${FLYINGV_ICON_B64}" style="${imgStyle}">`;
                         } else if (f.type === "Short 360") {
                             htmlContent = `<img src="${SHORT360_ICON_B64}" style="${imgStyle}">`;
-                        } else if (f.type === "USS Akron (ZRS-4)") {
-                            htmlContent = `<img src="${BLIMP_ICON_B64}" style="${imgStyle}">`;
-                        } else if (f.type === "Zeppelin NT") {
-                            htmlContent = `<img src="${BLIMP_ICON_B64}" style="${imgStyle}">`;
-                        } else if (f.type === "LZ 127 Graf Zeppelin") {
-                            htmlContent = `<img src="${BLIMP_ICON_B64}" style="${imgStyle}">`;
-                        } else if (f.type === "LZ 129 Hindenburg") {
-                            htmlContent = `<img src="${BLIMP_ICON_B64}" style="${imgStyle}">`;
+                        
                         } else if (f.type === "Airlander 10") {
                             htmlContent = `<img src="${AIRLANDER_ICON_B64}" style="${imgStyle}">`;
                         } else if (f.type === "Hot Air Balloon") {
                             htmlContent = `<img src="${CIRCLE_ICON_B64}" style="${imgStyle}">`;
+                        } else if (isAirship) {
+                            htmlContent = `<img src="${BLIMP_ICON_B64}" style="${imgStyle}">`;
                         } else {
                             let glyph = isHeli ? `<img src="${HELICOPTER_ICON_B64}` : isCargo ? '✈' : '✈' ;
                             let color = isHeli ? '#c084fc' : isCargo ? '#f97316' : '#eab308';
@@ -5407,11 +5828,24 @@ const hub =
     if (atcFeedFleetId && String(atcFeedFleetId) === fIdStr && window._atcHeldFleets) {
         window._atcHeldFleets.add(fIdStr);
     }
-                           // If aircraft landed while player was away, park it
+                           // If aircraft landed while player was away: ground it, UNLESS a
+                           // flying-while-away setting is on AND it can actually afford another
+                           // leg — in which case let it keep going instead of parking it for no reason.
 if (!isTabFocused || !isLiveTick) {
-    gameState.voluntarilyGrounded[f.id] = true;
-    f.progress = 0;
-    continue;
+    const keepFlyingAway = gameState.autoMaintenance || gameState.continueFlyingOffline;
+    let canAffordNextLeg = false;
+    if (keepFlyingAway) {
+        const nextFuelCost = 100 * (route.distanceNM / (craftSpec?.rangeNM || 1)) * 0.5;
+        const nextCondCost = nextFuelCost * 0.15;
+        const fuelNow = getAircraftStat(f.id, 'fuel');
+        const condNow = getAircraftStat(f.id, 'condition');
+        canAffordNextLeg = (fuelNow - nextFuelCost > 0) && (condNow - nextCondCost > 0);
+    }
+    if (!canAffordNextLeg) {
+        gameState.voluntarilyGrounded[f.id] = true;
+        f.progress = 0;
+        continue;
+    }
 }
 
     // ADD THIS NEW BLOCK: Transfer pending ground to actual ground upon landing
@@ -5452,6 +5886,8 @@ if (!isTabFocused || !isLiveTick) {
                                         addAircraftToHangar(f.type, route.origin, String(f.id), getAircraftStat(f.id,'fuel'), getAircraftStat(f.id,'condition'));
                                         route.fleet.splice(i, 1);
                                         gameState.xp += Math.round(route.distanceNM);
+                                        gameState.totalDistanceFlownNM = (gameState.totalDistanceFlownNM || 0) + route.distanceNM;
+                                        gameState.totalContractsCompleted = (gameState.totalContractsCompleted || 0) + 1;
                                         triggerMilestonePopupNotification(`✅ ${route.contractLabel || 'Contract'} Complete`, `+$${route.rewardCash.toLocaleString()}`);
                                     }
                                 } else {
@@ -5460,6 +5896,8 @@ if (!isTabFocused || !isLiveTick) {
                                     addAircraftToHangar(f.type, route.origin, String(f.id), getAircraftStat(f.id,'fuel'), getAircraftStat(f.id,'condition'));
                                     route.fleet.splice(i, 1);
                                     gameState.xp += Math.round(route.distanceNM);
+                                    gameState.totalDistanceFlownNM = (gameState.totalDistanceFlownNM || 0) + route.distanceNM;
+                                    gameState.totalContractsCompleted = (gameState.totalContractsCompleted || 0) + 1;
                                 }
                             } else {
                                 const mult = isCargo ? CARGO_EARNINGS_MULTIPLIER : EARNINGS_MULTIPLIER;
@@ -5479,8 +5917,9 @@ if (!isTabFocused || !isLiveTick) {
                                     cashReward = Math.round(route.distanceNM * mult * unit * effectiveDemandMod * condMod * (1 + evMods.earningsMod)) * legsFinished;
                                 }
                                 gameState.cash += applyCashForTick(cashReward, isLiveTick);
-                                gameState.lifetimeEarnings = (gameState.lifetimeEarnings || 0) + applyCashForTick(cashReward, isLiveTick);
+                                gameState.totalFlightLegs = (gameState.totalFlightLegs || 0) + legsFinished;
                                 gameState.xp += Math.round(route.distanceNM) * legsFinished;
+                                gameState.totalDistanceFlownNM = (gameState.totalDistanceFlownNM || 0) + (route.distanceNM * legsFinished);
                                 const tkOdds = Math.min(0.98, route.distanceNM / 1500 + 0.25);
                                 for (let k = 0; k < legsFinished; k++) if (Math.random() < tkOdds) gameState.tokens += Math.max(1, Math.floor(route.distanceNM / 1000));
                                 if (!achievements.bring_a_jacket.unlocked && (findRegionNameByAirport(route.origin) === "Antarctica" || findRegionNameByAirport(route.destination) === "Antarctica")) {
@@ -5618,6 +6057,9 @@ if (!isTabFocused || !isLiveTick) {
             if (orig === dest) { alert('Origin and destination must be different airports.'); return; }
             if (gameState.routes.some(r => r.origin === orig && r.destination === dest)) { alert('This route already exists.'); return; }
             gameState.tokens -= 15;
+            gameState.totalRoutesCreated = (gameState.totalRoutesCreated || 0) + 1;
+            const nation1 = getAirportNation(orig), nation2 = getAirportNation(dest);
+            if (nation1 && nation2 && nation1 !== nation2) gameState.totalInternationalRoutes = (gameState.totalInternationalRoutes || 0) + 1;
             const a1 = findAirportData(orig), a2 = findAirportData(dest);
             const distanceNM = Math.round(L.latLng(a1.lat, a1.lng).distanceTo(L.latLng(a2.lat, a2.lng)) / 1852);
             let base = Math.sqrt(a1.baseDemand * a2.baseDemand);
@@ -6627,6 +7069,11 @@ if (allCraftsForCheck[type] && allCraftsForCheck[type].waterOnly) {
     for (let i = 0; i < qty; i++) {
         addAircraftToHangar(selectedBulkAircraft, hubName);
     }
+    gameState.totalAircraftPurchased = (gameState.totalAircraftPurchased || 0) + qty;
+    if (isLegacy) gameState.totalLegacyPurchased = (gameState.totalLegacyPurchased || 0) + qty;
+    if (spec.isCargo || spec.type === 'cargo-plane') gameState.totalCargoPurchased = (gameState.totalCargoPurchased || 0) + qty;
+    if (spec.type === 'helicopter') gameState.totalHelicopterPurchased = (gameState.totalHelicopterPurchased || 0) + qty;
+    if (spec.isMilitary) gameState.totalMilitaryPurchased = (gameState.totalMilitaryPurchased || 0) + qty;
 
     // Notification for aircraft purchase
     const rar = (spec.rarity || 'common').toLowerCase();
@@ -6640,6 +7087,24 @@ if (allCraftsForCheck[type] && allCraftsForCheck[type].waterOnly) {
         gameState.cash += 10000;
         gameState.tokens += 10;
         triggerMilestonePopupNotification(achievements.spinning_around.title, achievements.spinning_around.rewardDesc);
+    }
+    if (!achievements.up_up_and_away.unlocked && allCraftsCheck[selectedBulkAircraft]?.type === 'airship') {
+        achievements.up_up_and_away.unlocked = true;
+        gameState.cash += 25000;
+        gameState.tokens += 15;
+        triggerMilestonePopupNotification(achievements.up_up_and_away.title, achievements.up_up_and_away.rewardDesc);
+    }
+    if (!achievements.top_gun.unlocked && allCraftsCheck[selectedBulkAircraft]?.isMilitary) {
+        achievements.top_gun.unlocked = true;
+        gameState.cash += 50000;
+        gameState.tokens += 20;
+        triggerMilestonePopupNotification(achievements.top_gun.title, achievements.top_gun.rewardDesc);
+    }
+    if (!achievements.old_school.unlocked && allCraftsCheck[selectedBulkAircraft]?.type === 'legacy-plane') {
+        achievements.old_school.unlocked = true;
+        gameState.cash += 25000;
+        gameState.tokens += 15;
+        triggerMilestonePopupNotification(achievements.old_school.title, achievements.old_school.rewardDesc);
     }
 
     closeMarketModal();
@@ -6968,7 +7433,350 @@ if (allCraftsForCheck[type] && allCraftsForCheck[type].waterOnly) {
             return names;
         }
  
+        // ===== DAILY LOGIN STREAK BONUS =====
+        const DAILY_LOGIN_REWARDS = [
+            { cash: 5000,   tokens: 2  },  // day 1
+            { cash: 10000,  tokens: 4  },  // day 2
+            { cash: 15000,  tokens: 6  },  // day 3
+            { cash: 25000,  tokens: 10 },  // day 4
+            { cash: 35000,  tokens: 15 },  // day 5
+            { cash: 50000,  tokens: 20 },  // day 6
+            { cash: 100000, tokens: 50 },  // day 7 (streak milestone)
+        ];
+        function checkDailyLoginBonus() {
+            const today = new Date().toDateString();
+            if (gameState.lastLoginDate === today) return; // already claimed today
+            const yesterday = new Date(Date.now() - 86400000).toDateString();
+            const isConsecutive = gameState.lastLoginDate === yesterday;
+            // The streak only continues if the player actually cleared at least one Daily Quest
+            // yesterday — logging in alone is no longer enough to keep it climbing.
+            const questedYesterday = gameState.lastQuestCompletionDate === yesterday;
+            gameState.loginStreak = (isConsecutive && questedYesterday) ? (gameState.loginStreak || 0) + 1 : 1;
+            gameState.lastLoginDate = today;
+            const dayIndex = (gameState.loginStreak - 1) % DAILY_LOGIN_REWARDS.length;
+            const reward = DAILY_LOGIN_REWARDS[dayIndex];
+            gameState.cash += reward.cash;
+            gameState.tokens += reward.tokens;
+            const streakLabel = `Day ${((dayIndex + 1))} of streak (${gameState.loginStreak} day${gameState.loginStreak !== 1 ? 's' : ''} total)`;
+            setTimeout(() => {
+                if (typeof triggerMilestonePopupNotification === 'function') {
+                    triggerMilestonePopupNotification('📅 Daily Login Bonus', `${streakLabel} — $${reward.cash.toLocaleString()} and +${reward.tokens} AeroTokens`);
+                }
+                if (typeof updateUI === 'function') updateUI();
+                if (typeof saveProgress === 'function') saveProgress();
+            }, 1000);
+        }
+
+        function openStreakScreen() {
+            renderStreakScreen();
+            document.getElementById('streak-screen').style.display = 'flex';
+        }
+        function closeStreakScreen() {
+            document.getElementById('streak-screen').style.display = 'none';
+        }
+        function renderStreakScreen() {
+            const streak = gameState.loginStreak || 0;
+            const today = new Date().toDateString();
+            const claimedToday = gameState.lastLoginDate === today;
+            const countEl = document.getElementById('streak-current-count');
+            if (countEl) countEl.textContent = streak;
+            const cycleLen = DAILY_LOGIN_REWARDS.length;
+            // Day index (0-based) within the current 7-day cycle that was last claimed
+            const currentCycleDay = streak === 0 ? -1 : (streak - 1) % cycleLen;
+            const grid = document.getElementById('streak-calendar-grid');
+            if (grid) {
+                grid.innerHTML = DAILY_LOGIN_REWARDS.map((reward, i) => {
+                    const isClaimed = i <= currentCycleDay && streak > 0;
+                    const isNext = claimedToday ? i === (currentCycleDay + 1) % cycleLen : i === (currentCycleDay + 1 <= cycleLen - 1 ? currentCycleDay + 1 : 0) || (streak === 0 && i === 0);
+                    const bg = isClaimed ? 'rgba(16,185,129,0.15)' : (isNext && !claimedToday ? 'rgba(99,102,241,0.15)' : 'var(--card-bg)');
+                    const border = isClaimed ? '#10b981' : (isNext && !claimedToday ? 'var(--accent-color)' : 'var(--card-border)');
+                    return `<div style="background:${bg};border:1px solid ${border};border-radius:8px;padding:8px 4px;text-align:center;">
+                        <div style="font-size:9px;color:#94a3b8;font-weight:700;">DAY ${i + 1}</div>
+                        <div style="font-size:14px;margin:3px 0;">${isClaimed ? '✅' : '🎁'}</div>
+                        <div style="font-size:9px;color:var(--money-color);font-weight:700;">$${reward.cash >= 1000 ? Math.round(reward.cash/1000)+'k' : reward.cash}</div>
+                        <div style="font-size:8px;color:var(--token-color);">+${reward.tokens}✈</div>
+                    </div>`;
+                }).join('');
+            }
+            const statusEl = document.getElementById('streak-status-text');
+            if (statusEl) {
+                const today = new Date().toDateString();
+                const questedToday = gameState.lastQuestCompletionDate === today;
+                statusEl.textContent = claimedToday
+                    ? (questedToday
+                        ? `Today's bonus claimed and a quest is done — streak is safe. See you tomorrow!`
+                        : `Today's bonus claimed, but you haven't finished a Daily Quest yet — do one today or the streak resets tomorrow!`)
+                    : `Log in and clear at least one Daily Quest today to extend your streak!`;
+            }
+        }
+
+        // ===== DAILY QUESTS =====
+        const QUEST_METRICS = {
+            earn_cash:   { label: 'Earn', unit: 'cash', icon: '💵', getVal: () => gameState.lifetimeEarnings || 0,
+                            tiers: [50000, 150000, 400000, 1000000, 3000000] },
+            fly_legs:    { label: 'Complete', unit: 'flight legs', icon: '🛫', getVal: () => gameState.totalFlightLegs || 0,
+                            tiers: [10, 25, 60, 150, 400] },
+            open_crates: { label: 'Open', unit: 'supply crates', icon: '📦', getVal: () => gameState.cratesClaimed || 0,
+                            tiers: [1, 2, 4, 8, 15] },
+            refuel_fleet:{ label: 'Refuel', unit: 'aircraft', icon: '⛽', getVal: () => gameState.totalRefuels || 0,
+                            tiers: [3, 8, 20, 45, 100] },
+            run_contracts:{ label: 'Complete', unit: 'special contracts', icon: '📜', getVal: () => gameState.totalContractsCompleted || 0,
+                            tiers: [1, 2, 4, 8, 15] },
+            earn_xp:     { label: 'Earn', unit: 'XP', icon: '⭐', getVal: () => gameState.xp || 0,
+                            tiers: [500, 1500, 4000, 10000, 25000] },
+            earn_tokens: { label: 'Earn', unit: 'AeroTokens', icon: '🪙', getVal: () => gameState.lifetimeTokensEarned || 0,
+                            tiers: [10, 25, 60, 150, 400] },
+            fly_legacy:  { label: 'Fly', unit: 'legacy aircraft legs', icon: '🕰️', getVal: () => gameState.legacyFlightTicks || 0,
+                            tiers: [20, 60, 150, 400, 1000] },
+            fly_distance:{ label: 'Fly', unit: 'nautical miles', icon: '🌍', getVal: () => Math.round(gameState.totalDistanceFlownNM || 0),
+                            tiers: [5000, 15000, 40000, 100000, 250000] },
+            own_aircraft:{ label: 'Grow your fleet by', unit: 'aircraft', icon: '🛩️', getVal: () => Object.values(gameState.hangar || {}).reduce((s, c) => s + c, 0),
+                            tiers: [1, 2, 4, 8, 15] },
+            unlock_achievements: { label: 'Unlock', unit: 'achievements', icon: '🏅', getVal: () => Object.values(achievements).filter(a => a.unlocked).length,
+                            tiers: [1, 2, 3, 4, 6] },
+        };
+        // Hard-quest-only metrics. Unlike the normal pool above (which just tallies passive
+        // accumulation) these force the player to actively commit real capital or resources
+        // within a tight window — buying fleet, standing up new routes, burning AeroTokens —
+        // decisions that cost something and can't just be idled through.
+        const HARD_QUEST_METRICS = {
+            buy_aircraft: { label: 'Purchase', unit: 'aircraft', icon: '🛒', getVal: () => gameState.totalAircraftPurchased || 0,
+                            tiers: [8, 16, 30, 55, 100] },
+            new_routes:   { label: 'Establish', unit: 'new routes', icon: '🗺️', getVal: () => gameState.totalRoutesCreated || 0,
+                            tiers: [6, 12, 24, 40, 70] },
+            spend_tokens: { label: 'Spend', unit: 'AeroTokens', icon: '✈️', getVal: () => gameState.lifetimeTokensSpent || 0,
+                            tiers: [200, 500, 1200, 3000, 7000] },
+            buy_hubs:     { label: 'Establish', unit: 'new hubs', icon: '🏙️', getVal: () => gameState.totalHubsPurchased || 0,
+                            tiers: [2, 3, 5, 7, 10] },
+            repair_fleet: { label: 'Fully repair', unit: 'aircraft', icon: '🔧', getVal: () => gameState.totalRepairs || 0,
+                            tiers: [10, 20, 35, 60, 100] },
+            sell_fleet:   { label: 'Sell', unit: 'aircraft from your fleet', icon: '💸', getVal: () => gameState.totalAircraftSold || 0,
+                            tiers: [5, 8, 12, 18, 28] },
+            buy_legacy:   { label: 'Purchase', unit: 'legacy aircraft', icon: '🕰️', getVal: () => gameState.totalLegacyPurchased || 0,
+                            tiers: [4, 6, 10, 15, 24], minRank: 1 },
+            buy_cargo:    { label: 'Purchase', unit: 'cargo aircraft', icon: '📦', getVal: () => gameState.totalCargoPurchased || 0,
+                            tiers: [5, 10, 18, 30, 50], minRank: 1 },
+            buy_helicopter:{ label: 'Purchase', unit: 'helicopters', icon: '🚁', getVal: () => gameState.totalHelicopterPurchased || 0,
+                            tiers: [5, 10, 18, 30, 50], minRank: 1 },
+            buy_military: { label: 'Purchase', unit: 'military aircraft', icon: '🎖️', getVal: () => gameState.totalMilitaryPurchased || 0,
+                            tiers: [3, 4, 6, 10, 18], minRank: MILITARY_UNLOCK_RANK },
+            unlock_regions: { label: 'Unlock', unit: 'new regions/territories', icon: '🌍', getVal: () => Object.values(regions).filter(r => r.unlocked).length,
+                            tiers: [1, 1, 2, 2, 3] },
+            spend_cash:   { label: 'Spend', unit: 'in cash', icon: '🧾', getVal: () => gameState.totalCashSpent || 0,
+                            tiers: [30000, 80000, 200000, 500000, 1200000] },
+            international_route: { label: 'Establish', unit: 'international route(s)', icon: '🌐', getVal: () => gameState.totalInternationalRoutes || 0,
+                            tiers: [1, 1, 1, 2, 2] },
+            buy_named_aircraft: { label: 'Purchase', unit: 'aircraft', icon: '🛒', getVal: () => 0, // progress handled specially in questProgress()
+                            tiers: [1, 1, 2, 2, 3] },
+        };
+        const ALL_QUEST_METRICS = { ...QUEST_METRICS, ...HARD_QUEST_METRICS };
+        const HARD_QUEST_POOL = Object.keys(HARD_QUEST_METRICS);
+        const HARD_QUEST_DURATION_MS = 90 * 60 * 1000; // 90-minute window — brutally tight, this is what actually makes it hard
+        const HARD_REWARD_MULTIPLIER = 10;  // 10x the normal quest's payout, to match the real cost of committing capital
+        function _questTierForRank() {
+            const r = gameState.rank || 1;
+            if (r >= 40) return 4; if (r >= 25) return 3; if (r >= 12) return 2; if (r >= 5) return 1; return 0;
+        }
+        function _questReward(tierIdx) {
+            const base = [8000, 20000, 50000, 120000, 300000][tierIdx] || 8000;
+            const tok = [3, 8, 18, 40, 90][tierIdx] || 3;
+            return { cash: base, tokens: tok };
+        }
+        function _generateHardQuest(excludeMetrics) {
+            const rank = gameState.rank || 1;
+            const eligible = HARD_QUEST_POOL.filter(k => rank >= (HARD_QUEST_METRICS[k].minRank || 1));
+            const available = eligible.filter(k => !(excludeMetrics || []).includes(k));
+            const pool = available.length > 0 ? available : (eligible.length > 0 ? eligible : HARD_QUEST_POOL); // fallback if everything's excluded or ineligible
+            const hardKey = pool[Math.floor(Math.random() * pool.length)];
+            const tierIdx = _questTierForRank();
+            const hardDef = HARD_QUEST_METRICS[hardKey];
+            const hardTarget = hardDef.tiers[tierIdx];
+            const baseReward = _questReward(tierIdx);
+            const quest = {
+                metric: hardKey, target: hardTarget,
+                baseline: hardDef.getVal(),
+                reward: { cash: baseReward.cash * HARD_REWARD_MULTIPLIER, tokens: baseReward.tokens * HARD_REWARD_MULTIPLIER },
+                hard: true,
+                expiresAt: Date.now() + HARD_QUEST_DURATION_MS,
+                claimed: false
+            };
+            // Named-aircraft quest: pick a random purchasable plane the player can currently buy,
+            // and track progress against that specific hangar count rather than a shared metric.
+            if (hardKey === 'buy_named_aircraft') {
+                const purchasablePool = { ...aircraftCatalog, ...cargoCatalog, ...helicopterCatalog, ...airshipCatalog, ...militaryCatalog };
+                const names = Object.keys(purchasablePool).filter(n => rank >= (purchasablePool[n].minRank || 1));
+                const pickPool = names.length > 0 ? names : Object.keys(purchasablePool);
+                const aircraftName = pickPool[Math.floor(Math.random() * pickPool.length)];
+                quest.aircraftName = aircraftName;
+                quest.baseline = gameState.hangar?.[aircraftName] || 0;
+                quest.unitOverride = aircraftName;
+            }
+            return quest;
+        }
+        const HARD_QUESTS_PER_DAY = 2;
+        const TOTAL_QUESTS_PER_DAY = 3 + HARD_QUESTS_PER_DAY;
+        function generateDailyQuests() {
+            const keys = Object.keys(QUEST_METRICS);
+            const chosen = [];
+            while (chosen.length < 3 && chosen.length < keys.length) {
+                const k = keys[Math.floor(Math.random() * keys.length)];
+                if (!chosen.includes(k)) chosen.push(k);
+            }
+            const tierIdx = _questTierForRank();
+            const normalQuests = chosen.map(metric => {
+                const def = QUEST_METRICS[metric];
+                const target = def.tiers[tierIdx];
+                return {
+                    metric, target,
+                    baseline: def.getVal(),
+                    reward: _questReward(tierIdx),
+                    hard: false,
+                    claimed: false
+                };
+            });
+            const hardQuests = [];
+            for (let i = 0; i < HARD_QUESTS_PER_DAY; i++) {
+                hardQuests.push(_generateHardQuest(hardQuests.map(q => q.metric)));
+            }
+            gameState.dailyQuests = [...normalQuests, ...hardQuests];
+            gameState.questsBonusClaimed = false;
+        }
+        function refreshDailyQuestsIfNeeded() {
+            const today = new Date().toDateString();
+            if (gameState.questsDate !== today || !gameState.dailyQuests || gameState.dailyQuests.length !== TOTAL_QUESTS_PER_DAY) {
+                gameState.questsDate = today;
+                generateDailyQuests();
+                if (typeof saveProgress === 'function') saveProgress();
+                return;
+            }
+            refreshHardQuestIfExpired();
+        }
+        // Hard quests each run on their own short clock, independent of the daily reset — if a
+        // window lapses without one being claimed, it re-rolls (new metric, fresh target) rather
+        // than sitting there passively completable for the rest of the day.
+        function refreshHardQuestIfExpired() {
+            const quests = gameState.dailyQuests;
+            if (!quests || quests.length !== TOTAL_QUESTS_PER_DAY) return;
+            let changed = false;
+            quests.forEach((hq, hardIdx) => {
+                if (!hq.hard) return;
+                if (!hq.claimed && Date.now() >= (hq.expiresAt || 0)) {
+                    const otherHardMetrics = quests.filter((q, i) => i !== hardIdx && q.hard).map(q => q.metric);
+                    quests[hardIdx] = _generateHardQuest(otherHardMetrics);
+                    changed = true;
+                }
+            });
+            if (changed && typeof saveProgress === 'function') saveProgress();
+        }
+        function questProgress(q) {
+            if (q.metric === 'buy_named_aircraft') {
+                return Math.max(0, (gameState.hangar?.[q.aircraftName] || 0) - q.baseline);
+            }
+            const def = ALL_QUEST_METRICS[q.metric];
+            if (!def) return 0;
+            return Math.max(0, def.getVal() - q.baseline);
+        }
+        function claimQuest(idx) {
+            refreshDailyQuestsIfNeeded();
+            const q = gameState.dailyQuests[idx];
+            if (!q || q.claimed) return;
+            if (q.hard && Date.now() >= (q.expiresAt || 0)) { renderQuestsScreen(); return; } // expired right as they clicked
+            const prog = questProgress(q);
+            if (prog < q.target) return;
+            q.claimed = true;
+            gameState.cash += q.reward.cash;
+            gameState.tokens += q.reward.tokens;
+            gameState.lastQuestCompletionDate = new Date().toDateString(); // powers the login-streak requirement
+            triggerMilestonePopupNotification('🎯 Quest Complete', `+$${q.reward.cash.toLocaleString()} and +${q.reward.tokens} AeroTokens`);
+            if (gameState.dailyQuests.every(qq => qq.claimed) && !gameState.questsBonusClaimed) {
+                gameState.questsBonusClaimed = true;
+                const bonus = _questReward(Math.min(4, _questTierForRank() + 1));
+                gameState.cash += bonus.cash;
+                gameState.tokens += bonus.tokens;
+                setTimeout(() => triggerMilestonePopupNotification('🏆 All Quests Cleared!', `Bonus: +$${bonus.cash.toLocaleString()} and +${bonus.tokens} AeroTokens`), 800);
+            }
+            if (typeof updateUI === 'function') updateUI();
+            if (typeof saveProgress === 'function') saveProgress();
+            renderQuestsScreen();
+        }
+        let _questsCountdownInterval = null;
+        function openQuestsScreen() {
+            refreshDailyQuestsIfNeeded();
+            renderQuestsScreen();
+            document.getElementById('quests-screen').style.display = 'flex';
+            if (_questsCountdownInterval) clearInterval(_questsCountdownInterval);
+            _questsCountdownInterval = setInterval(renderQuestsScreen, 1000); // keeps the refresh timer + hard-quest countdowns live to the second
+        }
+        function closeQuestsScreen() {
+            document.getElementById('quests-screen').style.display = 'none';
+            if (_questsCountdownInterval) { clearInterval(_questsCountdownInterval); _questsCountdownInterval = null; }
+        }
+        function _formatHms(ms) {
+            const totalSec = Math.max(0, Math.floor(ms / 1000));
+            const h = Math.floor(totalSec / 3600), m = Math.floor((totalSec % 3600) / 60), s = totalSec % 60;
+            return h > 0 ? `${h}h ${m}m ${s}s` : `${m}m ${s}s`;
+        }
+        function renderQuestsScreen() {
+            refreshDailyQuestsIfNeeded();
+            const list = document.getElementById('quests-list');
+            if (!list) return;
+            list.innerHTML = (gameState.dailyQuests || []).map((q, idx) => {
+                const def = ALL_QUEST_METRICS[q.metric];
+                if (!def) return '';
+                const unit = q.unitOverride || def.unit;
+                const prog = Math.min(q.target, questProgress(q));
+                const pct = Math.round((prog / q.target) * 100);
+                const done = prog >= q.target;
+                const barColor = q.claimed ? '#10b981' : (done ? 'var(--achievement-color)' : (q.hard ? '#ef4444' : 'var(--accent-color)'));
+                const cardBorder = q.hard ? '#ef4444' : 'var(--card-border)';
+                const hardTag = q.hard ? `<span style="font-size:8px; font-weight:800; color:#ef4444; border:1px solid #ef4444; border-radius:4px; padding:1px 5px; margin-right:6px; vertical-align:middle;">HARD</span>` : '';
+                const timeLeft = q.hard && !q.claimed ? `<div style="font-size:9px; color:#ef4444; font-weight:700; margin-top:4px;">⏱ Expires in ${_formatHms((q.expiresAt || 0) - Date.now())} — fails to a new challenge if you miss it</div>` : '';
+                return `<div style="background:var(--card-bg); border:1px solid ${cardBorder}; border-radius:8px; padding:10px 12px;">
+                    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:6px;">
+                        <span style="font-size:12px; font-weight:700;">${hardTag}${def.icon} ${def.label} ${q.target.toLocaleString()} ${unit}</span>
+                        <span style="font-size:10px; color:#94a3b8;">$${q.reward.cash.toLocaleString()} · +${q.reward.tokens}✈</span>
+                    </div>
+                    <div style="background:rgba(255,255,255,0.08); border-radius:5px; height:8px; overflow:hidden; margin-bottom:6px;">
+                        <div style="background:${barColor}; height:100%; width:${pct}%; transition:width 0.3s;"></div>
+                    </div>
+                    <div style="display:flex; justify-content:space-between; align-items:center;">
+                        <span style="font-size:10px; color:#94a3b8;">${Math.min(prog, q.target).toLocaleString()} / ${q.target.toLocaleString()}</span>
+                        ${q.claimed
+                            ? `<span style="font-size:10px; color:#10b981; font-weight:700;">✅ Claimed</span>`
+                            : done
+                                ? `<button class="btn" style="margin:0; padding:4px 10px; font-size:11px;" onclick="claimQuest(${idx})">Claim</button>`
+                                : `<span style="font-size:10px; color:#64748b;">In progress</span>`}
+                    </div>
+                    ${timeLeft}
+                </div>`;
+            }).join('');
+            const allDone = (gameState.dailyQuests || []).length === TOTAL_QUESTS_PER_DAY && gameState.dailyQuests.every(q => q.claimed);
+            const bonusRow = document.getElementById('quests-bonus-row');
+            if (bonusRow) {
+                bonusRow.textContent = allDone
+                    ? '🏆 Bonus reward already claimed for today!'
+                    : 'Clear all three quests today for a bonus AeroToken payout.';
+            }
+            const timerEl = document.getElementById('quests-refresh-timer');
+            if (timerEl) {
+                const now = new Date();
+                const midnight = new Date(now); midnight.setHours(24,0,0,0);
+                timerEl.textContent = `New quests in ${_formatHms(midnight - now)}`;
+            }
+        }
+        function updateQuestsBadge() {
+            refreshDailyQuestsIfNeeded();
+            const badge = document.getElementById('quests-badge-count');
+            if (!badge) return;
+            const readyCount = (gameState.dailyQuests || []).filter(q => !q.claimed && questProgress(q) >= q.target).length;
+            badge.textContent = readyCount > 0 ? readyCount : '';
+        }
+
         function checkMilestones() {
+            if (!achievements.hidden_ghost_region.unlocked && Object.values(regions).some(r => r.unlocked && !r.airports.some(a => a.type === 'airport' || a.type === 'heliport'))) {
+                achievements.hidden_ghost_region.unlocked = true; gameState.cash += 100000; gameState.tokens += 50;
+                triggerMilestonePopupNotification(achievements.hidden_ghost_region.revealTitle, achievements.hidden_ghost_region.revealDesc);
+            }
             if (!achievements.globetrotter.unlocked && Object.values(regions).filter(r => r.unlocked).length >= Object.keys(regions).length) {
                 achievements.globetrotter.unlocked = true; gameState.cash += 1000000; gameState.tokens += 500;
                 triggerMilestonePopupNotification(achievements.globetrotter.title, achievements.globetrotter.rewardDesc);
@@ -7174,7 +7982,7 @@ if (!achievements.purchasable_collector.unlocked && purchasable.every(c => owned
     triggerMilestonePopupNotification(achievements.purchasable_collector.title, achievements.purchasable_collector.rewardDesc);
 }
 
-const mythic = ["Lockheed SR-71 Blackbird", "Lockheed Martin SR-72", "Scaled Composites Model 351 Stratolaunch"];
+const mythic = ["Lockheed SR-71 Blackbird", "Scaled Composites Model 351 Stratolaunch"];
 if (!achievements.mythic_collector.unlocked && mythic.every(c => ownedCrafts.has(c))) {
     achievements.mythic_collector.unlocked = true;
     gameState.cash += 2500000; gameState.tokens += 500;
@@ -7258,7 +8066,7 @@ if (!achievements.route_it_ns.unlocked && routeExists("Bolzano Airport", "Lamped
 
             // Secret Collector: own all 7 secret aircraft
             if (!achievements.secret_collector.unlocked) {
-                const secretNames = ["Avro Canada VZ-9 Avrocar","Lockheed SR-71 Blackbird","Lockheed Martin SR-72","Scaled Composites Model 351 Stratolaunch","Kaman K-MAX","Mil V-12","Lun-Class Ekranoplan","Messerschmitt Me 323 Gigant","Wright Flyer","A-90 Orlyonok","Bartini Beriev VVA-14","Cessna 172 Skyhawk","Boeing Pelican ULTRA","Caproni Ca.60 Noviplano","Kalinin K-7","Tupolev ANT-20","Fairey Rotodyne"];
+                const secretNames = ["Avro Canada VZ-9 Avrocar","Lockheed SR-71 Blackbird","Lockheed Martin SR-72","Scaled Composites Model 351 Stratolaunch","Kaman K-MAX","Mil V-12","Lun-Class Ekranoplan","Messerschmitt Me 323 Gigant","Wright Flyer","A-90 Orlyonok","Bartini Beriev VVA-14","Cessna 172 Skyhawk","Boeing Pelican ULTRA","Caproni Ca.60 Noviplano","Kalinin K-7","Tupolev ANT-20","Fairey Rotodyne","Flying-V"];
                 const owned2 = new Set(Object.keys(gameState.hangar).filter(k => gameState.hangar[k] > 0));
                 gameState.routes.forEach(r => { if (r.fleet) r.fleet.forEach(f => owned2.add(f.type)); });
                 if (secretNames.every(n => owned2.has(n))) {
@@ -7365,6 +8173,12 @@ if (!achievements.route_it_ns.unlocked && routeExists("Bolzano Airport", "Lamped
                 achievements.helicopter_squadron.unlocked = true; gameState.cash += 75000; gameState.tokens += 25;
                 triggerMilestonePopupNotification(achievements.helicopter_squadron.title, achievements.helicopter_squadron.rewardDesc);
             }
+
+            // The Completionist: every OTHER achievement unlocked (checked last so it can't unlock itself early)
+            if (!achievements.completionist.unlocked && Object.entries(achievements).every(([key, a]) => key === 'completionist' || a.unlocked)) {
+                achievements.completionist.unlocked = true; gameState.cash += 25000000; gameState.tokens += 10000;
+                triggerMilestonePopupNotification(achievements.completionist.revealTitle, achievements.completionist.revealDesc);
+            }
         }
  
         function updateUI() {
@@ -7375,6 +8189,9 @@ if (!achievements.route_it_ns.unlocked && routeExists("Bolzano Airport", "Lamped
             document.getElementById('cash-display').innerText = gameState.cash.toLocaleString();
             document.getElementById('tokens-display').innerText = gameState.tokens.toLocaleString();
             document.getElementById('rank-display').innerText = gameState.rank;
+            const streakBadge = document.getElementById('streak-badge-count');
+            if (streakBadge) streakBadge.textContent = gameState.loginStreak ? gameState.loginStreak : '';
+            updateQuestsBadge();
  
             // XP bar
             const xpForNext = xpThreshold(gameState.rank + 1);
@@ -7833,10 +8650,12 @@ if (groundAllBtn) {
             const currentFilter = window._achFilter || 'all';
 
             // Stats row: unlocked + rarity counts
+            const exoticCount  = Object.values(achievements).filter(a => a.rarity === 'Exotic').length;
             const mythicCount   = Object.values(achievements).filter(a => a.rarity === 'Mythic').length;
             const legendCount   = Object.values(achievements).filter(a => a.rarity === 'Legendary').length;
             const epicCount     = Object.values(achievements).filter(a => a.rarity === 'Epic').length;
             const rareCount     = Object.values(achievements).filter(a => a.rarity === 'Rare').length;
+            const exoticUnlocked  = Object.values(achievements).filter(a => a.rarity === 'Exotic' && a.unlocked).length;
             const mythicUnlocked  = Object.values(achievements).filter(a => a.rarity === 'Mythic' && a.unlocked).length;
             const legendUnlocked  = Object.values(achievements).filter(a => a.rarity === 'Legendary' && a.unlocked).length;
             const epicUnlocked    = Object.values(achievements).filter(a => a.rarity === 'Epic' && a.unlocked).length;
@@ -7851,6 +8670,7 @@ if (groundAllBtn) {
                     <div style="height:100%; width:${achPercent}%; background:linear-gradient(90deg,var(--accent-color),var(--achievement-color)); border-radius:5px; transition:width 0.4s ease;"></div>
                 </div>
                 <div style="display:flex;gap:8px;flex-wrap:wrap;font-size:10px;">
+                    <span><span class="rarity-tag rarity-exotic" style="margin:0;">EXOTIC</span> <span style="color:#94a3b8;">${exoticUnlocked}/${exoticCount}</span></span>
                     <span><span class="rarity-tag rarity-mythic" style="margin:0;">MYTHIC</span> <span style="color:#94a3b8;">${mythicUnlocked}/${mythicCount}</span></span>
                     <span><span class="rarity-tag rarity-legendary" style="margin:0;">LEGEND</span> <span style="color:#94a3b8;">${legendUnlocked}/${legendCount}</span></span>
                     <span><span class="rarity-tag rarity-epic" style="margin:0;">EPIC</span> <span style="color:#94a3b8;">${epicUnlocked}/${epicCount}</span></span>
@@ -8182,6 +9002,7 @@ if (groundAllBtn) {
          document.addEventListener('mouseup', function() { destDropdownMousedown = false; });
         
         function findAirportData(name) { for (const r of Object.values(regions)) { const m = r.airports.find(a => a.name === name); if (m) return m; } return null; }
+        function getAirportNation(name) { for (const r of Object.values(regions)) { if (r.airports.some(a => a.name === name)) return r.nation || null; } return null; }
  
         function switchMarketSubTab(name) {
             const tabColors = { passenger: '#94a3b8', cargo: 'var(--cargo-color)', legacy: '#a855f7', helicopter: '#38bdf8', airship: '#f472b6', military: '#84cc16' };
@@ -8405,7 +9226,18 @@ if (groundAllBtn) {
             const sellPrice = Math.floor(getInflatedPrice(spec.price) * 0.25);
             gameState.cash += sellPrice;
             gameState.hangar[type]--;
+            gameState.totalAircraftSold = (gameState.totalAircraftSold || 0) + 1;
             if (gameState.hangar[type] <= 0) delete gameState.hangar[type];
+            // Keep hangarPool (and its registrations/stats) in sync — remove one idle
+            // pool entry of this type, or the pool would drift ahead of the real count
+            // and the registration picker would offer aircraft that no longer exist.
+            if (!gameState.hangarPool) gameState.hangarPool = [];
+            const poolIdx = gameState.hangarPool.findIndex(p => p.type === type);
+            if (poolIdx !== -1) {
+                const [removed] = gameState.hangarPool.splice(poolIdx, 1);
+                if (removed && gameState.aircraftRegistrations) delete gameState.aircraftRegistrations[removed.id];
+                if (removed && gameState.aircraftStats) delete gameState.aircraftStats[removed.id];
+            }
             saveProgress(); updateUI();
             triggerMilestonePopupNotification("Aircraft Sold!", `Sold 1 ${type} for $${sellPrice.toLocaleString()}`);
         }
@@ -8422,33 +9254,118 @@ if (groundAllBtn) {
             { id:'airline_sale',     rarity:'common',    emoji:'🏷',  title:'Fare Sale Season',      desc:'Discounted fares boost passenger volume but reduce per-ticket revenue.',durationMin:3,  durationMax:6,  earningsMod:-0.08, demandMod:+0.12, scope:'global' },
             { id:'fuel_rebate',      rarity:'common',    emoji:'⛽',  title:'Fuel Cost Dip',          desc:'Global fuel prices ease — refuel costs halved temporarily.',           durationMin:3,  durationMax:5,  fuelCostMod:0.5,   scope:'global' },
             { id:'minor_boom',       rarity:'common',    emoji:'📈',  title:'Weekend Rush',           desc:'Leisure traffic is up — small earnings boost across all routes.',      durationMin:2,  durationMax:4,  earningsMod:+0.10, scope:'global' },
+            { id:'crew_shortage',    rarity:'common',    emoji:'🧑‍✈️', title:'Crew Shortage',        desc:'Staffing gaps at one airport dent demand slightly.',                   durationMin:2,  durationMax:5,  demandMod:-0.15, scope:'airport' },
+            { id:'local_festival',   rarity:'common',    emoji:'🎉',  title:'Local Festival',         desc:'A city festival draws a small bump in visitors to one airport.',       durationMin:2,  durationMax:5,  demandMod:+0.18, scope:'airport' },
             // Uncommon
             { id:'storm_region',     rarity:'uncommon',  emoji:'⛈',  title:'Regional Storm',         desc:'Severe weather hits a region, cutting demand to routes through it.',   durationMin:4,  durationMax:8,  demandMod:-0.25, scope:'region' },
             { id:'tourist_boom',     rarity:'uncommon',  emoji:'🌴',  title:'Tourist Boom',           desc:'A destination surges in popularity — demand to that airport spikes.',  durationMin:5,  durationMax:10, demandMod:+0.30, scope:'airport' },
             { id:'tech_conf',        rarity:'uncommon',  emoji:'💻',  title:'Tech Conference',        desc:'A major conference drives corporate travel to a random hub.',           durationMin:3,  durationMax:6,  demandMod:+0.25, earningsMod:+0.08, scope:'airport' },
             { id:'repair_discount',  rarity:'uncommon',  emoji:'🔧',  title:'Maintenance Discount',   desc:'Parts are cheap — repair costs halved for a limited time.',            durationMin:3,  durationMax:7,  repairCostMod:0.5, scope:'global' },
+            { id:'currency_swing',   rarity:'uncommon',  emoji:'💱',  title:'Currency Swing',         desc:'Favorable exchange rates lift international earnings a bit.',          durationMin:4,  durationMax:8,  earningsMod:+0.12, scope:'global' },
+            { id:'baggage_strike',   rarity:'uncommon',  emoji:'🧳',  title:'Baggage Handler Strike', desc:'A labor dispute at one airport slows operations and demand.',          durationMin:4,  durationMax:8,  demandMod:-0.22, scope:'airport' },
             // Rare
             { id:'fuel_crisis',      rarity:'rare',      emoji:'🛢',  title:'Global Fuel Crisis',     desc:'Fuel prices spike worldwide — refuel costs are doubled.',             durationMin:5,  durationMax:10, fuelCostMod:2.0,   scope:'global' },
             { id:'aviation_boom',    rarity:'rare',      emoji:'🚀',  title:'Aviation Boom',          desc:'Industry-wide surge in air travel — strong earnings multiplier.',     durationMin:5,  durationMax:10, earningsMod:+0.25, demandMod:+0.15, scope:'global' },
             { id:'sports_event',     rarity:'rare',      emoji:'🏆',  title:'World Sports Event',     desc:'A mega sporting event sends demand through the roof for one airport.', durationMin:6,  durationMax:12, demandMod:+0.50, earningsMod:+0.20, scope:'airport' },
             { id:'volcano',          rarity:'rare',      emoji:'🌋',  title:'Volcanic Eruption',      desc:'Ash cloud forces reroutes — a region loses all its demand.',           durationMin:5,  durationMax:9,  demandMod:-0.60, scope:'region' },
+            { id:'trade_summit',     rarity:'rare',      emoji:'🤝',  title:'Global Trade Summit',    desc:'Diplomats and delegates flock to a hub — big demand spike.',           durationMin:5,  durationMax:9,  demandMod:+0.40, earningsMod:+0.15, scope:'airport' },
+            { id:'cyberattack',      rarity:'rare',      emoji:'🖥️', title:'Airline IT Outage',      desc:'A cyberattack disrupts booking systems worldwide — earnings drop.',    durationMin:4,  durationMax:8,  earningsMod:-0.25, scope:'global' },
             // Epic
             { id:'golden_age',       rarity:'epic',      emoji:'✨',  title:'Golden Age of Aviation', desc:'Global excitement for air travel — massive earnings boost.',          durationMin:8,  durationMax:14, earningsMod:+0.40, demandMod:+0.25, scope:'global' },
             { id:'pandemic_scare',   rarity:'epic',      emoji:'😷',  title:'Disease Outbreak Scare', desc:'Health concerns slash global demand drastically.',                    durationMin:8,  durationMax:15, demandMod:-0.45, earningsMod:-0.20, scope:'global' },
             { id:'celebrity_tour',   rarity:'epic',      emoji:'🎤',  title:'Celebrity World Tour',   desc:'A megastar tour sends fans flooding to one airport.',                 durationMin:6,  durationMax:10, demandMod:+0.70, earningsMod:+0.35, scope:'airport' },
+            { id:'oil_boom',         rarity:'epic',      emoji:'🛢️', title:'Oil Price Collapse',     desc:'Crashing oil prices make fuel remarkably cheap worldwide.',           durationMin:7,  durationMax:12, fuelCostMod:0.35,  scope:'global' },
+            { id:'war_scare',        rarity:'epic',      emoji:'⚠️',  title:'Regional Conflict',      desc:'Rising tensions ground most traffic through an entire region.',        durationMin:7,  durationMax:13, demandMod:-0.70, scope:'region' },
             // Legendary
             { id:'space_tourism',    rarity:'legendary', emoji:'🚀',  title:'Space Tourism Hype',     desc:'Space fever grips the world — everyone wants to fly, all earnings ×2.', durationMin:10, durationMax:18, earningsMod:+1.0, demandMod:+0.40, scope:'global' },
             { id:'mega_storm',       rarity:'legendary', emoji:'🌪',  title:'Category 5 Superstorm',  desc:'A catastrophic storm shuts down an entire region for an extended time.',durationMin:10, durationMax:20, demandMod:-0.80, scope:'region' },
+            { id:'world_expo',       rarity:'legendary', emoji:'🎡',  title:'World Expo',              desc:'The whole world descends on one host airport for months.',            durationMin:9,  durationMax:16, demandMod:+1.20, earningsMod:+0.30, scope:'airport' },
             // Mythic
             { id:'golden_era',       rarity:'mythic',    emoji:'👑',  title:'Golden Era',             desc:'The perfect storm of conditions — all earnings tripled!',             durationMin:12, durationMax:20, earningsMod:+2.0, demandMod:+0.50, fuelCostMod:0.5, scope:'global' },
             { id:'global_grounding', rarity:'mythic',    emoji:'🚫',  title:'Global Groundstop',      desc:'A global crisis temporarily halts all flights — no earnings.',        durationMin:3,  durationMax:6,  earningsMod:-1.0, demandMod:-0.90, scope:'global' },
         ];
 
+        // Cost in AeroTokens to cancel a negative event early — estimated from the real
+        // routes/fleet it's actually hurting, not a flat guess.
+        function getEventCancelCost(ev) {
+            const remainingMin = Math.max(1, (ev.endTime - Date.now()) / 60000);
+            const routes = (gameState.routes || []);
+            const routeRegionCache = {};
+            const regionOf = (apName) => {
+                if (routeRegionCache[apName] !== undefined) return routeRegionCache[apName];
+                const r = (typeof findRegionNameByAirport === 'function') ? findRegionNameByAirport(apName) : null;
+                routeRegionCache[apName] = r;
+                return r;
+            };
+            let impactPerMin = 0;
+            let affectedFleetCount = 0;
+            routes.forEach(route => {
+                const fleetCount = route.fleet ? route.fleet.length : 0;
+                if (fleetCount === 0) return;
+                let applies = false;
+                if (ev.scope === 'global') applies = true;
+                else if (ev.scope === 'airport' && ev.targetName) {
+                    const shortName = ev.targetName.split(' (')[0];
+                    if (route.origin.startsWith(shortName) || route.destination.startsWith(shortName)) applies = true;
+                } else if (ev.scope === 'region' && ev.targetName) {
+                    if (regionOf(route.origin) === ev.targetName || regionOf(route.destination) === ev.targetName) applies = true;
+                }
+                if (!applies) return;
+                affectedFleetCount += fleetCount;
+                // Real per-minute earnings baseline for this route: distance * fleet size * earnings rate,
+                // scaled down from the per-tick constant to an approximate per-minute figure.
+                const earningsSeverity = Math.abs(ev.earningsMod || 0);
+                const demandSeverity = Math.abs(ev.demandMod || 0) * 0.5; // demand hits are softer than direct earnings hits
+                const baselinePerMin = route.distanceNM * fleetCount * EARNINGS_MULTIPLIER * 0.15;
+                impactPerMin += baselinePerMin * (earningsSeverity + demandSeverity);
+            });
+            // Fuel/repair surcharges hit any grounded or active fleet regardless of route "applies" scope
+            const totalFleetCount = routes.reduce((s, r) => s + (r.fleet ? r.fleet.length : 0), 0);
+            if (ev.fuelCostMod && ev.fuelCostMod > 1) impactPerMin += totalFleetCount * 30 * (ev.fuelCostMod - 1);
+            if (ev.repairCostMod && ev.repairCostMod > 1) impactPerMin += totalFleetCount * 20 * (ev.repairCostMod - 1);
+            const estimatedTotalLoss = impactPerMin * remainingMin;
+            // Convert estimated $ loss avoided into an AeroToken price (roughly $2,500 of avoided loss per token)
+            let cost = Math.round(estimatedTotalLoss / 2500);
+            // Floor reflects the event's base severity even with no active fleet yet, so it's never free
+            const severityFloor = Math.round(remainingMin * ((Math.abs(ev.earningsMod||0) + Math.abs(ev.demandMod||0)) * 8 + (affectedFleetCount === 0 ? 3 : 0)));
+            cost = Math.max(cost, severityFloor, 5);
+            return Math.min(3000, cost);
+        }
+
+        // Returns true if an event is net-negative for the player (worth being able to cancel)
+        function isEventNegative(ev) {
+            return (ev.earningsMod && ev.earningsMod < 0) || (ev.demandMod && ev.demandMod < 0) || (ev.fuelCostMod && ev.fuelCostMod > 1) || (ev.repairCostMod && ev.repairCostMod > 1);
+        }
+
+        // Cancel an active negative event early by spending AeroTokens
+        function cancelEventWithTokens(instanceId) {
+            const ev = activeWorldEvents.find(e => e.instanceId === instanceId);
+            if (!ev || !isEventNegative(ev)) return;
+            const cost = getEventCancelCost(ev);
+            if (gameState.tokens < cost) {
+                if (typeof triggerMilestonePopupNotification === 'function') {
+                    triggerMilestonePopupNotification('Not Enough AeroTokens', `You need ${cost} AeroTokens to cancel "${ev.title}".`);
+                }
+                return;
+            }
+            gameState.tokens -= cost;
+            activeWorldEvents = activeWorldEvents.filter(e => e.instanceId !== instanceId);
+            eventHistory.unshift({ ...ev, expiredAt: Date.now(), cancelledByPlayer: true });
+            if (eventHistory.length > 12) eventHistory.pop();
+            if (typeof updateEventMapVisuals === 'function') updateEventMapVisuals();
+            if (typeof triggerMilestonePopupNotification === 'function') {
+                triggerMilestonePopupNotification('Event Cancelled', `Spent ${cost} AeroTokens to end "${ev.title}" early.`);
+            }
+            if (typeof renderEventsTab === 'function') renderEventsTab();
+            if (typeof updateUI === 'function') updateUI();
+            saveProgress();
+        }
+
         // Rarity spawn weights (lower = rarer)
         const EVENT_RARITY_WEIGHTS = { common:50, uncommon:28, rare:14, epic:6, legendary:2, mythic:0.4 };
         // How often to try spawning a new event (in real seconds)
-        const EVENT_SPAWN_INTERVAL_S = 90;
-        const MAX_ACTIVE_EVENTS = 3;
+        const EVENT_SPAWN_INTERVAL_S = 150;
+        const MAX_ACTIVE_EVENTS = 2;
 
         let eventSpawnTimer = 0; // seconds accumulator
         let activeWorldEvents = []; // { ...catalogEntry, endTime, targetName, id_instance }
@@ -8483,8 +9400,8 @@ if (groundAllBtn) {
 
         function trySpawnEvent() {
             if (activeWorldEvents.length >= MAX_ACTIVE_EVENTS) return;
-            // 40% chance each interval to actually spawn
-            if (Math.random() > 0.40) return;
+            // 25% chance each interval to actually spawn
+            if (Math.random() > 0.25) return;
             const template = pickWeighted(EVENT_CATALOG, e => EVENT_RARITY_WEIGHTS[e.rarity] || 1);
             const durationSec = (template.durationMin + Math.random() * (template.durationMax - template.durationMin)) * 60;
             const endTime = Date.now() + durationSec * 1000;
@@ -8635,6 +9552,7 @@ if (groundAllBtn) {
                         <div style="font-size:11px;color:#94a3b8;margin-top:4px;">${ev.desc}</div>
                         ${mods.length ? `<div style="font-size:10px;margin-top:4px;display:flex;gap:8px;flex-wrap:wrap;">${mods.join('')}</div>` : ''}
                         <div class="event-timer-bar"><div class="event-timer-fill" style="width:${pct}%;background:${color};"></div></div>
+                        ${isEventNegative(ev) ? `<button onclick="cancelEventWithTokens(${ev.instanceId})" style="margin-top:8px;width:100%;background:rgba(239,68,68,0.12);border:1px solid rgba(239,68,68,0.4);color:#ef4444;border-radius:6px;padding:5px;font-size:10px;font-weight:700;cursor:pointer;">✖ Cancel Early — ${getEventCancelCost(ev)} AeroTokens</button>` : ''}
                     </div>`;
                 }).join('');
             }
@@ -8651,11 +9569,22 @@ if (groundAllBtn) {
         }
 
         // ============================================================
+        let _eventsTabInterval = null;
         function switchTab(tabId) {
             document.querySelectorAll('.tab-content').forEach(el => el.classList.remove('active'));
             document.querySelectorAll('.tab-btn').forEach(el => el.classList.remove('active'));
             const content = document.getElementById(tabId); if (content) content.classList.add('active');
             const btn = document.getElementById(`tab-btn-${tabId}`); if (btn) btn.classList.add('active');
+            // The events tab's countdowns only update when the wider UI happens to re-render
+            // (e.g. a flight lands), so they'd otherwise sit frozen most of the time. Give the
+            // tab its own 1s ticker while it's the one actually on screen.
+            if (_eventsTabInterval) { clearInterval(_eventsTabInterval); _eventsTabInterval = null; }
+            if (tabId === 'events') {
+                if (typeof renderEventsTab === 'function') renderEventsTab();
+                _eventsTabInterval = setInterval(() => {
+                    if (typeof renderEventsTab === 'function') renderEventsTab();
+                }, 1000);
+            }
         }
     </script>
 </body>
