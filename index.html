@@ -1,6 +1,7 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
+    <link rel="icon" type="image/png" href="https://github.com/WormDude/Airline-Manager-81-3-64/blob/main/an225.png?raw=true">
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Airline Manager 81 3⁄64</title>
@@ -173,8 +174,12 @@
         #interactive-tutorial-bubble { position: fixed; bottom: 30px; left: 30px; width: 380px; background: var(--panel-color); border: 2px solid var(--achievement-color); border-radius: 10px; padding: 20px; z-index: 1050; box-shadow: 0 15px 30px rgba(0,0,0,0.5); display: none; flex-direction: column; gap: 12px; }
         details { background: rgba(0,0,0,0.05); padding: 6px; border-radius: 4px; margin-top: 4px; border: 1px solid var(--card-border); }
         summary { font-weight: 600; cursor: pointer; color: var(--text-color); padding: 2px; font-size: 13px; display: flex; align-items: center; gap: 8px; }
-        #achievement-popup { position: fixed; top: -100px; left: 50%; transform: translateX(-50%); background: #1e1b4b; border: 2px solid var(--achievement-color); padding: 15px 30px; border-radius: 50px; box-shadow: 0 10px 25px rgba(0,0,0,0.5); display: flex; align-items: center; gap: 15px; z-index: 100000; transition: top 0.5s cubic-bezier(0.175,0.885,0.32,1.275); }
-        #achievement-popup.show { top: 30px; }
+        #achievement-popup { position: fixed; top: -200px; left: 50%; transform: translateX(-50%); background: #1e1b4b; border: 2px solid var(--achievement-color); padding: 15px 30px; border-radius: 50px; box-shadow: 0 10px 25px rgba(0,0,0,0.5); display: flex; align-items: center; gap: 15px; z-index: 100000; opacity: 0; pointer-events: none; transition: top 0.5s cubic-bezier(0.175,0.885,0.32,1.275), opacity 0.4s ease; max-width: calc(100vw - 24px); }
+        #achievement-popup.show { top: 30px; opacity: 1; pointer-events: auto; }
+        @media (max-width: 768px) {
+            #achievement-popup { top: -200px; padding: 10px 16px; gap: 8px; border-radius: 16px; }
+            #achievement-popup.show { top: max(10px, env(safe-area-inset-top, 10px)); }
+        }
         /* Celebration overlay popup */
         .plane-marker-icon { font-size: 20px; color: #eab308; text-shadow: 0 0 3px #000; text-align: center; line-height: 1; }
         /* Ensure aircraft click targets work — Leaflet sometimes clears pointer-events on divIcon */
@@ -626,7 +631,7 @@
     </div>
  
     <!-- ACHIEVEMENT POPUP -->
-    <div id="achievement-popup">
+    <div id="achievement-popup" onclick="dismissMilestonePopupNotification()" style="cursor:pointer;" title="Click to dismiss">
         <span id="pop-icon" style="font-size: 30px;">🏆</span>
         <div>
             <h4 style="color: var(--achievement-color); font-size: 13px; text-transform: uppercase;">Notification</h4>
@@ -804,7 +809,7 @@ z-index:99999;
                 <h3>📅 Login Streak</h3>
                 <button style="background:none; border:none; color:var(--text-color); font-size:20px; cursor:pointer;" onclick="closeStreakScreen()">✕</button>
             </div>
-            <p style="font-size:12px; color:#94a3b8; margin-bottom:14px;">Log in AND complete at least one Daily Quest to climb the reward streak. Miss a day — or clear zero quests — and it resets to Day 1.</p>
+            <p style="font-size:12px; color:#94a3b8; margin-bottom:14px;">Log in AND complete at least one Daily Quest to climb the reward streak. Miss a day or clear zero quests and it resets to Day 1.</p>
             <div style="text-align:center; margin-bottom:14px;">
                 <div id="streak-current-count" style="font-size:30px; font-weight:900; color:var(--achievement-color);">0</div>
                 <div style="font-size:11px; color:#94a3b8;">day streak</div>
@@ -821,7 +826,7 @@ z-index:99999;
                 <h3>🎯 Daily Quests</h3>
                 <button style="background:none; border:none; color:var(--text-color); font-size:20px; cursor:pointer;" onclick="closeQuestsScreen()">✕</button>
             </div>
-            <p style="font-size:12px; color:#94a3b8; margin-bottom:6px;">Three standard objectives, plus two Hard challenges each with their own countdown — miss the window and it re-rolls. Finish all five for a bonus payout.</p>
+            <p style="font-size:12px; color:#94a3b8; margin-bottom:6px;">Three standard objectives, plus two Hard challenges each with their own countdown. Miss the window and it re-rolls. Finish all five for a bonus payout.</p>
             <div id="quests-refresh-timer" style="font-size:10px; color:#64748b; margin-bottom:12px; text-align:right;"></div>
             <div id="quests-list" style="display:flex; flex-direction:column; gap:10px;"></div>
             <div id="quests-bonus-row" style="margin-top:14px; padding-top:12px; border-top:2px dashed var(--card-border); text-align:center; font-size:12px; color:#94a3b8;"></div>
@@ -870,6 +875,7 @@ z-index:99999;
                 <button id="tab-btn-achievements" class="tab-btn" onclick="switchTab('achievements')">Achieve</button>
                 <button id="tab-btn-directory" class="tab-btn" onclick="switchTab('directory')">Directory</button>
                 <button id="tab-btn-events" class="tab-btn" onclick="switchTab('events')">Events</button>
+                <button id="tab-btn-reputation" class="tab-btn" onclick="switchTab('reputation')">Reputation</button>
             </div>
             <div id="routes" class="tab-content active">
 
@@ -976,7 +982,7 @@ z-index:99999;
                 <!-- Helicopter sub-tab -->
                 <div id="msubtab-helicopter" style="display:none;">
                     <h3 style="color:#38bdf8;margin-bottom:6px;">🚁 Helicopters</h3>
-                    <p style="font-size:11px; color:#94a3b8; margin-bottom:5px; font-style:italic;">Civilian and utility rotorcraft — always available.</p>
+                    <p style="font-size:11px; color:#94a3b8; margin-bottom:5px; font-style:italic;">Civilian and utility rotorcraft</p>
                     <div id="helicopter-grid" class="market-grid"></div>
                 </div>
                 <!-- Cargo sub-tab -->
@@ -994,7 +1000,7 @@ z-index:99999;
                     <div id="legacy-locked-banner" class="rank-locked-banner" style="display:none;">
                         🔒 Legacy aircraft unlock at <strong>Rank 15</strong>.
                     </div>
-                    <p id="legacy-subtitle" style="font-size:11px; color:#a855f7; margin-bottom:5px; font-style:italic; display:none;">Iconic legacy airliners — retired classics reborn.</p>
+                    <p id="legacy-subtitle" style="font-size:11px; color:#a855f7; margin-bottom:5px; font-style:italic; display:none;">Iconic legacy airliners</p>
                     <div id="legacy-grid" class="market-grid"></div>
                 </div>
                 <!-- Military sub-tab -->
@@ -1012,7 +1018,7 @@ z-index:99999;
                     <div id="airship-locked-banner" class="rank-locked-banner" style="display:none;">
                         🔒 Airships unlock at <strong>Rank 20</strong>.
                     </div>
-                    <p id="airship-subtitle" style="font-size:11px; color:#94a3b8; margin-bottom:5px; font-style:italic; display:none;">Slow, majestic lighter-than-air craft — a novelty way to travel.</p>
+                    <p id="airship-subtitle" style="font-size:11px; color:#94a3b8; margin-bottom:5px; font-style:italic; display:none;">Slow, majestic lighter-than-air craft</p>
                     <div id="airship-grid" class="market-grid"></div>
                 </div>
             </div>
@@ -1085,6 +1091,18 @@ z-index:99999;
                 <div id="events-active-list" style="margin-bottom:14px;"></div>
                 <div style="font-size:11px;font-weight:700;color:#64748b;text-transform:uppercase;letter-spacing:1px;margin-bottom:8px;">Event History</div>
                 <div id="events-history-list" style="font-size:11px;color:#64748b;"></div>
+            </div>
+
+            <div id="reputation" class="tab-content">
+                <div id="rep-overall-rating" style="margin-bottom:14px;"></div>
+                <div id="rep-category-switcher" style="display:flex;gap:8px;margin-bottom:14px;"></div>
+                <div id="rep-category-detail"></div>
+                <div style="display:flex;align-items:center;gap:8px;margin:18px 0 8px;">
+                    <div style="flex:1;height:1px;background:var(--card-border);"></div>
+                    <div style="font-size:10.5px;font-weight:700;color:#64748b;text-transform:uppercase;letter-spacing:1.5px;white-space:nowrap;">💬 Passenger Reviews</div>
+                    <div style="flex:1;height:1px;background:var(--card-border);"></div>
+                </div>
+                <div id="rep-reviews-list" style="font-size:11px;"></div>
             </div>
  
     <script src="https://cdn.jsdelivr.net/npm/leaflet@1.9.4/dist/leaflet.min.js"></script>
@@ -1198,8 +1216,9 @@ z-index:99999;
             const airportDemand = ((origBase + destBase) / 2) / 100;
             // Route-level event modifier (default 100 = unchanged)
             const routeMod = (route.routeDemand == null ? 100 : route.routeDemand) / 100;
-            // Combine: airport sets the ceiling, route events shift it
-            return Math.max(0, Math.min(1.5, airportDemand * routeMod + (evDemandMod || 0)));
+            // Combine: airport sets the ceiling, route events shift it, reputation perk adds a flat bonus
+            const repDemandBonus = (typeof getReputationDemandBonus === 'function') ? getReputationDemandBonus() : 0;
+            return Math.max(0, Math.min(1.5, airportDemand * routeMod + (evDemandMod || 0) + repDemandBonus));
         }
 
         function getDefaultTicketing(distanceNM) {
@@ -1239,7 +1258,10 @@ z-index:99999;
                 totalRevenue += filledSeats * actualPrice;
                 totalFilledPax += filledSeats;
             }
-            return { revenue: Math.round(totalRevenue), pax: totalFilledPax };
+            const repMult = (typeof getReputationEarningsMultiplier === 'function') ? getReputationEarningsMultiplier() : 1;
+            const foodPaxBonus = (typeof getReputationFoodPaxBonus === 'function') ? getReputationFoodPaxBonus() * totalFilledPax : 0;
+            if (foodPaxBonus > 0) gameState.totalFoodPaxServed = (gameState.totalFoodPaxServed || 0) + totalFilledPax;
+            return { revenue: Math.round(totalRevenue * repMult + foodPaxBonus), pax: totalFilledPax };
         }
 
         // Used for route card display — shows per-class breakdown
@@ -2709,82 +2731,120 @@ z-index:99999;
  
         // ===== AIRCRAFT CATALOGS =====
         const aircraftCatalog = {
-            "Cessna 208 Caravan":       { name: "Cessna 208 Caravan",    category: "Other",  price: 25000,    pax: 11,  rangeNM: 1070,  topSpeedKnots: 186, minRank: 1,  iconSize: 24, img: "https://upload.wikimedia.org/wikipedia/commons/b/b3/Iraqi_Air_Force_Cessna_208_Caravan_training_mission.jpg", type: "plane" },
-            "de Havilland Canada DHC-6 Twin Otter": { name: "de Havilland Canada DHC-6 Twin Otter", category: "Other", price: 120000, pax: 20, rangeNM: 771, topSpeedKnots: 160, minRank: 2, iconSize: 24, img: "https://upload.wikimedia.org/wikipedia/commons/thumb/2/20/WinAir_De_Havilland_Canada_DHC-6-300_Twin_Otter_Breidenstein.jpg/1280px-WinAir_De_Havilland_Canada_DHC-6-300_Twin_Otter_Breidenstein.jpg", type: "plane" },
-            "Saab 340":                 { name: "Saab 340",              category: "Other",  price: 220000,   pax: 34,  rangeNM: 730,  topSpeedKnots: 283, minRank: 3,  iconSize: 24, img: "https://upload.wikimedia.org/wikipedia/commons/thumb/0/08/Saab_340_G-LGNC_IMG_3425_%2811712072893%29.jpg/1920px-Saab_340_G-LGNC_IMG_3425_%2811712072893%29.jpg", type: "plane" },
-            "ATR 72-600":               { name: "ATR 72-600",            category: "ATR",    price: 480000,   pax: 72,  rangeNM: 758,  topSpeedKnots: 275, minRank: 4,  iconSize: 26, img: "https://upload.wikimedia.org/wikipedia/commons/thumb/b/bc/Wings_Air_ATR_72-600_with_special_livery_as_the_50th_delivered_aircraft.jpg/1280px-Wings_Air_ATR_72-600_with_special_livery_as_the_50th_delivered_aircraft.jpg", type: "plane" },
-            "Bombardier Q400":          { name: "Bombardier Q400",       category: "Other",  price: 850000,   pax: 82,  rangeNM: 1100, topSpeedKnots: 360, minRank: 5,  iconSize: 26, img: "https://upload.wikimedia.org/wikipedia/commons/thumb/e/ec/Hamburg_Airport_Wider%C3%B8e_Bombardier_DHC-8-402Q_LN-WDR_%28DSC08713%29.jpg/1920px-Hamburg_Airport_Wider%C3%B8e_Bombardier_DHC-8-402Q_LN-WDR_%28DSC08713%29.jpg", type: "plane" },
-            "Airbus A220-300":          { name: "Airbus A220-300",       category: "Airbus", price: 1800000,  pax: 130, rangeNM: 3400, topSpeedKnots: 488, minRank: 8,  iconSize: 26, img: "https://upload.wikimedia.org/wikipedia/commons/thumb/9/96/Delta_Airbus_A220-300_N333DU_departing_Boston_June_2025.jpg/1920px-Delta_Airbus_A220-300_N333DU_departing_Boston_June_2025.jpg", type: "plane" },
-            "Boeing 737-800":           { name: "Boeing 737-800",        category: "Boeing", price: 2800000,  pax: 160, rangeNM: 2927, topSpeedKnots: 452, minRank: 12,  iconSize: 28, img: "https://upload.wikimedia.org/wikipedia/commons/thumb/8/8b/D-ATUF_B737-8K5W_TUIfly-Hapag_retro_PMI_26SEP10_%286341092368%29.jpg/1280px-D-ATUF_B737-8K5W_TUIfly-Hapag_retro_PMI_26SEP10_%286341092368%29.jpg", type: "plane" },
-            "Airbus A320":              { name: "Airbus A320",           category: "Airbus", price: 2600000,  pax: 150, rangeNM: 3350, topSpeedKnots: 448, minRank: 11,  iconSize: 28, img: "https://upload.wikimedia.org/wikipedia/commons/c/c1/Airbus_A320-214%2C_Airbus_Industrie_JP7617615.jpg", type: "plane" },
-            "Embraer E175":             { name: "Embraer E175",          category: "Other",  price: 2200000,  pax: 76,  rangeNM: 2200, topSpeedKnots: 470, minRank: 9,  iconSize: 28, img: "https://upload.wikimedia.org/wikipedia/commons/thumb/e/e0/N199SY_SkyWest_Embraer_175_for_Alaska_Airlines.jpg/1920px-N199SY_SkyWest_Embraer_175_for_Alaska_Airlines.jpg", type: "plane" },
-            "Boeing 787-9 Dreamliner":  { name: "Boeing 787-9 Dreamliner", category: "Boeing", price: 8500000, pax: 242, rangeNM: 7305, topSpeedKnots: 516, minRank: 16, iconSize: 32, img: "https://upload.wikimedia.org/wikipedia/commons/thumb/4/4e/Boeing_787_N1015B_ANA_Airlines_%2827611880663%29_%28cropped%29.jpg/1920px-Boeing_787_N1015B_ANA_Airlines_%2827611880663%29_%28cropped%29.jpg", type: "plane" },
-            "Airbus A350-900":          { name: "Airbus A350-900",       category: "Airbus", price: 13000000, pax: 315, rangeNM: 8500, topSpeedKnots: 513, minRank: 20,  iconSize: 32, img: "https://upload.wikimedia.org/wikipedia/commons/thumb/c/ce/F-WWCF_A350_LBG_SIAE_2015_%2818953559366%29.jpg/1920px-F-WWCF_A350_LBG_SIAE_2015_%2818953559366%29.jpg", type: "plane" },
-            "Boeing 747-8":             { name: "Boeing 747-8",          category: "Boeing", price: 22000000, pax: 467, rangeNM: 7730, topSpeedKnots: 600, minRank: 25, iconSize: 36, img: "https://upload.wikimedia.org/wikipedia/commons/thumb/b/b1/D-ABYT_at_FRA.jpg/1280px-D-ABYT_at_FRA.jpg", type: "plane" },
+            "Cessna 208 Caravan":       { name: "Cessna 208 Caravan",    category: "Other",  price: 25000,    pax: 11,  rangeNM: 1070,  topSpeedKnots: 186, minRank: 1,  iconSize: 24, img: "https://upload.wikimedia.org/wikipedia/commons/b/b3/Iraqi_Air_Force_Cessna_208_Caravan_training_mission.jpg", type: "plane", rarity: "common" },
+            "de Havilland Canada DHC-6 Twin Otter": { name: "de Havilland Canada DHC-6 Twin Otter", category: "Other", price: 120000, pax: 20, rangeNM: 771, topSpeedKnots: 160, minRank: 2, iconSize: 24, img: "https://upload.wikimedia.org/wikipedia/commons/thumb/2/20/WinAir_De_Havilland_Canada_DHC-6-300_Twin_Otter_Breidenstein.jpg/1280px-WinAir_De_Havilland_Canada_DHC-6-300_Twin_Otter_Breidenstein.jpg", type: "plane", rarity: "common" },
+            "Saab 340":                 { name: "Saab 340",              category: "Other",  price: 220000,   pax: 34,  rangeNM: 730,  topSpeedKnots: 283, minRank: 3,  iconSize: 24, img: "https://upload.wikimedia.org/wikipedia/commons/thumb/0/08/Saab_340_G-LGNC_IMG_3425_%2811712072893%29.jpg/1920px-Saab_340_G-LGNC_IMG_3425_%2811712072893%29.jpg", type: "plane", rarity: "common" },
+            "ATR 72-600":               { name: "ATR 72-600",            category: "ATR",    price: 480000,   pax: 72,  rangeNM: 758,  topSpeedKnots: 275, minRank: 4,  iconSize: 26, img: "https://upload.wikimedia.org/wikipedia/commons/thumb/b/bc/Wings_Air_ATR_72-600_with_special_livery_as_the_50th_delivered_aircraft.jpg/1280px-Wings_Air_ATR_72-600_with_special_livery_as_the_50th_delivered_aircraft.jpg", type: "plane", rarity: "uncommon" },
+            "Bombardier Q400":          { name: "Bombardier Q400",       category: "Other",  price: 850000,   pax: 82,  rangeNM: 1100, topSpeedKnots: 360, minRank: 5,  iconSize: 26, img: "https://upload.wikimedia.org/wikipedia/commons/thumb/e/ec/Hamburg_Airport_Wider%C3%B8e_Bombardier_DHC-8-402Q_LN-WDR_%28DSC08713%29.jpg/1920px-Hamburg_Airport_Wider%C3%B8e_Bombardier_DHC-8-402Q_LN-WDR_%28DSC08713%29.jpg", type: "plane", rarity: "uncommon" },
+            "Airbus A220-300":          { name: "Airbus A220-300",       category: "Airbus", price: 1800000,  pax: 130, rangeNM: 3400, topSpeedKnots: 488, minRank: 8,  iconSize: 26, img: "https://upload.wikimedia.org/wikipedia/commons/thumb/9/96/Delta_Airbus_A220-300_N333DU_departing_Boston_June_2025.jpg/1920px-Delta_Airbus_A220-300_N333DU_departing_Boston_June_2025.jpg", type: "plane", rarity: "uncommon" },
+            "Boeing 737-800":           { name: "Boeing 737-800",        category: "Boeing", price: 2800000,  pax: 160, rangeNM: 2927, topSpeedKnots: 452, minRank: 12,  iconSize: 28, img: "https://upload.wikimedia.org/wikipedia/commons/thumb/8/8b/D-ATUF_B737-8K5W_TUIfly-Hapag_retro_PMI_26SEP10_%286341092368%29.jpg/1280px-D-ATUF_B737-8K5W_TUIfly-Hapag_retro_PMI_26SEP10_%286341092368%29.jpg", type: "plane", rarity: "rare" },
+            "Airbus A320":              { name: "Airbus A320",           category: "Airbus", price: 2600000,  pax: 150, rangeNM: 3350, topSpeedKnots: 448, minRank: 11,  iconSize: 28, img: "https://upload.wikimedia.org/wikipedia/commons/c/c1/Airbus_A320-214%2C_Airbus_Industrie_JP7617615.jpg", type: "plane", rarity: "rare" },
+            "Embraer E175":             { name: "Embraer E175",          category: "Other",  price: 2200000,  pax: 76,  rangeNM: 2200, topSpeedKnots: 470, minRank: 9,  iconSize: 28, img: "https://upload.wikimedia.org/wikipedia/commons/thumb/e/e0/N199SY_SkyWest_Embraer_175_for_Alaska_Airlines.jpg/1920px-N199SY_SkyWest_Embraer_175_for_Alaska_Airlines.jpg", type: "plane", rarity: "uncommon" },
+            "Boeing 787-9 Dreamliner":  { name: "Boeing 787-9 Dreamliner", category: "Boeing", price: 8500000, pax: 242, rangeNM: 7305, topSpeedKnots: 516, minRank: 16, iconSize: 32, img: "https://upload.wikimedia.org/wikipedia/commons/thumb/4/4e/Boeing_787_N1015B_ANA_Airlines_%2827611880663%29_%28cropped%29.jpg/1920px-Boeing_787_N1015B_ANA_Airlines_%2827611880663%29_%28cropped%29.jpg", type: "plane", rarity: "epic" },
+            "Airbus A350-900":          { name: "Airbus A350-900",       category: "Airbus", price: 13000000, pax: 315, rangeNM: 8500, topSpeedKnots: 513, minRank: 20,  iconSize: 32, img: "https://upload.wikimedia.org/wikipedia/commons/thumb/c/ce/F-WWCF_A350_LBG_SIAE_2015_%2818953559366%29.jpg/1920px-F-WWCF_A350_LBG_SIAE_2015_%2818953559366%29.jpg", type: "plane", rarity: "epic" },
+            "Boeing 747-8":             { name: "Boeing 747-8",          category: "Boeing", price: 22000000, pax: 467, rangeNM: 7730, topSpeedKnots: 600, minRank: 25, iconSize: 36, img: "https://upload.wikimedia.org/wikipedia/commons/thumb/b/b1/D-ABYT_at_FRA.jpg/1280px-D-ABYT_at_FRA.jpg", type: "plane", rarity: "legendary" },
 
             // ===== ADDITIONAL PASSENGER AIRCRAFT =====
-            "Beechcraft King Air":      { name: "Beechcraft King Air",      category: "Other",  price: 650000,  pax: 9,   rangeNM: 1806, topSpeedKnots: 312, minRank: 5,  iconSize: 24, img: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTmMK9SockCfcDBA0Ruj8Xe64wPGQVK5CrWW16JmYyTe-4IbLz8k3f8QzHq&s=10", type: "plane" },
-            "Beechcraft 1900":          { name: "Beechcraft 1900",          category: "Other",  price: 350000,  pax: 19,  rangeNM: 1587, topSpeedKnots: 260, minRank: 4,  iconSize: 24, img: "https://cdn11.bigcommerce.com/s-bng8bbzq86/images/stencil/640w/Beechcraft_1900d_d-cbig_fairford_arp1-e1433797517409.jpg", type: "plane" },
-            "Short 360":                { name: "Short 360",                category: "Other",  price: 280000,  pax: 36,  rangeNM: 396,  topSpeedKnots: 200, minRank: 3,  iconSize: 24, img: "https://i0.wp.com/northwestairlineshistory.org/wp-content/uploads/2020/11/Northwest_Short_360.jpg?resize=840%2C577&ssl=1", type: "plane" },
-            "Antonov An-2":             { name: "Antonov An-2",             category: "Other",  price: 45000,   pax: 12,  rangeNM: 560,  topSpeedKnots: 119, minRank: 1,  iconSize: 22, img: "https://images.squarespace-cdn.com/content/v1/602531ed52cb0b327fea1168/1710210495689-8WXLJS6L7P5O3QN6V2WU/DSC_1479EA-DeNoiseAI-clear.jpg", type: "plane" },
-            "Boeing 717":               { name: "Boeing 717",               category: "Boeing", price: 1600000,  pax: 134, rangeNM: 1430, topSpeedKnots: 447, minRank: 7,  iconSize: 26, img: "https://upload.wikimedia.org/wikipedia/commons/0/0d/Delta_Air_Lines_Boeing_717-2BD_N966AT.jpg", type: "plane" },
-            "Airbus A318":              { name: "Airbus A318",              category: "Airbus", price: 1900000,  pax: 107, rangeNM: 3100, topSpeedKnots: 449, minRank: 9,  iconSize: 26, img: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQiLcXqOCUeZP1tH7hPS47xaSb2Q7_FcOshG4Ur55XzgQ&s=10", type: "plane" },
-            "Airbus A319":              { name: "Airbus A319",              category: "Airbus", price: 2200000,  pax: 124, rangeNM: 3700, topSpeedKnots: 448, minRank: 10, iconSize: 26, img: "https://upload.wikimedia.org/wikipedia/commons/4/4d/United_Airbus_A319_%2813942617705%29.jpg", type: "plane" },
-            "Boeing 737-700":           { name: "Boeing 737-700",           category: "Boeing", price: 2400000,  pax: 140, rangeNM: 3440, topSpeedKnots: 448, minRank: 10, iconSize: 26, img: "https://upload.wikimedia.org/wikipedia/commons/thumb/5/55/United_Boeing_737-700_N54711_MD1.jpg/3840px-United_Boeing_737-700_N54711_MD1.jpg", type: "plane" },
-            "Boeing 737 MAX 8":         { name: "Boeing 737 MAX 8",         category: "Boeing", price: 3200000,  pax: 178, rangeNM: 3550, topSpeedKnots: 453, minRank: 13, iconSize: 28, img: "https://upload.wikimedia.org/wikipedia/commons/3/32/Alaska_737_Max_9.jpg", type: "plane" },
-            "Airbus A330":              { name: "Airbus A330",              category: "Airbus", price: 10000000, pax: 335, rangeNM: 6340, topSpeedKnots: 475, minRank: 17, iconSize: 32, img: "https://upload.wikimedia.org/wikipedia/commons/thumb/c/c8/Turkish_Airlines%2C_Airbus_A330-300_TC-JNL_NRT_%2823708073592%29.jpg/330px-Turkish_Airlines%2C_Airbus_A330-300_TC-JNL_NRT_%2823708073592%29.jpg", type: "plane" },
-            "Airbus A340":              { name: "Airbus A340",              category: "Airbus", price: 11500000, pax: 295, rangeNM: 7450, topSpeedKnots: 494, minRank: 18, iconSize: 32, img: "https://upload.wikimedia.org/wikipedia/commons/e/ec/Frankfurt_Airport_Lufthansa_Airbus_A340-313_D-AIGY_%28DSC02566%29.jpg", type: "plane" },
-            "Boeing 747-400":           { name: "Boeing 747-400",           category: "Boeing", price: 17000000, pax: 416, rangeNM: 7260, topSpeedKnots: 490, minRank: 22, iconSize: 36, img: "https://upload.wikimedia.org/wikipedia/commons/4/48/Frankfurt_Airport_Lufthansa_Boeing_747-430_D-ABVY_%28DSC09727%29.jpg", type: "plane" }, 
-            "Airbus A380":              { name: "Airbus A380",           category: "Airbus", price: 32000000, pax: 525, rangeNM: 7991, topSpeedKnots: 515, minRank: 30, iconSize: 38, img: "https://upload.wikimedia.org/wikipedia/commons/e/ef/Singapore_Airlines_A380-841_%289V-SKB%29_landing_at_Singapore_Changi_Airport_%283%29.jpg", type: "plane" }
+            "Beechcraft King Air":      { name: "Beechcraft King Air",      category: "Other",  price: 650000,  pax: 9,   rangeNM: 1806, topSpeedKnots: 312, minRank: 5,  iconSize: 24, img: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTmMK9SockCfcDBA0Ruj8Xe64wPGQVK5CrWW16JmYyTe-4IbLz8k3f8QzHq&s=10", type: "plane", rarity: "uncommon" },
+            "Beechcraft 1900":          { name: "Beechcraft 1900",          category: "Other",  price: 350000,  pax: 19,  rangeNM: 1587, topSpeedKnots: 260, minRank: 4,  iconSize: 24, img: "https://cdn11.bigcommerce.com/s-bng8bbzq86/images/stencil/640w/Beechcraft_1900d_d-cbig_fairford_arp1-e1433797517409.jpg", type: "plane", rarity: "common" },
+            "Short 360":                { name: "Short 360",                category: "Other",  price: 280000,  pax: 36,  rangeNM: 396,  topSpeedKnots: 200, minRank: 3,  iconSize: 24, img: "https://i0.wp.com/northwestairlineshistory.org/wp-content/uploads/2020/11/Northwest_Short_360.jpg?resize=840%2C577&ssl=1", type: "plane", rarity: "common" },
+            "Antonov An-2":             { name: "Antonov An-2",             category: "Other",  price: 45000,   pax: 12,  rangeNM: 560,  topSpeedKnots: 119, minRank: 1,  iconSize: 22, img: "https://images.squarespace-cdn.com/content/v1/602531ed52cb0b327fea1168/1710210495689-8WXLJS6L7P5O3QN6V2WU/DSC_1479EA-DeNoiseAI-clear.jpg", type: "plane", rarity: "common" },
+            "Boeing 717":               { name: "Boeing 717",               category: "Boeing", price: 1600000,  pax: 134, rangeNM: 1430, topSpeedKnots: 447, minRank: 7,  iconSize: 26, img: "https://upload.wikimedia.org/wikipedia/commons/0/0d/Delta_Air_Lines_Boeing_717-2BD_N966AT.jpg", type: "plane", rarity: "uncommon" },
+            "Airbus A318":              { name: "Airbus A318",              category: "Airbus", price: 1900000,  pax: 107, rangeNM: 3100, topSpeedKnots: 449, minRank: 9,  iconSize: 26, img: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQiLcXqOCUeZP1tH7hPS47xaSb2Q7_FcOshG4Ur55XzgQ&s=10", type: "plane", rarity: "uncommon" },
+            "Airbus A319":              { name: "Airbus A319",              category: "Airbus", price: 2200000,  pax: 124, rangeNM: 3700, topSpeedKnots: 448, minRank: 10, iconSize: 26, img: "https://upload.wikimedia.org/wikipedia/commons/4/4d/United_Airbus_A319_%2813942617705%29.jpg", type: "plane", rarity: "uncommon" },
+            "Boeing 737-700":           { name: "Boeing 737-700",           category: "Boeing", price: 2400000,  pax: 140, rangeNM: 3440, topSpeedKnots: 448, minRank: 10, iconSize: 26, img: "https://upload.wikimedia.org/wikipedia/commons/thumb/5/55/United_Boeing_737-700_N54711_MD1.jpg/3840px-United_Boeing_737-700_N54711_MD1.jpg", type: "plane", rarity: "rare" },
+            "Boeing 737 MAX 8":         { name: "Boeing 737 MAX 8",         category: "Boeing", price: 3200000,  pax: 178, rangeNM: 3550, topSpeedKnots: 453, minRank: 13, iconSize: 28, img: "https://upload.wikimedia.org/wikipedia/commons/3/32/Alaska_737_Max_9.jpg", type: "plane", rarity: "rare" },
+            "Airbus A330":              { name: "Airbus A330",              category: "Airbus", price: 10000000, pax: 335, rangeNM: 6340, topSpeedKnots: 475, minRank: 17, iconSize: 32, img: "https://upload.wikimedia.org/wikipedia/commons/thumb/c/c8/Turkish_Airlines%2C_Airbus_A330-300_TC-JNL_NRT_%2823708073592%29.jpg/330px-Turkish_Airlines%2C_Airbus_A330-300_TC-JNL_NRT_%2823708073592%29.jpg", type: "plane", rarity: "epic" },
+            "Airbus A340":              { name: "Airbus A340",              category: "Airbus", price: 11500000, pax: 295, rangeNM: 7450, topSpeedKnots: 494, minRank: 18, iconSize: 32, img: "https://upload.wikimedia.org/wikipedia/commons/e/ec/Frankfurt_Airport_Lufthansa_Airbus_A340-313_D-AIGY_%28DSC02566%29.jpg", type: "plane", rarity: "epic" },
+            "Boeing 747-400":           { name: "Boeing 747-400",           category: "Boeing", price: 17000000, pax: 416, rangeNM: 7260, topSpeedKnots: 490, minRank: 22, iconSize: 36, img: "https://upload.wikimedia.org/wikipedia/commons/4/48/Frankfurt_Airport_Lufthansa_Boeing_747-430_D-ABVY_%28DSC09727%29.jpg", type: "plane", rarity: "epic" }, 
+            "Airbus A380":              { name: "Airbus A380",           category: "Airbus", price: 32000000, pax: 525, rangeNM: 7991, topSpeedKnots: 515, minRank: 30, iconSize: 38, img: "https://upload.wikimedia.org/wikipedia/commons/e/ef/Singapore_Airlines_A380-841_%289V-SKB%29_landing_at_Singapore_Changi_Airport_%283%29.jpg", type: "plane", rarity: "legendary" },
+
+            // ===== SECOND ADDITIONAL PASSENGER AIRCRAFT BATCH =====
+            "Boeing 757-200":           { name: "Boeing 757-200",           category: "Boeing", price: 3600000,  pax: 200, rangeNM: 3915, topSpeedKnots: 500, minRank: 14, iconSize: 28, img: "https://upload.wikimedia.org/wikipedia/commons/thumb/0/0c/Icelandair_757-200_TF-LLX_on_final_approach_to_Boston_Aug_2020.jpg/1280px-Icelandair_757-200_TF-LLX_on_final_approach_to_Boston_Aug_2020.jpg", type: "plane", isNew: true, rarity: "rare" },
+            "Boeing 767-300":           { name: "Boeing 767-300",           category: "Boeing", price: 8700000,  pax: 269, rangeNM: 5990, topSpeedKnots: 459, minRank: 17, iconSize: 30, img: "https://upload.wikimedia.org/wikipedia/commons/thumb/b/ba/DELTA_AIRLINES_767-300_%282147238749%29.jpg/1920px-DELTA_AIRLINES_767-300_%282147238749%29.jpg", type: "plane", isNew: true, rarity: "epic" },
+            "Airbus A310":              { name: "Airbus A310",              category: "Airbus", price: 6200000,  pax: 240, rangeNM: 5150, topSpeedKnots: 468, minRank: 15, iconSize: 30, img: "https://upload.wikimedia.org/wikipedia/commons/5/5d/Air_Transat_A310_%28C-GTSF%29_%40_LHR%2C_Aug_2009.jpg", type: "plane", isNew: true, rarity: "rare" },
+            "Airbus A300":              { name: "Airbus A300",              category: "Airbus", price: 5400000,  pax: 266, rangeNM: 4070, topSpeedKnots: 469, minRank: 14, iconSize: 30, img: "https://upload.wikimedia.org/wikipedia/commons/5/5d/Air_Transat_A310_%28C-GTSF%29_%40_LHR%2C_Aug_2009.jpg", type: "plane", isNew: true, rarity: "rare" },
+            "Embraer E190":             { name: "Embraer E190",             category: "Other",  price: 2500000,  pax: 100, rangeNM: 2400, topSpeedKnots: 470, minRank: 10, iconSize: 26, img: "https://upload.wikimedia.org/wikipedia/commons/3/3d/KLM_Cityhopper_-_Embraer_190LR_-_AN2571563.jpg", type: "plane", isNew: true, rarity: "rare" },
+
+            // ===== ADDITIONAL PASSENGER AIRCRAFT =====
+            "Pilatus PC-12":            { name: "Pilatus PC-12",            category: "Other",  price: 320000,   pax: 9,   rangeNM: 1845, topSpeedKnots: 270, minRank: 2,  iconSize: 22, img: "https://upload.wikimedia.org/wikipedia/commons/8/89/Pilatus_PC-12-45%2C_Royal_Flying_Doctor_Service_AN0636290.jpg", type: "plane", isNew: true, rarity: "common" },
+            "Fokker 50":                { name: "Fokker 50",                category: "Other",  price: 350000,   pax: 50,  rangeNM: 1085, topSpeedKnots: 282, minRank: 3,  iconSize: 24, img: "https://upload.wikimedia.org/wikipedia/commons/thumb/8/8a/PH-LXP_KLM_%28393104846%29.jpg/1280px-PH-LXP_KLM_%28393104846%29.jpg", type: "plane", isNew: true, rarity: "uncommon" },
+            "Embraer E145":             { name: "Embraer E145",             category: "Other",  price: 750000,   pax: 50,  rangeNM: 1550, topSpeedKnots: 443, minRank: 6,  iconSize: 24, img: "https://upload.wikimedia.org/wikipedia/commons/thumb/2/25/Embraer_ERJ-145LU%2C_Air_France_%28Regional_Compagnie_Aerienne%29_JP6914566.jpg/1280px-Embraer_ERJ-145LU%2C_Air_France_%28Regional_Compagnie_Aerienne%29_JP6914566.jpg", type: "plane", isNew: true, rarity: "uncommon" },
+            "Bombardier CRJ200":        { name: "Bombardier CRJ200",        category: "Other",  price: 780000,   pax: 50,  rangeNM: 1650, topSpeedKnots: 459, minRank: 6,  iconSize: 24, img: "https://upload.wikimedia.org/wikipedia/commons/c/ce/American_Eagle_operated_by_SkyWest_CRJ-200_%28N955SW%29_%2813641859024%29.jpg", type: "plane", isNew: true, rarity: "uncommon" },
+            "Fokker 70":                { name: "Fokker 70",                category: "Other",  price: 1300000,  pax: 79,  rangeNM: 1500, topSpeedKnots: 461, minRank: 8,  iconSize: 26, img: "https://upload.wikimedia.org/wikipedia/commons/thumb/6/69/PH-JCT_Fokker_70_KLM_cityhopper.JPG/1280px-PH-JCT_Fokker_70_KLM_cityhopper.JPG", type: "plane", isNew: true, rarity: "uncommon" },
+            "Bombardier CRJ700":        { name: "Bombardier CRJ700",        category: "Other",  price: 1400000,  pax: 78,  rangeNM: 1520, topSpeedKnots: 473, minRank: 8,  iconSize: 26, img: "https://upload.wikimedia.org/wikipedia/commons/c/c1/F-GRZA_%287446799514%29.jpg", type: "plane", isNew: true, rarity: "uncommon" },
+            "Fokker 100":               { name: "Fokker 100",               category: "Other",  price: 1500000,  pax: 109, rangeNM: 1500, topSpeedKnots: 468, minRank: 9,  iconSize: 26, img: "https://upload.wikimedia.org/wikipedia/commons/thumb/e/e5/Fokker_100_%28KLM%29_PH-OFN_%2810676665315%29.jpg/1280px-Fokker_100_%28KLM%29_PH-OFN_%2810676665315%29.jpg", type: "plane", isNew: true, rarity: "uncommon" },
+            "Boeing 737-600":           { name: "Boeing 737-600",           category: "Boeing",  price: 1900000,  pax: 108, rangeNM: 3235, topSpeedKnots: 453, minRank: 11, iconSize: 26, img: "https://upload.wikimedia.org/wikipedia/commons/thumb/9/9b/Sas_b737-600_ln-rcw_arp.jpg/1280px-Sas_b737-600_ln-rcw_arp.jpg", type: "plane", isNew: true, rarity: "rare" },
+            "Boeing 737 MAX 9":         { name: "Boeing 737 MAX 9",         category: "Boeing",  price: 3400000,  pax: 193, rangeNM: 3550, topSpeedKnots: 453, minRank: 14, iconSize: 28, img: "https://upload.wikimedia.org/wikipedia/commons/thumb/4/46/Boeing%2C_N7379E%2C_Boeing_737-9_MAX_%28cropped%29.jpg/1280px-Boeing%2C_N7379E%2C_Boeing_737-9_MAX_%28cropped%29.jpg", type: "plane", isNew: true, rarity: "rare" },
+            "Boeing 737 MAX 10":        { name: "Boeing 737 MAX 10",        category: "Boeing",  price: 3750000,  pax: 204, rangeNM: 3300, topSpeedKnots: 453, minRank: 15, iconSize: 28, img: "https://upload.wikimedia.org/wikipedia/commons/thumb/5/56/737_MAX_10_Roll_Out_%28Nov_2019%29_-_003.jpg/1920px-737_MAX_10_Roll_Out_%28Nov_2019%29_-_003.jpg", type: "plane", isNew: true, rarity: "rare" },
+            "COMAC C919":               { name: "COMAC C919",               category: "Other",  price: 4200000,  pax: 168, rangeNM: 3000, topSpeedKnots: 471, minRank: 13, iconSize: 28, img: "https://upload.wikimedia.org/wikipedia/commons/thumb/7/78/B-919A%40PEK_%2820221226151722%29.jpg/1280px-B-919A%40PEK_%2820221226151722%29.jpg", type: "plane", isNew: true, rarity: "rare" },
+            "Airbus A321":              { name: "Airbus A321",              category: "Airbus", price: 3100000,  pax: 200, rangeNM: 3200, topSpeedKnots: 447, minRank: 12, iconSize: 28, img: "https://upload.wikimedia.org/wikipedia/commons/thumb/8/81/Airbus_A321-231%28w%29_%E2%80%98N915US%E2%80%99_American_Airlines_%2828442733186%29.jpg/1280px-Airbus_A321-231%28w%29_%E2%80%98N915US%E2%80%99_American_Airlines_%2828442733186%29.jpg", type: "plane", isNew: true, rarity: "rare" },
+            "Boeing 737-900":           { name: "Boeing 737-900",           category: "Boeing", price: 3400000,  pax: 189, rangeNM: 3200, topSpeedKnots: 453, minRank: 13, iconSize: 28, img: "https://upload.wikimedia.org/wikipedia/commons/5/5f/Alaska_Boeing_737-900_Airwim-2.jpg", type: "plane", isNew: true, rarity: "rare" },
+            "Airbus A350-1000":         { name: "Airbus A350-1000",         category: "Airbus", price: 15500000, pax: 366, rangeNM: 8700, topSpeedKnots: 513, minRank: 21, iconSize: 32, img: "https://upload.wikimedia.org/wikipedia/commons/thumb/d/d5/Paris_Air_Show_2019%2C_Le_Bourget_%28SIAE9586%29.jpg/1280px-Paris_Air_Show_2019%2C_Le_Bourget_%28SIAE9586%29.jpg", type: "plane", isNew: true, rarity: "epic" },
+            "Bombardier CRJ-900":                  { name: "Bombardier CRJ-900",                  category: "Other",  price: 1700000,  pax: 90,  rangeNM: 1550, topSpeedKnots: 470, minRank: 7,  iconSize: 26, img: "https://upload.wikimedia.org/wikipedia/commons/0/05/EC-JTU_%288544702097%29.jpg", type: "plane", isNew: true, rarity: "uncommon" },
+            "Ilyushin Il-96":           { name: "Ilyushin Il-96",           category: "Other",  price: 9500000,  pax: 300, rangeNM: 5000, topSpeedKnots: 480, minRank: 18, iconSize: 32, img: "https://upload.wikimedia.org/wikipedia/commons/thumb/4/48/CU-T1250%40PEK_%2820181107114529%29.jpg/1920px-CU-T1250%40PEK_%2820181107114529%29.jpg", type: "plane", isNew: true, rarity: "epic" }
         };
  
         // ===== CARGO AIRCRAFT (unlock at rank 10+) =====
         const cargoCatalog = {
-            "Cessna 208B Cargomaster":  { name: "Cessna 208B Cargomaster", category: "Cargo", price: 55000,    cargo: 1587,   rangeNM: 792,  topSpeedKnots: 185, minRank: 6, iconSize: 24, img: "https://upload.wikimedia.org/wikipedia/commons/thumb/3/30/Cessna_208B_Caravan_%27N876FE%27_FedEx_%2813006463414%29.jpg/1280px-Cessna_208B_Caravan_%27N876FE%27_FedEx_%2813006463414%29.jpg", type: "cargo-plane", isCargo: true },
-            "ATR 72 Freighter":         { name: "ATR 72 Freighter",         category: "Cargo", price: 750000,   cargo: 8900,   rangeNM: 950,  topSpeedKnots: 270, minRank: 8, iconSize: 26, img: "https://upload.wikimedia.org/wikipedia/commons/9/99/ATR_3.jpg", type: "cargo-plane", isCargo: true },
-            "Boeing 737-800F":          { name: "Boeing 737-800F",          category: "Cargo", price: 3800000,  cargo: 23900,  rangeNM: 2025, topSpeedKnots: 454, minRank: 14, iconSize: 28, img: "https://upload.wikimedia.org/wikipedia/commons/thumb/a/a4/G-NPTA_Boeing_737-86N_BCF_%28West_Atlantic_UK%29_at_East_Midlands_Airport.jpg/1280px-G-NPTA_Boeing_737-86N_BCF_%28West_Atlantic_UK%29_at_East_Midlands_Airport.jpg", type: "cargo-plane", isCargo: true },
-            "Boeing 767-300F":          { name: "Boeing 767-300F",          category: "Cargo", price: 9000000,  cargo: 52700,  rangeNM: 3225, topSpeedKnots: 461, minRank: 19, iconSize: 30, img: "https://upload.wikimedia.org/wikipedia/commons/thumb/2/2d/N107FE%40PEK_%2820190520150305%29.jpg/1280px-N107FE%40PEK_%2820190520150305%29.jpg", type: "cargo-plane", isCargo: true },
-            "Airbus A330-200F":         { name: "Airbus A330-200F",         category: "Cargo", price: 16000000, cargo: 70000,  rangeNM: 4000, topSpeedKnots: 470, minRank: 23, iconSize: 32, img: "https://upload.wikimedia.org/wikipedia/commons/thumb/8/80/CGN_20190331_SU-GCE_05.jpg/1280px-CGN_20190331_SU-GCE_05.jpg", type: "cargo-plane", isCargo: true },
-            "Boeing 777F":              { name: "Boeing 777F",              category: "Cargo", price: 22000000, cargo: 103700, rangeNM: 4970, topSpeedKnots: 511, minRank: 25, iconSize: 34, img: "https://upload.wikimedia.org/wikipedia/commons/thumb/f/f4/N866FD%40PEK_%2820200420152652%29.jpg/1280px-N866FD%40PEK_%2820200420152652%29.jpg", type: "cargo-plane", isCargo: true },
-            "Boeing 747-8F":            { name: "Boeing 747-8F",            category: "Cargo", price: 28000000, cargo: 137700, rangeNM: 4120, topSpeedKnots: 490, minRank: 26, iconSize: 36, img: "https://upload.wikimedia.org/wikipedia/commons/thumb/6/60/UPS_Boeing_747-8F_N611UP.jpg/1280px-UPS_Boeing_747-8F_N611UP.jpg", type: "cargo-plane", isCargo: true },
-            "Antonov An-124 Ruslan":    { name: "Antonov An-124 Ruslan",    category: "Cargo", price: 35000000, cargo: 150000, rangeNM: 2000, topSpeedKnots: 465, minRank: 31, iconSize: 38, img: "https://upload.wikimedia.org/wikipedia/commons/b/b6/%D0%90%D0%BD%D1%82%D0%BE%D0%BD%D0%BE%D0%B2_%D0%90%D0%BD-124_9773054055093%2C_%D0%9C%D0%BE%D1%81%D0%BA%D0%B2%D0%B0_-_%D0%94%D0%BE%D0%BC%D0%BE%D0%B4%D0%B5%D0%B4%D0%BE%D0%B2%D0%BE_RP2297.jpg", type: "cargo-plane", isCargo: true },
-            "Antonov An-22":            { name: "Antonov An-22",            category: "Cargo", price: 12000000, cargo: 80000,  rangeNM: 2700, topSpeedKnots: 400, minRank: 19, iconSize: 38, img: "https://upload.wikimedia.org/wikipedia/commons/e/e1/Antonov_An-22A_Antei%2C_Russia_-_Air_Force_AN2203462.jpg", type: "cargo-plane", isCargo: true },
-            "Boeing 747-400 LCF Dreamlifter": { name: "Boeing 747-400 LCF Dreamlifter", category: "Cargo", price: 30000000, cargo: 113400, rangeNM: 4200, topSpeedKnots: 471, minRank: 28, iconSize: 38, img: "https://upload.wikimedia.org/wikipedia/commons/thumb/a/a6/Boeing%2C_N780BA%2C_B747-409%28LCF%29_Dreamlifter_-_PAE_%2819833251496%29.jpg/1280px-Boeing%2C_N780BA%2C_B747-409%28LCF%29_Dreamlifter_-_PAE_%2819833251496%29.jpg", type: "cargo-plane", isCargo: true },
+            "Cessna 208B Cargomaster":  { name: "Cessna 208B Cargomaster", category: "Cargo", price: 55000,    cargo: 1587,   rangeNM: 792,  topSpeedKnots: 185, minRank: 6, iconSize: 24, img: "https://upload.wikimedia.org/wikipedia/commons/thumb/3/30/Cessna_208B_Caravan_%27N876FE%27_FedEx_%2813006463414%29.jpg/1280px-Cessna_208B_Caravan_%27N876FE%27_FedEx_%2813006463414%29.jpg", type: "cargo-plane", isCargo: true, rarity: "common" },
+            "ATR 72 Freighter":         { name: "ATR 72 Freighter",         category: "Cargo", price: 750000,   cargo: 8900,   rangeNM: 950,  topSpeedKnots: 270, minRank: 8, iconSize: 26, img: "https://upload.wikimedia.org/wikipedia/commons/9/99/ATR_3.jpg", type: "cargo-plane", isCargo: true, rarity: "uncommon" },
+            "Boeing 737-800F":          { name: "Boeing 737-800F",          category: "Cargo", price: 3800000,  cargo: 23900,  rangeNM: 2025, topSpeedKnots: 454, minRank: 14, iconSize: 28, img: "https://upload.wikimedia.org/wikipedia/commons/thumb/a/a4/G-NPTA_Boeing_737-86N_BCF_%28West_Atlantic_UK%29_at_East_Midlands_Airport.jpg/1280px-G-NPTA_Boeing_737-86N_BCF_%28West_Atlantic_UK%29_at_East_Midlands_Airport.jpg", type: "cargo-plane", isCargo: true, rarity: "rare" },
+            "Boeing 767-300F":          { name: "Boeing 767-300F",          category: "Cargo", price: 9000000,  cargo: 52700,  rangeNM: 3225, topSpeedKnots: 461, minRank: 19, iconSize: 30, img: "https://upload.wikimedia.org/wikipedia/commons/thumb/2/2d/N107FE%40PEK_%2820190520150305%29.jpg/1280px-N107FE%40PEK_%2820190520150305%29.jpg", type: "cargo-plane", isCargo: true, rarity: "epic" },
+            "Airbus A330-200F":         { name: "Airbus A330-200F",         category: "Cargo", price: 16000000, cargo: 70000,  rangeNM: 4000, topSpeedKnots: 470, minRank: 23, iconSize: 32, img: "https://upload.wikimedia.org/wikipedia/commons/thumb/8/80/CGN_20190331_SU-GCE_05.jpg/1280px-CGN_20190331_SU-GCE_05.jpg", type: "cargo-plane", isCargo: true, rarity: "epic" },
+            "Boeing 777F":              { name: "Boeing 777F",              category: "Cargo", price: 22000000, cargo: 103700, rangeNM: 4970, topSpeedKnots: 511, minRank: 25, iconSize: 34, img: "https://upload.wikimedia.org/wikipedia/commons/thumb/f/f4/N866FD%40PEK_%2820200420152652%29.jpg/1280px-N866FD%40PEK_%2820200420152652%29.jpg", type: "cargo-plane", isCargo: true, rarity: "legendary" },
+            "Boeing 747-8F":            { name: "Boeing 747-8F",            category: "Cargo", price: 28000000, cargo: 137700, rangeNM: 4120, topSpeedKnots: 490, minRank: 26, iconSize: 36, img: "https://upload.wikimedia.org/wikipedia/commons/thumb/6/60/UPS_Boeing_747-8F_N611UP.jpg/1280px-UPS_Boeing_747-8F_N611UP.jpg", type: "cargo-plane", isCargo: true, rarity: "legendary" },
+            "Antonov An-124 Ruslan":    { name: "Antonov An-124 Ruslan",    category: "Cargo", price: 35000000, cargo: 150000, rangeNM: 2000, topSpeedKnots: 465, minRank: 31, iconSize: 38, img: "https://upload.wikimedia.org/wikipedia/commons/b/b6/%D0%90%D0%BD%D1%82%D0%BE%D0%BD%D0%BE%D0%B2_%D0%90%D0%BD-124_9773054055093%2C_%D0%9C%D0%BE%D1%81%D0%BA%D0%B2%D0%B0_-_%D0%94%D0%BE%D0%BC%D0%BE%D0%B4%D0%B5%D0%B4%D0%BE%D0%B2%D0%BE_RP2297.jpg", type: "cargo-plane", isCargo: true, rarity: "legendary" },
+            "Antonov An-22":            { name: "Antonov An-22",            category: "Cargo", price: 12000000, cargo: 80000,  rangeNM: 2700, topSpeedKnots: 400, minRank: 19, iconSize: 38, img: "https://upload.wikimedia.org/wikipedia/commons/e/e1/Antonov_An-22A_Antei%2C_Russia_-_Air_Force_AN2203462.jpg", type: "cargo-plane", isCargo: true, rarity: "epic" },
+            "Boeing 747-400 LCF Dreamlifter": { name: "Boeing 747-400 LCF Dreamlifter", category: "Cargo", price: 30000000, cargo: 113400, rangeNM: 4200, topSpeedKnots: 471, minRank: 28, iconSize: 38, img: "https://upload.wikimedia.org/wikipedia/commons/thumb/a/a6/Boeing%2C_N780BA%2C_B747-409%28LCF%29_Dreamlifter_-_PAE_%2819833251496%29.jpg/1280px-Boeing%2C_N780BA%2C_B747-409%28LCF%29_Dreamlifter_-_PAE_%2819833251496%29.jpg", type: "cargo-plane", isCargo: true, rarity: "legendary" },
 
             // ===== ADDITIONAL CARGO AIRCRAFT =====
-            "Antonov An-12":            { name: "Antonov An-12",            category: "Cargo",  price: 4500000,  cargo: 20000, rangeNM: 2000, topSpeedKnots: 342, minRank: 16, iconSize: 30, img: "https://upload.wikimedia.org/wikipedia/commons/b/b5/Antonov_An-12BK%2C_Russia_-_Air_Force_AN1879625.jpg", type: "cargo-plane", isCargo: true },
-            "Airbus Beluga":            { name: "Airbus Beluga",            category: "Cargo",  price: 14000000, cargo: 47000, rangeNM: 900,  topSpeedKnots: 247, minRank: 21, iconSize: 34, img: "https://upload.wikimedia.org/wikipedia/commons/f/f6/Hamburg-Finkenwerder_Airport_Airbus_Transport_International_Airbus_A300B4-608ST_F-GSTD_%28DSC09656%29.jpg", type: "cargo-plane", isCargo: true },
-            "Airbus BelugaXL":          { name: "Airbus BelugaXL",         category: "Cargo",  price: 18000000, cargo: 51000, rangeNM: 2370, topSpeedKnots: 260, minRank: 23, iconSize: 36, img: "https://skybrary.aero/sites/default/files/A337.jpg", type: "cargo-plane", isCargo: true },
-            "Antonov An-225 Mriya":     { name: "Antonov An-225 Mriya",     category: "Cargo", price: 80000000, cargo: 250000, rangeNM: 2160, topSpeedKnots: 459, minRank: 34, iconSize: 42, img: "https://upload.wikimedia.org/wikipedia/commons/thumb/b/b5/Antonov_Design_Bureau_Antonov_An-225_Mriya_at_Leipzig_Halle_%28EDDP-LEJ%29.jpg/1280px-Antonov_Design_Bureau_Antonov_An-225_Mriya_at_Leipzig_Halle_%28EDDP-LEJ%29.jpg", type: "cargo-plane", isCargo: true }
+            "Antonov An-12":            { name: "Antonov An-12",            category: "Cargo",  price: 4500000,  cargo: 20000, rangeNM: 2000, topSpeedKnots: 342, minRank: 16, iconSize: 30, img: "https://upload.wikimedia.org/wikipedia/commons/b/b5/Antonov_An-12BK%2C_Russia_-_Air_Force_AN1879625.jpg", type: "cargo-plane", isCargo: true, rarity: "rare" },
+            "Airbus Beluga":            { name: "Airbus Beluga",            category: "Cargo",  price: 14000000, cargo: 47000, rangeNM: 900,  topSpeedKnots: 247, minRank: 21, iconSize: 34, img: "https://upload.wikimedia.org/wikipedia/commons/f/f6/Hamburg-Finkenwerder_Airport_Airbus_Transport_International_Airbus_A300B4-608ST_F-GSTD_%28DSC09656%29.jpg", type: "cargo-plane", isCargo: true, rarity: "epic" },
+            "Airbus BelugaXL":          { name: "Airbus BelugaXL",         category: "Cargo",  price: 18000000, cargo: 51000, rangeNM: 2370, topSpeedKnots: 260, minRank: 23, iconSize: 36, img: "https://skybrary.aero/sites/default/files/A337.jpg", type: "cargo-plane", isCargo: true, rarity: "epic" },
+            "Antonov An-225 Mriya":     { name: "Antonov An-225 Mriya",     category: "Cargo", price: 80000000, cargo: 250000, rangeNM: 2160, topSpeedKnots: 459, minRank: 34, iconSize: 42, img: "https://upload.wikimedia.org/wikipedia/commons/thumb/b/b5/Antonov_Design_Bureau_Antonov_An-225_Mriya_at_Leipzig_Halle_%28EDDP-LEJ%29.jpg/1280px-Antonov_Design_Bureau_Antonov_An-225_Mriya_at_Leipzig_Halle_%28EDDP-LEJ%29.jpg", type: "cargo-plane", isCargo: true, rarity: "legendary" },
+
+            // ===== SECOND ADDITIONAL CARGO AIRCRAFT BATCH =====
+            "McDonnell Douglas MD-11F": { name: "McDonnell Douglas MD-11F", category: "Cargo", price: 13500000, cargo: 90800,  rangeNM: 3800, topSpeedKnots: 507, minRank: 20, iconSize: 32, img: "https://upload.wikimedia.org/wikipedia/commons/6/6f/N259UP_-_McDonnell_Douglas_MD-11F_-_UPS_%28cropped%29.jpg", type: "cargo-plane", isNew: true, isCargo: true, rarity: "epic" },
+
+            // ===== THIRD ADDITIONAL CARGO AIRCRAFT BATCH =====
+            "Lockheed L-100 Hercules": { name: "Lockheed L-100 Hercules", category: "Cargo", price: 2900000, cargo: 19000, rangeNM: 2050, topSpeedKnots: 320, minRank: 17, iconSize: 30, img: "https://upload.wikimedia.org/wikipedia/commons/thumb/a/a5/Lockheed_L100-30_Hercules_HZ-128_%286819452647%29.jpg/1920px-Lockheed_L100-30_Hercules_HZ-128_%286819452647%29.jpg", type: "cargo-plane", isNew: true, isCargo: true, rarity: "rare" },
+            "Antonov An-26":           { name: "Antonov An-26",           category: "Cargo", price: 500000,   cargo: 5500,  rangeNM: 1600, topSpeedKnots: 270, minRank: 9,  iconSize: 26, img: "https://upload.wikimedia.org/wikipedia/commons/thumb/7/79/An-26_Ni%C2%B5_Nishava_Serbien_Marko_Stojkovic_IMG_2634-1-2.jpg/960px-An-26_Ni%C2%B5_Nishava_Serbien_Marko_Stojkovic_IMG_2634-1-2.jpg", type: "cargo-plane", isNew: true, isCargo: true, rarity: "common" },
+            "Boeing 727F":             { name: "Boeing 727F",             category: "Cargo", price: 2500000,  cargo: 18500, rangeNM: 2600, topSpeedKnots: 495, minRank: 15, iconSize: 28, img: "https://upload.wikimedia.org/wikipedia/commons/0/0f/Boeing_727-22C%28QF%29%2C_United_Parcel_Service_-_UPS_%28Star_Air%29_AN0780472.jpg", type: "cargo-plane", isNew: true, isCargo: true, rarity: "rare" },
+            "Antonov An-72":           { name: "Antonov An-72",           category: "Cargo", price: 1300000,  cargo: 10000, rangeNM: 900,  topSpeedKnots: 330, minRank: 13, iconSize: 28, img: "https://upload.wikimedia.org/wikipedia/commons/e/e2/Russian_Air_Force_-_Antonov_An-72.jpg", type: "cargo-plane", isNew: true, isCargo: true, rarity: "uncommon" }
         };
       
           const legacyAircraftCatalog = {
-    "Boeing 727-200":          { name: "Boeing 727-200",              category: "Legacy", price: 320,  pax: 189, rangeNM: 1900, topSpeedKnots: 511,  minRank: 26, iconSize: 28, img: "https://upload.wikimedia.org/wikipedia/commons/thumb/1/13/11gg_-_Northwest_Airlines_Boeing_727-251%3B_N203US%40FLL%3B30.01.1998_%288064695962%29.jpg/1280px-11gg_-_Northwest_Airlines_Boeing_727-251%3B_N203US%40FLL%3B30.01.1998_%288064695962%29.jpg", type: "legacy-plane", isCargo: false },
-    "Boeing 314 Clipper":      { name: "Boeing 314 Clipper",          category: "Legacy", price: 130,  pax: 68,  rangeNM: 3202, topSpeedKnots: 180,  minRank: 21, iconSize: 28, img: "https://upload.wikimedia.org/wikipedia/commons/6/6e/Boeing_314_Clipper-cropped.jpg", type: "legacy-plane", isCargo: false },
-    "Douglas DC-3":            { name: "Douglas DC-3",                category: "Legacy", price: 50,   pax: 30,  rangeNM: 1370, topSpeedKnots: 223,  minRank: 18, iconSize: 28, img: "https://upload.wikimedia.org/wikipedia/commons/d/df/Douglas_DC-3%2C_SE-CFP.jpg", type: "legacy-plane", isCargo: false },
-    "Concorde":                { name: "Aérospatiale-BAC Concorde",   category: "Legacy", price: 1800, pax: 100, rangeNM: 3900, topSpeedKnots: 1176, minRank: 40, iconSize: 42, img: "https://upload.wikimedia.org/wikipedia/commons/8/86/Concorde_first_visit_Heathrow_Fitzgerald.jpg", type: "legacy-plane", isCargo: false },
-    "Vickers VC10":            { name: "Vickers VC10",                category: "Legacy", price: 240,  pax: 151, rangeNM: 4100, topSpeedKnots: 505,  minRank: 24, iconSize: 30, img: "https://upload.wikimedia.org/wikipedia/commons/e/e7/Ghana_Airways_VC-10_9G-ABO_LHR_1972-9-17.png", type: "legacy-plane", isCargo: false },
-    "McDonnell Douglas DC-10": { name: "McDonnell Douglas DC-10",     category: "Legacy", price: 500,  pax: 380, rangeNM: 4350, topSpeedKnots: 490,  minRank: 30, iconSize: 34, img: "https://upload.wikimedia.org/wikipedia/commons/d/d9/Continental_Airlines_DC-10.jpg", type: "legacy-plane", isCargo: false },
-    "McDonnell Douglas MD-11": { name: "McDonnell Douglas MD-11",     category: "Legacy", price: 650,  pax: 410, rangeNM: 6725, topSpeedKnots: 503,  minRank: 34, iconSize: 34, img: "https://upload.wikimedia.org/wikipedia/commons/thumb/0/00/McDonnell_Douglas_MD-11P_KLM_PH-KCC.jpg/1280px-McDonnell_Douglas_MD-11P_KLM_PH-KCC.jpg", type: "legacy-plane", isCargo: false },
+    "Boeing 727-200":          { name: "Boeing 727-200",              category: "Legacy", price: 320,  pax: 189, rangeNM: 1900, topSpeedKnots: 511,  minRank: 26, iconSize: 28, img: "https://upload.wikimedia.org/wikipedia/commons/thumb/1/13/11gg_-_Northwest_Airlines_Boeing_727-251%3B_N203US%40FLL%3B30.01.1998_%288064695962%29.jpg/1280px-11gg_-_Northwest_Airlines_Boeing_727-251%3B_N203US%40FLL%3B30.01.1998_%288064695962%29.jpg", type: "legacy-plane", isCargo: false, rarity: "rare" },
+    "Boeing 314 Clipper":      { name: "Boeing 314 Clipper",          category: "Legacy", price: 130,  pax: 68,  rangeNM: 3202, topSpeedKnots: 180,  minRank: 21, iconSize: 28, img: "https://upload.wikimedia.org/wikipedia/commons/6/6e/Boeing_314_Clipper-cropped.jpg", type: "legacy-plane", isCargo: false, rarity: "rare" },
+    "Douglas DC-3":            { name: "Douglas DC-3",                category: "Legacy", price: 50,   pax: 30,  rangeNM: 1370, topSpeedKnots: 223,  minRank: 18, iconSize: 28, img: "https://upload.wikimedia.org/wikipedia/commons/d/df/Douglas_DC-3%2C_SE-CFP.jpg", type: "legacy-plane", isCargo: false, rarity: "common" },
+    "Concorde":                { name: "Aérospatiale-BAC Concorde",   category: "Legacy", price: 1800, pax: 100, rangeNM: 3900, topSpeedKnots: 1176, minRank: 40, iconSize: 42, img: "https://upload.wikimedia.org/wikipedia/commons/8/86/Concorde_first_visit_Heathrow_Fitzgerald.jpg", type: "legacy-plane", isCargo: false, rarity: "legendary" },
+    "Vickers VC10":            { name: "Vickers VC10",                category: "Legacy", price: 240,  pax: 151, rangeNM: 4100, topSpeedKnots: 505,  minRank: 24, iconSize: 30, img: "https://upload.wikimedia.org/wikipedia/commons/e/e7/Ghana_Airways_VC-10_9G-ABO_LHR_1972-9-17.png", type: "legacy-plane", isCargo: false, rarity: "uncommon" },
+    "McDonnell Douglas DC-10": { name: "McDonnell Douglas DC-10",     category: "Legacy", price: 500,  pax: 380, rangeNM: 4350, topSpeedKnots: 490,  minRank: 30, iconSize: 34, img: "https://upload.wikimedia.org/wikipedia/commons/d/d9/Continental_Airlines_DC-10.jpg", type: "legacy-plane", isCargo: false, rarity: "epic" },
+    "McDonnell Douglas MD-11": { name: "McDonnell Douglas MD-11",     category: "Legacy", price: 650,  pax: 410, rangeNM: 6725, topSpeedKnots: 503,  minRank: 34, iconSize: 34, img: "https://upload.wikimedia.org/wikipedia/commons/thumb/0/00/McDonnell_Douglas_MD-11P_KLM_PH-KCC.jpg/1280px-McDonnell_Douglas_MD-11P_KLM_PH-KCC.jpg", type: "legacy-plane", isCargo: false, rarity: "epic" },
 
     // ===== ADDITIONAL LEGACY AIRCRAFT =====
-    "Ford Trimotor":            { name: "Ford Trimotor",            category: "Legacy", price: 30,   pax: 11,  rangeNM: 570,  topSpeedKnots: 130, minRank: 18, iconSize: 26, img: "https://upload.wikimedia.org/wikipedia/commons/d/dc/Ford_Trimotor_EAA.jpg", type: "legacy-plane", isCargo: false },
-    "Boeing 307 Stratoliner":  { name: "Boeing 307 Stratoliner", category: "Legacy", price: 80,  pax: 33,  rangeNM: 3570, topSpeedKnots: 222, minRank: 20, iconSize: 28, img: "https://upload.wikimedia.org/wikipedia/commons/3/34/Boeing_307_Stratoliner%2C_Pan_Am_JP5629675.jpg", type: "legacy-plane", isCargo: false },
-    "Boeing 377 Stratocruiser": { name: "Boeing 377 Stratocruiser", category: "Legacy", price: 140,  pax: 100, rangeNM: 4600, topSpeedKnots: 300, minRank: 21, iconSize: 30, img: "https://historynet.com/wp-content/uploads/2023/10/stratocaster-flight-scaled.jpg", type: "legacy-plane", isCargo: false },
-    "Lockheed Constellation":   { name: "Lockheed Constellation",  category: "Legacy", price: 160,  pax: 100, rangeNM: 5400, topSpeedKnots: 330, minRank: 22,  iconSize: 30, img: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSI4dd25jx3qqiuXdXR-wqW6wYj6YDUGEQD3SOrr-_OxdUOjOGJx_QsMBE&s=10", type: "legacy-plane", isCargo: false },
-    "Dornier Do X":             { name: "Dornier Do X",             category: "Legacy", price: 90,   pax: 66,  rangeNM: 1052, topSpeedKnots: 112, minRank: 18,  iconSize: 32, img: "https://static.wikia.nocookie.net/aircraft/images/b/b4/Dornier_Do_X.jpg", type: "legacy-plane", isCargo: false, waterOnly: true },
-    "Consolidated PBY Catalina":{ name: "Consolidated PBY Catalina", category: "Legacy", price: 60,  pax: 7,   rangeNM: 2520, topSpeedKnots: 117, minRank: 17,  iconSize: 28, img: "https://upload.wikimedia.org/wikipedia/commons/0/07/RIHB_2022_PBY_Catalina.jpg", type: "legacy-plane", isCargo: false, waterOnly: true },
-    "Boeing 737-100":           { name: "Boeing 737-100",           category: "Legacy", price: 100,   pax: 100, rangeNM: 2100, topSpeedKnots: 420, minRank: 19,  iconSize: 26, img: "https://www.flugzeuginfo.net/acimages/7371_rees.jpg", type: "legacy-plane", isCargo: false },
-    "Boeing 737-200":           { name: "Boeing 737-200",           category: "Legacy", price: 120,  pax: 130, rangeNM: 2600, topSpeedKnots: 432, minRank: 20,  iconSize: 26, img: "https://upload.wikimedia.org/wikipedia/commons/thumb/e/e9/South_African_Airlink_Boeing_737-200_Advanced_Smith.jpg/330px-South_African_Airlink_Boeing_737-200_Advanced_Smith.jpg", type: "legacy-plane", isCargo: false },
-    "Boeing 737-300":           { name: "Boeing 737-300",           category: "Legacy", price: 175,  pax: 149, rangeNM: 2250, topSpeedKnots: 431, minRank: 22,  iconSize: 26, img: "https://upload.wikimedia.org/wikipedia/commons/5/5b/Classic_Colors_Southwest_Airlines_N648SW_Boeing_737-3H4_SJC.jpg", type: "legacy-plane", isCargo: false },
-    "McDonnell Douglas DC-9":   { name: "McDonnell Douglas DC-9",   category: "Legacy", price: 180,  pax: 115, rangeNM: 1600, topSpeedKnots: 425, minRank: 23,  iconSize: 26, img: "https://upload.wikimedia.org/wikipedia/commons/e/eb/Northwest_N756NW_DC9_%28cropped_16_9%29.JPG", type: "legacy-plane", isCargo: false },
-    "McDonnell Douglas MD-80":  { name: "McDonnell Douglas MD-80",  category: "Legacy", price: 280,  pax: 155, rangeNM: 2800, topSpeedKnots: 489, minRank: 24,  iconSize: 28, img: "https://upload.wikimedia.org/wikipedia/commons/3/34/MD83_Aircraft_of_TezJet.jpg", type: "legacy-plane", isCargo: false },
-    "McDonnell Douglas MD-90":  { name: "McDonnell Douglas MD-90",  category: "Legacy", price: 300,  pax: 172, rangeNM: 2800, topSpeedKnots: 489, minRank: 25,  iconSize: 28, img: "https://upload.wikimedia.org/wikipedia/commons/6/6d/McDonnell_Douglas_MD-90-30%2C_Japan_Airlines_-_JAL_AN2020984.jpg", type: "legacy-plane", isCargo: false },
-    "Douglas DC-8":             { name: "Douglas DC-8",             category: "Legacy", price: 220,  pax: 189, rangeNM: 5100, topSpeedKnots: 479, minRank: 25,  iconSize: 30, img: "https://cdn.airlineratings.com/uploads/DC-8-First-Flight.jpg", type: "legacy-plane", isCargo: false },
-    "Tupolev Tu-154":           { name: "Tupolev Tu-154",           category: "Legacy", price: 340,  pax: 180, rangeNM: 3900, topSpeedKnots: 513, minRank: 27,  iconSize: 30, img: "https://upload.wikimedia.org/wikipedia/commons/4/4c/Tupolev_Tu-154M%2C_Iran_Air_Tours_JP6511800.jpg", type: "legacy-plane", isCargo: false },
-    "Lockheed L-1011 TriStar":  { name: "Lockheed L-1011 TriStar",  category: "Legacy", price: 450,  pax: 400, rangeNM: 4400, topSpeedKnots: 526, minRank: 29,  iconSize: 32, img: "https://upload.wikimedia.org/wikipedia/commons/a/af/Trans_World_Airlines_Lockheed_L-1011-385-1-15_TriStar_100_Marmet.jpg", type: "legacy-plane", isCargo: false },
-    "Convair XC-99":            { name: "Convair XC-99",            category: "Legacy", price: 380,  pax: 400, rangeNM: 2500, topSpeedKnots: 300, minRank: 28,  iconSize: 36, img: "https://upload.wikimedia.org/wikipedia/commons/6/69/Convair_XC-99_in_flight_c1948.jpg", type: "legacy-plane", isCargo: false },
-    "Boeing 707":              { name: "Boeing 707",                  category: "Legacy", price: 200,  pax: 194, rangeNM: 2900, topSpeedKnots: 394,  minRank: 25, iconSize: 30, img: "https://upload.wikimedia.org/wikipedia/commons/0/06/Boeing_707-321B_Pan_Am_Freer.jpg", type: "legacy-plane", isCargo: false },
+    "Ford Trimotor":            { name: "Ford Trimotor",            category: "Legacy", price: 30,   pax: 11,  rangeNM: 570,  topSpeedKnots: 130, minRank: 18, iconSize: 26, img: "https://upload.wikimedia.org/wikipedia/commons/d/dc/Ford_Trimotor_EAA.jpg", type: "legacy-plane", isCargo: false, rarity: "common" },
+    "Boeing 307 Stratoliner":  { name: "Boeing 307 Stratoliner", category: "Legacy", price: 80,  pax: 33,  rangeNM: 3570, topSpeedKnots: 222, minRank: 20, iconSize: 28, img: "https://upload.wikimedia.org/wikipedia/commons/3/34/Boeing_307_Stratoliner%2C_Pan_Am_JP5629675.jpg", type: "legacy-plane", isCargo: false, rarity: "uncommon" },
+    "Boeing 377 Stratocruiser": { name: "Boeing 377 Stratocruiser", category: "Legacy", price: 140,  pax: 100, rangeNM: 4600, topSpeedKnots: 300, minRank: 21, iconSize: 30, img: "https://historynet.com/wp-content/uploads/2023/10/stratocaster-flight-scaled.jpg", type: "legacy-plane", isCargo: false, rarity: "uncommon" },
+    "Lockheed Constellation":   { name: "Lockheed Constellation",  category: "Legacy", price: 160,  pax: 100, rangeNM: 5400, topSpeedKnots: 330, minRank: 22,  iconSize: 30, img: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSI4dd25jx3qqiuXdXR-wqW6wYj6YDUGEQD3SOrr-_OxdUOjOGJx_QsMBE&s=10", type: "legacy-plane", isCargo: false, rarity: "rare" },
+    "Dornier Do X":             { name: "Dornier Do X",             category: "Legacy", price: 90,   pax: 66,  rangeNM: 1052, topSpeedKnots: 112, minRank: 18,  iconSize: 32, img: "https://static.wikia.nocookie.net/aircraft/images/b/b4/Dornier_Do_X.jpg", type: "legacy-plane", isCargo: false, waterOnly: true, rarity: "rare" },
+    "Consolidated PBY Catalina":{ name: "Consolidated PBY Catalina", category: "Legacy", price: 60,  pax: 7,   rangeNM: 2520, topSpeedKnots: 117, minRank: 17,  iconSize: 28, img: "https://upload.wikimedia.org/wikipedia/commons/0/07/RIHB_2022_PBY_Catalina.jpg", type: "legacy-plane", isCargo: false, waterOnly: true, rarity: "uncommon" },
+    "Boeing 737-100":           { name: "Boeing 737-100",           category: "Legacy", price: 100,   pax: 100, rangeNM: 2100, topSpeedKnots: 420, minRank: 19,  iconSize: 26, img: "https://www.flugzeuginfo.net/acimages/7371_rees.jpg", type: "legacy-plane", isCargo: false, rarity: "common" },
+    "Boeing 737-200":           { name: "Boeing 737-200",           category: "Legacy", price: 120,  pax: 130, rangeNM: 2600, topSpeedKnots: 432, minRank: 20,  iconSize: 26, img: "https://upload.wikimedia.org/wikipedia/commons/thumb/e/e9/South_African_Airlink_Boeing_737-200_Advanced_Smith.jpg/330px-South_African_Airlink_Boeing_737-200_Advanced_Smith.jpg", type: "legacy-plane", isCargo: false, rarity: "common" },
+    "Boeing 737-300":           { name: "Boeing 737-300",           category: "Legacy", price: 175,  pax: 149, rangeNM: 2250, topSpeedKnots: 431, minRank: 22,  iconSize: 26, img: "https://upload.wikimedia.org/wikipedia/commons/5/5b/Classic_Colors_Southwest_Airlines_N648SW_Boeing_737-3H4_SJC.jpg", type: "legacy-plane", isCargo: false, rarity: "uncommon" },
+    "McDonnell Douglas DC-9":   { name: "McDonnell Douglas DC-9",   category: "Legacy", price: 180,  pax: 115, rangeNM: 1600, topSpeedKnots: 425, minRank: 23,  iconSize: 26, img: "https://upload.wikimedia.org/wikipedia/commons/e/eb/Northwest_N756NW_DC9_%28cropped_16_9%29.JPG", type: "legacy-plane", isCargo: false, rarity: "uncommon" },
+    "McDonnell Douglas MD-80":  { name: "McDonnell Douglas MD-80",  category: "Legacy", price: 280,  pax: 155, rangeNM: 2800, topSpeedKnots: 489, minRank: 24,  iconSize: 28, img: "https://upload.wikimedia.org/wikipedia/commons/3/34/MD83_Aircraft_of_TezJet.jpg", type: "legacy-plane", isCargo: false, rarity: "uncommon" },
+    "McDonnell Douglas MD-90":  { name: "McDonnell Douglas MD-90",  category: "Legacy", price: 300,  pax: 172, rangeNM: 2800, topSpeedKnots: 489, minRank: 25,  iconSize: 28, img: "https://upload.wikimedia.org/wikipedia/commons/6/6d/McDonnell_Douglas_MD-90-30%2C_Japan_Airlines_-_JAL_AN2020984.jpg", type: "legacy-plane", isCargo: false, rarity: "uncommon" },
+    "Douglas DC-8":             { name: "Douglas DC-8",             category: "Legacy", price: 220,  pax: 189, rangeNM: 5100, topSpeedKnots: 479, minRank: 25,  iconSize: 30, img: "https://cdn.airlineratings.com/uploads/DC-8-First-Flight.jpg", type: "legacy-plane", isCargo: false, rarity: "uncommon" },
+    "Tupolev Tu-154":           { name: "Tupolev Tu-154",           category: "Legacy", price: 340,  pax: 180, rangeNM: 3900, topSpeedKnots: 513, minRank: 27,  iconSize: 30, img: "https://upload.wikimedia.org/wikipedia/commons/4/4c/Tupolev_Tu-154M%2C_Iran_Air_Tours_JP6511800.jpg", type: "legacy-plane", isCargo: false, rarity: "rare" },
+    "Lockheed L-1011 TriStar":  { name: "Lockheed L-1011 TriStar",  category: "Legacy", price: 450,  pax: 400, rangeNM: 4400, topSpeedKnots: 526, minRank: 29,  iconSize: 32, img: "https://upload.wikimedia.org/wikipedia/commons/a/af/Trans_World_Airlines_Lockheed_L-1011-385-1-15_TriStar_100_Marmet.jpg", type: "legacy-plane", isCargo: false, rarity: "rare" },
+    "Convair XC-99":            { name: "Convair XC-99",            category: "Legacy", price: 380,  pax: 400, rangeNM: 2500, topSpeedKnots: 300, minRank: 28,  iconSize: 36, img: "https://upload.wikimedia.org/wikipedia/commons/6/69/Convair_XC-99_in_flight_c1948.jpg", type: "legacy-plane", isCargo: false, rarity: "epic" },
+    "Boeing 707":              { name: "Boeing 707",                  category: "Legacy", price: 200,  pax: 194, rangeNM: 2900, topSpeedKnots: 394,  minRank: 25, iconSize: 30, img: "https://upload.wikimedia.org/wikipedia/commons/0/06/Boeing_707-321B_Pan_Am_Freer.jpg", type: "legacy-plane", isCargo: false, rarity: "uncommon" },
+
+    // ===== THIRD ADDITIONAL LEGACY AIRCRAFT BATCH =====
+    "BAC One-Eleven":          { name: "BAC One-Eleven",          category: "Legacy", price: 220,  pax: 89,  rangeNM: 1650, topSpeedKnots: 461, minRank: 23, iconSize: 28, img: "https://upload.wikimedia.org/wikipedia/commons/thumb/1/1f/TAROM_BAC_1-11-500%3B_YR-BCI%40ZRH%3B02.10.1995_%288353902456%29.jpg/1280px-TAROM_BAC_1-11-500%3B_YR-BCI%40ZRH%3B02.10.1995_%288353902456%29.jpg", type: "legacy-plane", isCargo: false, isNew: true, rarity: "uncommon" },
+    "Martin JRM Mars":         { name: "Martin JRM Mars",         category: "Legacy", price: 700,  pax: 56,  rangeNM: 4300, topSpeedKnots: 215, minRank: 32, iconSize: 42, img: "https://upload.wikimedia.org/wikipedia/commons/thumb/1/1b/Mars_Water_Bomber.jpg/1280px-Mars_Water_Bomber.jpg", type: "legacy-plane", isCargo: false, isNew: true, waterOnly: true, rarity: "legendary" },
 };
  
         // ===== SECRET AIRCRAFT (crate drops only) =====
@@ -2810,6 +2870,10 @@ z-index:99999;
             "Tupolev ANT-20":          { name: "Tupolev ANT-20",           category: "Secret", rarity: "rare",      price: 3500000,  pax: 64,  rangeNM: 900,  topSpeedKnots: 215, minRank: 1, iconSize: 38, img: "https://upload.wikimedia.org/wikipedia/commons/1/1c/Tupolew_ANT-20_1935.jpg", type: "plane" },
             "Fairey Rotodyne":         { name: "Fairey Rotodyne",          category: "Secret", rarity: "epic",      price: 6000000,  pax: 48,  rangeNM: 400,  topSpeedKnots: 190, minRank: 1, iconSize: 30, img: "https://i.redd.it/britains-fairey-rotodyne-a-late-1950s-then-promising-cross-v0-4heu3r7q63sf1.jpg?width=619&format=pjpg&auto=webp&s=c739089be0024be6176a95d8a491a5f427f4c4b6", type: "helicopter" },
             "Avro Canada VZ-9 Avrocar":      { name: "Avro Canada VZ-9 Avrocar",   category: "Secret", rarity: "uncommon",      price: 3500000,  pax: 1, rangeNM: 70,  topSpeedKnots: 30, minRank: 1, iconSize: 24, img: "https://upload.wikimedia.org/wikipedia/commons/thumb/9/90/Colour_avrocar_59.jpg/1280px-Colour_avrocar_59.jpg", type: "helicopter", isCargo: false },
+
+            // ===== SECOND ADDITIONAL SECRET AIRCRAFT =====
+            "Rutan Voyager":                 { name: "Rutan Voyager",              category: "Secret", rarity: "legendary", price: 9000000,  pax: 2,  rangeNM: 24986, topSpeedKnots: 116, minRank: 1, iconSize: 30, img: "https://upload.wikimedia.org/wikipedia/commons/thumb/a/ae/Voyager_aircraft_return_from_non-stop_trip_around_the_world_%28EC87-0029-02%29.jpg/1280px-Voyager_aircraft_return_from_non-stop_trip_around_the_world_%28EC87-0029-02%29.jpg", type: "plane", isCargo: false },
+            "Solar Impulse 2":               { name: "Solar Impulse 2",            category: "Secret", rarity: "mythic",    price: 24000000, pax: 1,  rangeNM: 3900,  topSpeedKnots: 28,  minRank: 1, iconSize: 34, img: "https://upload.wikimedia.org/wikipedia/commons/7/73/SolarImpulse_HB-SIA_landing_Brussels_Airport_3-crop.jpg", type: "plane", isCargo: false },
         };
 
         // ===== HELICOPTERS (always unlocked — civilian/utility rotorcraft) =====
@@ -2818,28 +2882,70 @@ z-index:99999;
             "Airbus Helicopters H135":  { name: "Airbus Helicopters H135",  category: "Helicopter", price: 850000,   pax: 6,   rangeNM: 325, topSpeedKnots: 137, minRank: 5,  iconSize: 22, img: "https://canadiandefencereview.com/wp-content/uploads/2025/09/Website-3.png", type: "helicopter" },
             "Airbus Helicopters EC160": { name: "Airbus Helicopters EC160", category: "Helicopter", price: 1200000,  pax: 8,   rangeNM: 335, topSpeedKnots: 150, minRank: 6, iconSize: 22, img: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTZ8PJ4SUEtbzQwgt3eSsbZp54GYcyY-o8-5gmBa__oBw&s=10", type: "helicopter" },
             "Sikorsky S-64 Skycrane":   { name: "Sikorsky S-64 Skycrane",   category: "Helicopter", price: 2200000,  cargo: 9100, rangeNM: 200, topSpeedKnots: 115, minRank: 11, iconSize: 24, img: "https://upload.wikimedia.org/wikipedia/commons/thumb/5/56/Air-Crane_-_Flickr_-_Beige_Alert_%28cropped%29.jpg/1280px-Air-Crane_-_Flickr_-_Beige_Alert_%28cropped%29.jpg", type: "helicopter", isCargo: true },
+
+            // ===== ADDITIONAL HELICOPTERS =====
+            "Robinson R44":             { name: "Robinson R44",             category: "Helicopter", price: 65000,    pax: 4,   rangeNM: 300, topSpeedKnots: 130, minRank: 2,  iconSize: 20, img: "https://upload.wikimedia.org/wikipedia/commons/thumb/d/d5/Robinson_R44_II_%28cropped%29.jpg/1280px-Robinson_R44_II_%28cropped%29.jpg", type: "helicopter", isNew: true },
+            "Bell 206 JetRanger":       { name: "Bell 206 JetRanger",       category: "Helicopter", price: 150000,   pax: 5,   rangeNM: 370, topSpeedKnots: 122, minRank: 2,  iconSize: 20, img: "https://upload.wikimedia.org/wikipedia/commons/thumb/7/78/LAPD_Bell_206_Jetranger.jpg/960px-LAPD_Bell_206_Jetranger.jpg", type: "helicopter", isNew: true },
+            "Bell 429 GlobalRanger":    { name: "Bell 429 GlobalRanger",    category: "Helicopter", price: 1900000,  pax: 7,   rangeNM: 411, topSpeedKnots: 155, minRank: 9,  iconSize: 22, img: "https://upload.wikimedia.org/wikipedia/commons/thumb/d/d6/8-19-11_NEW_2010_MERCY_FLIGHT_5_AT_WCCH_%28modified%29.jpg/960px-8-19-11_NEW_2010_MERCY_FLIGHT_5_AT_WCCH_%28modified%29.jpg", type: "helicopter", isNew: true },
+            "Airbus Helicopters H145":              { name: "Airbus Helicopters H145",              category: "Helicopter", price: 2100000,  pax: 9,   rangeNM: 350, topSpeedKnots: 140, minRank: 10, iconSize: 24, img: "https://upload.wikimedia.org/wikipedia/commons/thumb/a/ab/Stanford_EC145.jpg/960px-Stanford_EC145.jpg", type: "helicopter", isNew: true },
         };
 
         // ===== AIRSHIPS (level-locked — rank 20+, slow & long-range novelty aircraft) =====
         const AIRSHIP_UNLOCK_RANK = 20;
         const airshipCatalog = {
-            "Hot Air Balloon":         { name: "Hot Air Balloon",         category: "Airship", price: 150000,   pax: 4,  rangeNM: 50,   topSpeedKnots: 15, minRank: 20, iconSize: 26, isNew: true, img: "https://commons.wikimedia.org/wiki/Special:FilePath/Hot%20air%20balloon.JPG", type: "airship" },
-            "LZ 127 Graf Zeppelin":    { name: "LZ 127 Graf Zeppelin",    category: "Airship", price: 4000000,  pax: 24, rangeNM: 10000, topSpeedKnots: 73, minRank: 25, isNew: true,iconSize: 40, img: "https://commons.wikimedia.org/wiki/Special:FilePath/Graf%20Zeppelin%20LZ127.jpg", type: "airship" },
-            "LZ 129 Hindenburg":       { name: "LZ 129 Hindenburg",       category: "Airship", price: 11000000,  pax: 72, rangeNM: 8000,  topSpeedKnots: 78, minRank: 36, isNew: true,iconSize: 42, img: "https://commons.wikimedia.org/wiki/Special:FilePath/Hindenburg%20over%20New%20York%201937.jpg", type: "airship" },
-            "Zeppelin NT":             { name: "Zeppelin NT",             category: "Airship", price: 3000000,  pax: 12, rangeNM: 500,  topSpeedKnots: 70, minRank: 22, isNew: true,iconSize: 30, img: "https://commons.wikimedia.org/wiki/Special:FilePath/Zeppellin%20NT%20amk.JPG", type: "airship" },
-            "Airlander 10":            { name: "Airlander 10",            category: "Airship", price: 8000000,  pax: 90,  rangeNM: 4300, topSpeedKnots: 90, minRank: 32, isNew: true, iconSize: 42, img: "https://www.airport-technology.com/wp-content/uploads/sites/14/2023/07/first-flight-original2-e1689173259484.jpg", type: "airship" }, 
-            "USS Akron (ZRS-4)":       { name: "USS Akron (ZRS-4)",       category: "Airship", price: 6500000, pax: 40,  rangeNM: 8200, topSpeedKnots: 74, minRank: 30, isNew: true, iconSize: 30, img: "https://www.airships.net/wp-content/uploads/macon-flight-web-crop-1200x630.jpg", type: "airship" },
+            "Hot Air Balloon":         { name: "Hot Air Balloon",         category: "Airship", price: 150000,   pax: 4,  rangeNM: 50,   topSpeedKnots: 15, minRank: 20, iconSize: 26, img: "https://commons.wikimedia.org/wiki/Special:FilePath/Hot%20air%20balloon.JPG", type: "airship" },
+            "LZ 127 Graf Zeppelin":    { name: "LZ 127 Graf Zeppelin",    category: "Airship", price: 4000000,  pax: 24, rangeNM: 10000, topSpeedKnots: 73, minRank: 25, iconSize: 40, img: "https://commons.wikimedia.org/wiki/Special:FilePath/Graf%20Zeppelin%20LZ127.jpg", type: "airship" },
+            "LZ 129 Hindenburg":       { name: "LZ 129 Hindenburg",       category: "Airship", price: 11000000,  pax: 72, rangeNM: 8000,  topSpeedKnots: 78, minRank: 36, iconSize: 42, img: "https://commons.wikimedia.org/wiki/Special:FilePath/Hindenburg%20over%20New%20York%201937.jpg", type: "airship" },
+            "Zeppelin NT":             { name: "Zeppelin NT",             category: "Airship", price: 3000000,  pax: 12, rangeNM: 500,  topSpeedKnots: 70, minRank: 22, iconSize: 30, img: "https://commons.wikimedia.org/wiki/Special:FilePath/Zeppellin%20NT%20amk.JPG", type: "airship" },
+            "Airlander 10":            { name: "Airlander 10",            category: "Airship", price: 8000000,  pax: 90,  rangeNM: 4300, topSpeedKnots: 90, minRank: 32, iconSize: 42, img: "https://www.airport-technology.com/wp-content/uploads/sites/14/2023/07/first-flight-original2-e1689173259484.jpg", type: "airship" }, 
+            "USS Akron (ZRS-4)":       { name: "USS Akron (ZRS-4)",       category: "Airship", price: 6500000, pax: 40,  rangeNM: 8200, topSpeedKnots: 74, minRank: 30, iconSize: 30, img: "https://www.airships.net/wp-content/uploads/macon-flight-web-crop-1200x630.jpg", type: "airship" },
+            "Skyship 600":             { name: "Skyship 600",             category: "Airship", price: 1800000,  pax: 13, rangeNM: 700,  topSpeedKnots: 60, minRank: 21, iconSize: 26, isNew: true, img: "https://upload.wikimedia.org/wikipedia/commons/thumb/a/a1/Airship_at_Floyd_Bennett.jpg/1280px-Airship_at_Floyd_Bennett.jpg", type: "airship" },
+            "R101":                    { name: "R101",                    category: "Airship", price: 9000000,  pax: 50, rangeNM: 4500, topSpeedKnots: 63, minRank: 34, iconSize: 42, isNew: true, img: "https://upload.wikimedia.org/wikipedia/commons/thumb/0/0b/R101.jpg/960px-R101.jpg", type: "airship" },
+            "Skyship 500":             { name: "Skyship 500",             category: "Airship", price: 1200000,  pax: 8,  rangeNM: 600,  topSpeedKnots: 50, minRank: 20, iconSize: 24, isNew: true, img: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSflhsNWy1ox_oksA0sy6lvaPrOCSiadOLCy7HKuCeTWhF1FujK9D0TqJBI&s=10", type: "airship" },
+            "USS Macon (ZRS-5)":       { name: "USS Macon (ZRS-5)",       category: "Airship", price: 7000000,  pax: 40, rangeNM: 8600, topSpeedKnots: 74, minRank: 31, iconSize: 30, isNew: true, img: "https://upload.wikimedia.org/wikipedia/commons/thumb/4/4f/NH43901-enhanced.jpg/1280px-NH43901-enhanced.jpg", type: "airship" },
         }; 
 
         // ===== MILITARY (level-locked — rank 12+, armed forces aircraft) =====
         const MILITARY_UNLOCK_RANK = 18;
         const militaryCatalog = {
-            "Boeing-Vertol H-47 Chinook": { name: "Boeing-Vertol H-47 Chinook", category: "Military", price: 4500000,  pax: 55,  rangeNM: 400,  topSpeedKnots: 170, minRank: 18, iconSize: 28, img: "https://upload.wikimedia.org/wikipedia/commons/thumb/a/a0/CH-47_assigned_to_3rd_General_Support_Aviation_Battalion%2C_82nd_Combat_Aviation_Brigade.jpg/330px-CH-47_assigned_to_3rd_General_Support_Aviation_Battalion%2C_82nd_Combat_Aviation_Brigade.jpg", type: "helicopter", isMilitary: true },
-            "Mil Mi-6":                   { name: "Mil Mi-6",                   category: "Military", price: 2500000,  pax: 65,  rangeNM: 560,  topSpeedKnots: 162, minRank: 18, iconSize: 30, img: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSeiPt8GObYQIqukZiD5XW4Dr5wihWlw52WdcFpnhmsEw&s=10", type: "helicopter", isMilitary: true },
-            "Lockheed C-130 Hercules":    { name: "Lockheed C-130 Hercules",    category: "Military", price: 30000000, cargo: 19356,  rangeNM: 2100, topSpeedKnots: 320, minRank: 30, iconSize: 30, img: "https://upload.wikimedia.org/wikipedia/commons/c/cc/Lockheed_C-130_Hercules.jpg", type: "cargo-plane", isCargo: true, isMilitary: true },
-            "Lockheed C-5 Galaxy":        { name: "Lockheed C-5 Galaxy",        category: "Military", price: 75000000, cargo: 122472, rangeNM: 2400, topSpeedKnots: 503, minRank: 32, iconSize: 36, img: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTf2T4L_CECDpSpoBYnYlKTHf4lGUiIeGcxiVUt2FocLb1OnG80G7LKduvV&s=10", type: "cargo-plane", isCargo: true, isMilitary: true },
-            "Boeing C-17 Globemaster III":{ name: "Boeing C-17 Globemaster III",category: "Military", price: 90000000, cargo: 77519,  rangeNM: 2800, topSpeedKnots: 450, minRank: 38, iconSize: 34, img: "https://upload.wikimedia.org/wikipedia/commons/b/bc/C-17_test_sortie.jpg", type: "cargo-plane", isCargo: true, isMilitary: true },
+            "Boeing-Vertol H-47 Chinook": { name: "Boeing-Vertol H-47 Chinook", category: "Military", price: 4500000,  pax: 55,  rangeNM: 400,  topSpeedKnots: 170, minRank: 18, iconSize: 28, img: "https://upload.wikimedia.org/wikipedia/commons/thumb/a/a0/CH-47_assigned_to_3rd_General_Support_Aviation_Battalion%2C_82nd_Combat_Aviation_Brigade.jpg/330px-CH-47_assigned_to_3rd_General_Support_Aviation_Battalion%2C_82nd_Combat_Aviation_Brigade.jpg", type: "helicopter", isMilitary: true, rarity: "uncommon" },
+            "Mil Mi-6":                   { name: "Mil Mi-6",                   category: "Military", price: 2500000,  pax: 65,  rangeNM: 560,  topSpeedKnots: 162, minRank: 18, iconSize: 30, img: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSeiPt8GObYQIqukZiD5XW4Dr5wihWlw52WdcFpnhmsEw&s=10", type: "helicopter", isMilitary: true, rarity: "uncommon" },
+            "Lockheed C-130 Hercules":    { name: "Lockheed C-130 Hercules",    category: "Military", price: 30000000, cargo: 19356,  rangeNM: 2100, topSpeedKnots: 320, minRank: 30, iconSize: 30, img: "https://upload.wikimedia.org/wikipedia/commons/c/cc/Lockheed_C-130_Hercules.jpg", type: "cargo-plane", isCargo: true, isMilitary: true, rarity: "epic" },
+            "Lockheed C-5 Galaxy":        { name: "Lockheed C-5 Galaxy",        category: "Military", price: 75000000, cargo: 122472, rangeNM: 2400, topSpeedKnots: 503, minRank: 32, iconSize: 36, img: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTf2T4L_CECDpSpoBYnYlKTHf4lGUiIeGcxiVUt2FocLb1OnG80G7LKduvV&s=10", type: "cargo-plane", isCargo: true, isMilitary: true, rarity: "legendary" },
+            "Boeing C-17 Globemaster III":{ name: "Boeing C-17 Globemaster III",category: "Military", price: 90000000, cargo: 77519,  rangeNM: 2800, topSpeedKnots: 450, minRank: 38, iconSize: 34, img: "https://upload.wikimedia.org/wikipedia/commons/b/bc/C-17_test_sortie.jpg", type: "cargo-plane", isCargo: true, isMilitary: true, rarity: "legendary" },
+
+            // ===== ADDITIONAL MILITARY TRANSPORTS =====
+            "Alenia C-27J Spartan":              { name: "Alenia C-27J Spartan",              category: "Military", price: 6500000,  cargo: 11500, rangeNM: 2700, topSpeedKnots: 325, minRank: 16, iconSize: 28, img: "https://upload.wikimedia.org/wikipedia/commons/9/90/Alenia_C27J_Spartan_2_%28cropped%29.jpg", type: "cargo-plane", isNew: true, isCargo: true, isMilitary: true, rarity: "rare" },
+            "Ilyushin Il-76":             { name: "Ilyushin Il-76",             category: "Military", price: 24000000, cargo: 48000, rangeNM: 2200, topSpeedKnots: 460, minRank: 24, iconSize: 34, img: "https://upload.wikimedia.org/wikipedia/commons/thumb/5/5a/Il-76MD-90A_RF-78653.jpg/960px-Il-76MD-90A_RF-78653.jpg", type: "cargo-plane", isNew: true, isCargo: true, isMilitary: true, rarity: "epic" },
+            "Airbus A400M Atlas":                { name: "A400M Atlas",                category: "Military", price: 32000000, cargo: 37000, rangeNM: 2450, topSpeedKnots: 480, minRank: 27, iconSize: 34, img: "https://upload.wikimedia.org/wikipedia/commons/thumb/3/3a/Airbus_A400M_Atlas_of_the_Spanish_Air_Force_%28code_EC-400%29_arrives_RIAT_Fairford_18July2019_arp.jpg/1920px-Airbus_A400M_Atlas_of_the_Spanish_Air_Force_%28code_EC-400%29_arrives_RIAT_Fairford_18July2019_arp.jpg", type: "cargo-plane", isNew: true, isCargo: true, isMilitary: true, rarity: "epic" },
+
+            // ===== ADDITIONAL MILITARY ROTORCRAFT =====
+            "Mil Mi-8":                   { name: "Mil Mi-8",                   category: "Military", price: 1800000,  pax: 24,  rangeNM: 280,  topSpeedKnots: 140, minRank: 18, iconSize: 28, img: "https://upload.wikimedia.org/wikipedia/commons/1/1b/Mil_Mi-8P%2C_Baltic_Airlines_%28cropped%29.jpg", type: "helicopter", isNew: true, isMilitary: true, rarity: "uncommon" },
+            "Mil Mi-26":                  { name: "Mil Mi-26",                  category: "Military", price: 36000000, cargo: 20000, rangeNM: 500,  topSpeedKnots: 159, minRank: 30, iconSize: 34, img: "https://upload.wikimedia.org/wikipedia/commons/thumb/2/23/MAKS_Airshow_2013_%28Ramenskoye_Airport%2C_Russia%29_%28cropped%29%29.jpg/1280px-MAKS_Airshow_2013_%28Ramenskoye_Airport%2C_Russia%29_%28cropped%29%29.jpg", type: "helicopter", isCargo: true, isNew: true, isMilitary: true, rarity: "epic" },
+            "Sikorsky CH-53K King Stallion": { name: "Sikorsky CH-53K King Stallion", category: "Military", price: 65000000,  cargo: 27000, rangeNM: 460, topSpeedKnots: 170, minRank: 40, iconSize: 34, img: "https://upload.wikimedia.org/wikipedia/commons/thumb/7/7e/CH-53K-King-Stallion-induction-NAS-Patuxent-River-_cropped.jpg/960px-CH-53K-King-Stallion-induction-NAS-Patuxent-River-_cropped.jpg", type: "helicopter", isCargo: true, isNew: true, isMilitary: true, rarity: "legendary" },
         };
+
+        // ===== SHARED AIRCRAFT RARITY LOOKUP =====
+        // Single source of truth for market/hangar/purchase-notification rarity display.
+        // Explicit .rarity field on the catalog entry wins; otherwise fall back to this
+        // hardcoded map for aircraft that don't have one set yet; unlisted aircraft are 'common'.
+        const AIRCRAFT_RARITY_FALLBACK = {
+            "Airbus A380": "legendary",
+            "Boeing 747-8": "legendary",
+            "Airbus A350-900": "epic",
+            "ATR 72-600": "rare",
+            "Cessna 208 Caravan": "common",
+        };
+        function getAircraftRarity(type, spec) {
+            const s = spec || { ...aircraftCatalog, ...cargoCatalog, ...legacyAircraftCatalog, ...secretCatalog, ...helicopterCatalog, ...airshipCatalog, ...militaryCatalog }[type];
+            if (s && s.rarity) return s.rarity.toLowerCase();
+            return (AIRCRAFT_RARITY_FALLBACK[type] || 'common').toLowerCase();
+        }
+        const RARITY_LABELS = { exotic: 'EXOTIC', mythic: 'MYTHIC', legendary: 'LEGENDARY', epic: 'EPIC', rare: 'RARE', uncommon: 'UNCOMMON', common: 'COMMON' };
+        function getRarityTagHtml(type, spec) {
+            const r = getAircraftRarity(type, spec);
+            return `<span class="rarity-tag rarity-${r}" style="font-size:8px;">${RARITY_LABELS[r]}</span>`;
+        }
  
         // ===== ACHIEVEMENTS =====
         const achievements = {
@@ -2933,11 +3039,14 @@ z-index:99999;
             lastLoginDate: null, loginStreak: 0, lastQuestCompletionDate: null,
             autoMaintenance: false,
             dailyQuests: [], questsDate: null, questsBonusClaimed: false,
-            totalFlightLegs: 0, totalContractsCompleted: 0,
+            totalFlightLegs: 0, totalContractsCompleted: 0, opsSinceLastCrash: 0,
             totalAircraftPurchased: 0, totalRoutesCreated: 0, lifetimeTokensSpent: 0, totalHubsPurchased: 0,
             totalRepairs: 0, totalAircraftSold: 0, lifetimeTokensEarned: 0, totalDistanceFlownNM: 0,
             totalLegacyPurchased: 0, totalCargoPurchased: 0, totalHelicopterPurchased: 0, totalMilitaryPurchased: 0,
-            totalCashSpent: 0, totalInternationalRoutes: 0, continueFlyingOffline: false
+            totalCashSpent: 0, totalInternationalRoutes: 0, continueFlyingOffline: false,
+            reputationItemsOwned: { safety: [], fleet: [], food: [] }, reputationPerkActive: { safety: false, fleet: false, food: false },
+            reputationEquipped: { safety: [], fleet: [], food: [] }, totalFoodPaxServed: 0,
+            reputationReviews: [], reputationLastReviewAt: 0
         };
         let uiUpdatePending = false;
         let _lastUiRender = 0;
@@ -3039,7 +3148,11 @@ window.addEventListener('blur', () => {
 });
 document.addEventListener('visibilitychange', () => {
     isTabFocused = !document.hidden;
-    if (document.hidden && !gameState.autoMaintenance && !gameState.continueFlyingOffline && typeof forceLandAirborneFleet === 'function') forceLandAirborneFleet();
+    // NOTE: previously this force-landed any airborne aircraft the instant the tab was hidden
+    // (when Continue Flying Offline was off), which made a flight appear to have already
+    // arrived after even a split-second tab switch. gameSimulationTick's cappedElapsedMs
+    // logic already handles backgrounded progress correctly (capped to 30s of simulated
+    // ticks), so no extra action is needed here.
 });
 // ===== REEL PRIZE TABLE =====
         const reelPrizes = [
@@ -3087,6 +3200,7 @@ document.addEventListener('visibilitychange', () => {
             { id:"tokens_150",     label:"150 Tokens",                     icon:"✈", rarity:"legendary", rarityLabel:"LEGENDARY",  weight:1.2,  apply:(gs)=>{gs.tokens+=150;} },
             { id:"a380_drop",      label:"Airbus A380",                    icon:"🛫", rarity:"legendary", rarityLabel:"LEGENDARY",  weight:1,    apply:(gs)=>{gs.hangar["Airbus A380"]=(gs.hangar["Airbus A380"]||0)+1;} },
             { id:"wright_drop",    label:"Wright Flyer",                   icon:"🛸", rarity:"legendary", rarityLabel:"LEGENDARY",  weight:0.8,  apply:(gs)=>{gs.hangar["Wright Flyer"]=(gs.hangar["Wright Flyer"]||0)+1;} },
+            { id:"voyager_drop",   label:"Rutan Voyager",                  icon:"🌍", rarity:"legendary", rarityLabel:"LEGENDARY",  weight:0.7,  apply:(gs)=>{gs.hangar["Rutan Voyager"]=(gs.hangar["Rutan Voyager"]||0)+1;} },
             { id:"crate_luck_4x",  label:"4x Crate Luck 30min",            icon:"🍀", rarity:"legendary", rarityLabel:"LEGENDARY",  weight:1.5,  apply:(gs)=>{gs.crateLuckMultiplier=mergeMultiplier(gs.crateLuckMultiplier,4);gs.crateLuckEndTime=extendBoostDuration(gs.crateLuckEndTime,30*60*1000);} },
             { id:"crate_spawn_4x", label:"4x Crate Spawn 30min",           icon:"📦", rarity:"legendary", rarityLabel:"LEGENDARY",  weight:1.5,  apply:(gs)=>{ if(typeof spawnCrate==='function')spawnCrate(); const endTime=Date.now()+30*60*1000; gs._crateBoostEnd4x=endTime; if(window._nextCrateSpawnAt){const remaining=Math.max(0,window._nextCrateSpawnAt-Date.now());window._nextCrateSpawnAt=Date.now()+Math.round(remaining/4);} } },
             { id:"lun_drop",       label:"Lun-Class Ekranoplan",           icon:"⚓", rarity:"legendary", rarityLabel:"LEGENDARY",  weight:0.8,  apply:(gs)=>{gs.hangar["Lun-Class Ekranoplan"]=(gs.hangar["Lun-Class Ekranoplan"]||0)+1;} },
@@ -3096,6 +3210,7 @@ document.addEventListener('visibilitychange', () => {
             { id:"sr71_drop",      label:"Lockheed SR-71 Blackbird",       icon:"🔥", rarity:"mythic",    rarityLabel:"MYTHIC",     weight:0.3,  apply:(gs)=>{gs.hangar["Lockheed SR-71 Blackbird"]=(gs.hangar["Lockheed SR-71 Blackbird"]||0)+1;} },
             { id:"sr72_drop",      label:"Lockheed Martin SR-72",          icon:"🌈", rarity:"exotic",    rarityLabel:"EXOTIC",     weight:0.05, apply:(gs)=>{gs.hangar["Lockheed Martin SR-72"]=(gs.hangar["Lockheed Martin SR-72"]||0)+1;} },
             { id:"strato_drop",    label:"Scaled Composites Stratolaunch", icon:"🔥", rarity:"mythic",    rarityLabel:"MYTHIC",     weight:0.2,  apply:(gs)=>{gs.hangar["Scaled Composites Model 351 Stratolaunch"]=(gs.hangar["Scaled Composites Model 351 Stratolaunch"]||0)+1;} },
+            { id:"solarimpulse_drop", label:"Solar Impulse 2",             icon:"☀️", rarity:"mythic",    rarityLabel:"MYTHIC",     weight:0.15, apply:(gs)=>{gs.hangar["Solar Impulse 2"]=(gs.hangar["Solar Impulse 2"]||0)+1;} },
             // ── EXOTIC ──────────────────────────────────────────────────────
             { id:"flyingv_drop",   label:"Flying-V",                       icon:"🌈", rarity:"exotic",    rarityLabel:"EXOTIC",     weight:0.05, apply:(gs)=>{gs.hangar["Flying-V"]=(gs.hangar["Flying-V"]||0)+1;} },
         ];
@@ -3369,6 +3484,7 @@ function repairAllGrounded() {
  
             // First crash achievement
             gameState.totalCrashes = (gameState.totalCrashes || 0) + 1;
+            gameState.opsSinceLastCrash = 0; // safety score streak resets on a crash
             if (!achievements.first_crash.unlocked) {
                 achievements.first_crash.unlocked = true;
                 gameState.tokens += 5;
@@ -3984,6 +4100,9 @@ if (prize.rarity === 'exotic' && !achievements['hidden_exotic'].unlocked) {
             } else {
                 gameState.cash = 25000;
             }
+            // Starting cash is a grant, not earned income — don't let it feed the
+            // lifetime-earnings-based aircraft price multiplier (was inflating Rank 1 prices).
+            gameState.lifetimeEarnings = 0;
 
             document.getElementById('setup-screen').style.display = 'none';
             saveProgress();
@@ -4111,6 +4230,11 @@ if (prize.rarity === 'exotic' && !achievements['hidden_exotic'].unlocked) {
     if (gameState.questsBonusClaimed === undefined) gameState.questsBonusClaimed = false;
     if (!gameState.totalFlightLegs) gameState.totalFlightLegs = 0;
     if (!gameState.totalContractsCompleted) gameState.totalContractsCompleted = 0;
+    if (gameState.opsSinceLastCrash === undefined) {
+        // Migrating an existing save: credit prior operations as clean rather than
+        // resetting everyone's Safety Record streak to 0 on this update.
+        gameState.opsSinceLastCrash = gameState.totalFlightLegs + gameState.totalContractsCompleted;
+    }
     if (!gameState.totalAircraftPurchased) gameState.totalAircraftPurchased = 0;
     if (!gameState.totalRoutesCreated) gameState.totalRoutesCreated = 0;
     if (!gameState.lifetimeTokensSpent) gameState.lifetimeTokensSpent = 0;
@@ -4124,6 +4248,12 @@ if (prize.rarity === 'exotic' && !achievements['hidden_exotic'].unlocked) {
     if (!gameState.totalHelicopterPurchased) gameState.totalHelicopterPurchased = 0;
     if (!gameState.totalMilitaryPurchased) gameState.totalMilitaryPurchased = 0;
     if (!gameState.totalCashSpent) gameState.totalCashSpent = 0;
+    if (!gameState.reputationItemsOwned) gameState.reputationItemsOwned = { safety: [], fleet: [], food: [] };
+    if (!gameState.reputationPerkActive) gameState.reputationPerkActive = { safety: false, fleet: false, food: false };
+    if (!gameState.reputationEquipped) gameState.reputationEquipped = { safety: [], fleet: [], food: [] };
+    if (!gameState.totalFoodPaxServed) gameState.totalFoodPaxServed = 0;
+    if (!gameState.reputationReviews) gameState.reputationReviews = [];
+    if (!gameState.reputationLastReviewAt) gameState.reputationLastReviewAt = 0;
     if (!gameState.totalInternationalRoutes) gameState.totalInternationalRoutes = 0;
     if (gameState.continueFlyingOffline === undefined) gameState.continueFlyingOffline = false;
     // Reconcile hangarPool against hangar counts per aircraft type. Older saves (and the
@@ -4323,7 +4453,8 @@ if (prize.rarity === 'exotic' && !achievements['hidden_exotic'].unlocked) {
                             const tickResult = calcTicketingResult(route, fUnit, effectiveDemandMod, 1);
                             baseCash = tickResult.revenue;
                         } else {
-                            baseCash = Math.round(route.distanceNM * mult * fUnit * effectiveDemandMod * (1 + evMods.earningsMod));
+                            const repMultCargo1 = (typeof getReputationEarningsMultiplier === 'function') ? getReputationEarningsMultiplier() : 1;
+                            baseCash = Math.round(route.distanceNM * mult * fUnit * effectiveDemandMod * (1 + evMods.earningsMod) * repMultCargo1);
                         }
                         earnedCash += Math.round(baseCash * OFFLINE_EARN_RATIO);
                         earnedXp += Math.round(route.distanceNM);
@@ -4352,7 +4483,7 @@ if (prize.rarity === 'exotic' && !achievements['hidden_exotic'].unlocked) {
                     setAircraftStat(f.id, 'cooldownTicks', COOLDOWN_TICKS);
                     anyGrounded = true;
                 }
-                if (legsCompleted > 0) gameState.totalFlightLegs = (gameState.totalFlightLegs || 0) + legsCompleted;
+                if (legsCompleted > 0) { gameState.totalFlightLegs = (gameState.totalFlightLegs || 0) + legsCompleted; gameState.opsSinceLastCrash = (gameState.opsSinceLastCrash || 0) + legsCompleted; }
             }
         });
 
@@ -5348,7 +5479,10 @@ const hub =
             rarityEl.style.border = '1px solid ' + (rarityColors[rarity] || '#94a3b8');
 
             document.getElementById('contract-title').innerText = contract.title || '✈️ Contract Offer';
-            document.getElementById('contract-description').innerText = contract.desc || '';
+            const hubName = gameState.primaryHub;
+            const destName = contract.destAp ? contract.destAp.name : null;
+            const flagsRow = destName ? `<div style="margin-bottom:4px;">${getFlagForAirport(hubName)} ${getFlagForAirport(destName)}</div>` : '';
+            document.getElementById('contract-description').innerHTML = flagsRow + (contract.desc || '');
             document.getElementById('contract-reward').innerText = `💰 Reward: $${(contract.reward || 0).toLocaleString()} — Aircraft Required: ${contract.type}`;
 
             const canAccept = (gameState.hangar[contract.type] || 0) > 0;
@@ -5364,6 +5498,7 @@ const hub =
         function gameSimulationTick() {
             const now = Date.now();
             const elapsedMs = now - lastTickTime;
+            if (typeof reputationTick === 'function') reputationTick();
             if (gameState.crateLuckEndTime && now >= gameState.crateLuckEndTime) {
                 gameState.crateLuckEndTime = 0;
                 gameState.crateLuckMultiplier = 0;
@@ -5404,7 +5539,22 @@ const hub =
                         // _atcHeldFleets is only cleared inside the setTimeout that delivers
                         // the actual "cleared for takeoff" message to the ATC panel, so there
                         // is no race between convo-state transitions and the game tick.
-                        const atcTakeoffHeld = window._atcHeldFleets && window._atcHeldFleets.has(String(f.id));
+                        let atcTakeoffHeld = window._atcHeldFleets && window._atcHeldFleets.has(String(f.id));
+                        // WATCHDOG: if a hold has been in place for too long (message chain broke,
+                        // panel closed mid-sequence without cleanup, etc.), auto-release it so the
+                        // aircraft can never be stuck on the ground forever.
+                        if (atcTakeoffHeld) {
+                            const heldSince = window._atcHeldSince ? window._atcHeldSince[String(f.id)] : null;
+                            if (!heldSince || (Date.now() - heldSince) > 20000) {
+                                window._atcHeldFleets.delete(String(f.id));
+                                if (window._atcHeldSince) delete window._atcHeldSince[String(f.id)];
+                                atcTakeoffHeld = false;
+                                if (atcFeedFleetId && String(atcFeedFleetId) === String(f.id)) {
+                                    appendATCMessage('ATC', 'Clearance delayed — proceeding, cleared for takeoff.', false, 'ATC');
+                                    atcConvoState = 'airborne';
+                                }
+                            }
+                        }
                         // Debug: update ATC panel with live tick state
                         if (atcFeedFleetId && String(atcFeedFleetId) === String(f.id)) {
                             const _dbg = document.getElementById('atc-debug');
@@ -5443,7 +5593,8 @@ const hub =
                             if (isLiveTick) {
                                 const fuelBefore = getAircraftStat(f.id, 'fuel');
                                 const condBefore = getAircraftStat(f.id, 'condition');
-                                const dynamicFuelDrain = progressAdded * (route.distanceNM / craftSpec.rangeNM) * 0.5;
+                                const wearMult = (typeof getReputationWearMultiplier === 'function') ? getReputationWearMultiplier() : 1;
+                                const dynamicFuelDrain = progressAdded * (route.distanceNM / craftSpec.rangeNM) * 0.5 * wearMult;
                                 const dynamicCondDrain = dynamicFuelDrain * 0.15;
                                 const newFuel = fuelBefore - dynamicFuelDrain;
                                 const newCond = condBefore - dynamicCondDrain;
@@ -5827,6 +5978,7 @@ const hub =
     // so the aircraft can't take off again until ATC clears it for the next departure.
     if (atcFeedFleetId && String(atcFeedFleetId) === fIdStr && window._atcHeldFleets) {
         window._atcHeldFleets.add(fIdStr);
+        window._atcHeldSince[fIdStr] = Date.now();
     }
                            // If aircraft landed while player was away: ground it, UNLESS a
                            // flying-while-away setting is on AND it can actually afford another
@@ -5888,6 +6040,7 @@ if (!isTabFocused || !isLiveTick) {
                                         gameState.xp += Math.round(route.distanceNM);
                                         gameState.totalDistanceFlownNM = (gameState.totalDistanceFlownNM || 0) + route.distanceNM;
                                         gameState.totalContractsCompleted = (gameState.totalContractsCompleted || 0) + 1;
+                                        gameState.opsSinceLastCrash = (gameState.opsSinceLastCrash || 0) + 1;
                                         triggerMilestonePopupNotification(`✅ ${route.contractLabel || 'Contract'} Complete`, `+$${route.rewardCash.toLocaleString()}`);
                                     }
                                 } else {
@@ -5898,6 +6051,7 @@ if (!isTabFocused || !isLiveTick) {
                                     gameState.xp += Math.round(route.distanceNM);
                                     gameState.totalDistanceFlownNM = (gameState.totalDistanceFlownNM || 0) + route.distanceNM;
                                     gameState.totalContractsCompleted = (gameState.totalContractsCompleted || 0) + 1;
+                                    gameState.opsSinceLastCrash = (gameState.opsSinceLastCrash || 0) + 1;
                                 }
                             } else {
                                 const mult = isCargo ? CARGO_EARNINGS_MULTIPLIER : EARNINGS_MULTIPLIER;
@@ -5914,10 +6068,12 @@ if (!isTabFocused || !isLiveTick) {
                                     cashReward = tickResult.revenue * legsFinished;
                                 } else {
                                     // Cargo: flat multiplier as before
-                                    cashReward = Math.round(route.distanceNM * mult * unit * effectiveDemandMod * condMod * (1 + evMods.earningsMod)) * legsFinished;
+                                    const repMultCargo2 = (typeof getReputationEarningsMultiplier === 'function') ? getReputationEarningsMultiplier() : 1;
+                                    cashReward = Math.round(route.distanceNM * mult * unit * effectiveDemandMod * condMod * (1 + evMods.earningsMod) * repMultCargo2) * legsFinished;
                                 }
                                 gameState.cash += applyCashForTick(cashReward, isLiveTick);
                                 gameState.totalFlightLegs = (gameState.totalFlightLegs || 0) + legsFinished;
+                                gameState.opsSinceLastCrash = (gameState.opsSinceLastCrash || 0) + legsFinished;
                                 gameState.xp += Math.round(route.distanceNM) * legsFinished;
                                 gameState.totalDistanceFlownNM = (gameState.totalDistanceFlownNM || 0) + (route.distanceNM * legsFinished);
                                 const tkOdds = Math.min(0.98, route.distanceNM / 1500 + 0.25);
@@ -5965,6 +6121,8 @@ if (!isTabFocused || !isLiveTick) {
                 [/rank up/i,                   '⭐'],
                 [/contract complete/i,         '✅'],
                 [/waypoint/i,                  '📍'],
+                [/not enough/i,                 '❌'],
+                [/event cancelled/i,            '✖️'],
                 // Achievements by badge
                 [/graduation|graduate/i,       '🎓'],
                 [/spinning around/i,           '🚁'],
@@ -6008,15 +6166,30 @@ if (!isTabFocused || !isLiveTick) {
                 [/mythic collecting/i,         '❤️‍🔥'],
             ];
             let icon = '🏆'; // default
-            for (const [pattern, emoji] of iconMap) {
-                if (pattern.test(title)) { icon = emoji; break; }
+            // Many call sites already prefix their title with a relevant emoji (e.g. "✈ Continue
+            // Flying Offline Enabled", "🔧 Auto-Maintenance Enabled") — use that directly instead
+            // of falling through to the generic trophy when no keyword pattern matches.
+            const leadingEmojiMatch = title.match(/^\s*(\p{Extended_Pictographic}\uFE0F?)/u);
+            if (leadingEmojiMatch) {
+                icon = leadingEmojiMatch[1];
+            } else {
+                for (const [pattern, emoji] of iconMap) {
+                    if (pattern.test(title)) { icon = emoji; break; }
+                }
             }
             document.getElementById('pop-icon').innerText  = icon;
             document.getElementById('pop-title').innerText  = title;
             document.getElementById('pop-reward').innerText = reward ? "Reward: " + reward : '';
             const el = document.getElementById('achievement-popup');
             el.classList.add('show');
-            setTimeout(() => el.classList.remove('show'), 5000);
+            if (window._milestonePopupTimeout) clearTimeout(window._milestonePopupTimeout);
+            window._milestonePopupTimeout = setTimeout(() => el.classList.remove('show'), 5000);
+        }
+
+        function dismissMilestonePopupNotification() {
+            const el = document.getElementById('achievement-popup');
+            if (window._milestonePopupTimeout) { clearTimeout(window._milestonePopupTimeout); window._milestonePopupTimeout = null; }
+            el.classList.remove('show');
         }
 
 
@@ -6162,6 +6335,29 @@ triggerMilestonePopupNotification(`🛫 Route Opened`, `${orig.split(' (')[0]} �
     "Airbus A330":                      9500,   // Widebody
     "Airbus A340":                      10200,  // Quadjet widebody, heavier than A330
     "Boeing 747-400":                   11000,  // Classic jumbo
+    // ===== SECOND ADDITIONAL PASSENGER AIRCRAFT BATCH =====
+    "Boeing 757-200":                    7000,   // Standard narrowbody, longer than 737
+    "Boeing 767-300":                    8500,   // Medium widebody
+    "Airbus A310":                       7500,   // Widebody twin
+    "Airbus A300":                       7900,   // Early widebody twin
+    "Embraer E190":                      6200,   // Regional jet
+    "COMAC C919":                        6900,   // Narrowbody, similar class to A320
+    "Airbus A321":                       7000,   // Stretched A320 family
+    "Boeing 737-900":                    7000,   // Stretched 737NG
+    "Airbus A350-1000":                  9800,   // Stretched A350 widebody
+    "Bombardier CRJ-900":                           5500,   // Regional jet
+    "Ilyushin Il-96":                    9800,   // Soviet-era widebody
+    // ===== THIRD ADDITIONAL PASSENGER AIRCRAFT BATCH =====
+    "Pilatus PC-12":                     2500,   // Single-engine turboprop, STOL capable
+    "Fokker 50":                         4900,   // Regional turboprop, similar to Saab 340/ATR 72
+    "Embraer E145":                      5300,   // Small regional jet
+    "Bombardier CRJ200":                 6600,   // Regional jet, longer field length than turboprops
+    "Fokker 70":                         5900,   // Regional jet
+    "Bombardier CRJ700":                 6100,   // Stretched CRJ200 derivative
+    "Fokker 100":                        6500,   // Stretched Fokker 70
+    "Boeing 737-600":                    6300,   // Shortest 737NG, lighter than -700/-800
+    "Boeing 737 MAX 9":                  7000,   // Stretched MAX variant, heavier than MAX 8
+    "Boeing 737 MAX 10":                 7600,   // Longest/heaviest 737 MAX variant
     // ===== ADDITIONAL CARGO AIRCRAFT =====
     "Antonov An-12":                    5000,   // Soviet tactical airlifter, rough-strip capable
     "Lockheed C-130 Hercules":          3600,   // STOL military transport
@@ -6169,6 +6365,16 @@ triggerMilestonePopupNotification(`🛫 Route Opened`, `${orig.split(' (')[0]} �
     "Lockheed C-5 Galaxy":              8000,   // Heavy strategic airlifter
     "Airbus Beluga":                    9500,   // Modified A300, same runway as A300
     "Airbus BelugaXL":                  11000,  // Modified A330, heavier than Beluga ST
+    // ===== SECOND ADDITIONAL CARGO/MILITARY BATCH =====
+    "McDonnell Douglas MD-11F":         9700,   // Same class as passenger MD-11
+    "C-27J Spartan":                    2200,   // Tactical airlifter, rough-strip capable
+    "Ilyushin Il-76":                   3000,   // Soviet strategic airlifter, unpaved capable
+    "A400M Atlas":                      3000,   // Modern tactical/strategic airlifter, STOL capable
+    // ===== THIRD ADDITIONAL CARGO AIRCRAFT BATCH =====
+    "Lockheed L-100 Hercules":           3800,   // Civil Hercules, STOL capable like military C-130
+    "Antonov An-26":                     2600,   // Soviet tactical airlifter, rough-strip capable
+    "Boeing 727F":                       6800,   // Same class as passenger 727-200
+    "Antonov An-72":                     2600,   // "Cheburashka", exceptional STOL performance
     // ===== ADDITIONAL LEGACY AIRCRAFT =====
     "Ford Trimotor":                    1500,   // Short-field pioneer airliner
     "Boeing C-75 Stratoliner":          5000,   // First pressurized airliner
@@ -6186,6 +6392,9 @@ triggerMilestonePopupNotification(`🛫 Route Opened`, `${orig.split(' (')[0]} �
     "Tupolev Tu-154":                   8200,   // Soviet trijet
     "Lockheed L-1011 TriStar":          9500,   // Trijet widebody
     "Convair XC-99":                    8000,   // Heavy military transport
+    // ===== THIRD ADDITIONAL LEGACY AIRCRAFT BATCH =====
+    "BAC One-Eleven":                    6200,   // Compact rear-engined regional jet
+    "Martin JRM Mars":                   0,      // Flying boat - water only, no runway needed
     // ===== ADDITIONAL SECRET AIRCRAFT =====
     "Boeing Pelican ULTRA":             8000,   // Ground-effect/conventional capable
     "Caproni Ca.60 Noviplano":          0,      // Flying boat - water only (crashed on first flight)
@@ -6193,6 +6402,24 @@ triggerMilestonePopupNotification(`🛫 Route Opened`, `${orig.split(' (')[0]} �
     "Tupolev ANT-20":                   4000,   // Maxim Gorky propaganda plane
     "Fairey Rotodyne":                  0,      // VTOL gyrodyne - no runway needed
     "Avro Canada VZ-9 Avrocar":                 0,      // Saucer-shaped VTOL - no runway needed
+    // ===== SECOND ADDITIONAL SECRET AIRCRAFT =====
+    "Rutan Voyager":                     10000,  // Massively overloaded with fuel for round-the-world flight
+    "Solar Impulse 2":                   1000,   // Ultra-light solar aircraft, short takeoff roll
+
+    // ===== ADDITIONAL HELICOPTERS =====
+    "Robinson R44":                      0,      // Helicopter - no runway needed
+    "Bell 206 JetRanger":                0,      // Helicopter - no runway needed
+    "Bell 429 GlobalRanger":             0,      // Helicopter - no runway needed
+    "Airbus H145":                       0,      // Helicopter - no runway needed
+
+    // ===== ADDITIONAL MILITARY ROTORCRAFT =====
+    "Mil Mi-8":                          0,      // Helicopter - no runway needed
+    "Mil Mi-26":                         0,      // Helicopter - no runway needed
+    "Sikorsky CH-53K King Stallion":     0,      // Helicopter - no runway needed
+
+    // ===== ADDITIONAL AIRSHIPS =====
+    "Skyship 500":                       0,      // Airship - no runway needed
+    "USS Macon (ZRS-5)":                 0,      // Airship - no runway needed
 };
         function assignAircraftToRoute(routeId, type) {
             const route = gameState.routes.find(r => String(r.id) === String(routeId));
@@ -6379,6 +6606,7 @@ if (allCraftsForCheck[type] && allCraftsForCheck[type].waterOnly) {
         let atcFeedInterval = null;
         let atcMessageHistory = []; // kept for Claude context
         window._atcHeldFleets = new Set(); // aircraft IDs waiting for ATC takeoff clearance
+        window._atcHeldSince = {}; // fleetId -> timestamp when hold was armed (watchdog safety valve)
         window._atcLandHeldFleets = new Set(); // aircraft IDs waiting for ATC landing clearance (holding pattern)
         window._atcLandClearedFleets = new Set(); // aircraft IDs that have received landing clearance — never re-hold
 
@@ -6434,6 +6662,7 @@ if (allCraftsForCheck[type] && allCraftsForCheck[type].waterOnly) {
             const _atcCtxCheck = getATCFlightContext();
             if (_atcCtxCheck && (_atcCtxCheck.phase === 'on ground')) {
                 window._atcHeldFleets.add(String(fleetId));
+                window._atcHeldSince[String(fleetId)] = Date.now();
             }
             // If the aircraft is on approach OR close enough that descent/approach chatter will fire,
             // hold it in a holding pattern until ATC clears to land.
@@ -6450,7 +6679,7 @@ if (allCraftsForCheck[type] && allCraftsForCheck[type].waterOnly) {
             if (atcFeedInterval) { clearInterval(atcFeedInterval); atcFeedInterval = null; }
             const panel = document.getElementById('atc-feed-panel');
             if (panel) panel.remove();
-            if (atcFeedFleetId) window._atcHeldFleets.delete(String(atcFeedFleetId));
+            if (atcFeedFleetId) { window._atcHeldFleets.delete(String(atcFeedFleetId)); delete window._atcHeldSince[String(atcFeedFleetId)]; }
             if (atcFeedFleetId) window._atcLandHeldFleets.delete(String(atcFeedFleetId));
             if (atcFeedFleetId) window._atcLandClearedFleets.delete(String(atcFeedFleetId));
             if (atcFeedFleetId && window._holdingState) delete window._holdingState[String(atcFeedFleetId)];
@@ -6506,7 +6735,7 @@ if (allCraftsForCheck[type] && allCraftsForCheck[type].waterOnly) {
             }
             // Remove the close button so it stays until dismissed manually
             // (user can still close crash modal and see it, then × to dismiss)
-            if (fleetId) window._atcHeldFleets.delete(String(fleetId));
+            if (fleetId) { window._atcHeldFleets.delete(String(fleetId)); delete window._atcHeldSince[String(fleetId)]; }
             if (fleetId) window._atcLandHeldFleets.delete(String(fleetId));
             if (fleetId) window._atcLandClearedFleets.delete(String(fleetId));
             atcFeedFleetId = null; // disown the feed so it doesn't auto-close on next tick
@@ -6528,6 +6757,7 @@ if (allCraftsForCheck[type] && allCraftsForCheck[type].waterOnly) {
             const cond = Math.round(getAircraftStat(fleetEntry.id, 'condition'));
             const progress = fleetEntry.directionForward ? fleetEntry.progress : (100 - fleetEntry.progress);
             const isCargo = !!spec?.isCargo;
+            const isRotorOrAirship = spec?.type === 'helicopter' || spec?.type === 'airship';
             const pax = isCargo ? null : spec?.pax;
             const origin = route.origin.split(' (')[0];
             const dest = route.destination.split(' (')[0];
@@ -6538,7 +6768,11 @@ if (allCraftsForCheck[type] && allCraftsForCheck[type].waterOnly) {
             const inCooldown = isInCooldown(fleetEntry.id);
             const grounded = gameState.voluntarilyGrounded[fleetEntry.id];
             const phase = inCooldown || grounded ? 'on ground' : progress < 10 ? 'departure' : progress > 90 ? 'approach' : 'cruise';
-            return { reg, type: fleetEntry.type, origin, dest, fuel, cond, progress: Math.round(progress), altitude, speedKts, distFlown, distLeft, isCargo, pax, phase, distanceNM: route.distanceNM };
+            // Interpolated current position along the route, used to find the nearest airport for enroute ATC handoffs
+            const pFrac = Math.min(1, Math.max(0, progress / 100));
+            const curLat = route.origLat + (route.destLat - route.origLat) * pFrac;
+            const curLng = route.origLng + (route.destLng - route.origLng) * pFrac;
+            return { reg, type: fleetEntry.type, origin, dest, fuel, cond, progress: Math.round(progress), altitude, speedKts, distFlown, distLeft, isCargo, isRotorOrAirship, pax, phase, distanceNM: route.distanceNM, curLat, curLng };
         }
 
         // ATC State machine — tracks where in the procedure sequence each aircraft is
@@ -6637,7 +6871,7 @@ if (allCraftsForCheck[type] && allCraftsForCheck[type].waterOnly) {
                         appendATCMessage(m.speaker, m.message, false, m.label);
                         // When ATC clears takeoff, release ATC hold on this aircraft
                         if (m.label === 'ATC' && m.message && m.message.includes('cleared for takeoff') && atcFeedFleetId) {
-                            if (window._atcHeldFleets) window._atcHeldFleets.delete(String(atcFeedFleetId));
+                            if (window._atcHeldFleets) { window._atcHeldFleets.delete(String(atcFeedFleetId)); delete window._atcHeldSince[String(atcFeedFleetId)]; }
                         }
                         // When ATC clears to land, release landing hold and pre-arm
                         // the departure hold so it's in place before ground cooldown expires
@@ -6715,8 +6949,22 @@ if (allCraftsForCheck[type] && allCraftsForCheck[type].waterOnly) {
             ];
         }
 
+        function getNearestAirportName(lat, lng, excludeNames) {
+            let best = null, bestDist = Infinity;
+            for (const r of Object.values(regions)) {
+                if (!r.unlocked) continue;
+                for (const ap of r.airports) {
+                    if (excludeNames && excludeNames.includes(ap.name)) continue;
+                    if (ap.type === 'heliport') continue;
+                    const d = L.latLng(lat, lng).distanceTo(L.latLng(ap.lat, ap.lng));
+                    if (d < bestDist) { bestDist = d; best = ap; }
+                }
+            }
+            return best ? best.name : null;
+        }
+
         function generateATCSequence(ctx, state, cruiseOptionIndex) {
-            const { reg, type, origin, dest, fuel, cond, progress, altitude, speedKts, distLeft, isCargo, pax, phase, distanceNM } = ctx;
+            const { reg, type, origin, dest, fuel, cond, progress, altitude, speedKts, distLeft, isCargo, isRotorOrAirship, pax, phase, distanceNM, curLat, curLng } = ctx;
             const cs = reg; // e.g. "VT-XKR"
             const fuelWarn = fuel < 25;
             const condWarn = cond < 40;
@@ -6762,6 +7010,14 @@ if (allCraftsForCheck[type] && allCraftsForCheck[type].waterOnly) {
             const origIATA = extractIATA(origin);
             const destIATA = extractIATA(dest);
 
+            // Nearest real airport underneath the aircraft's current position — used so enroute
+            // "Center" handoffs feel realistic instead of always naming the final destination.
+            let enrouteIATA = destIATA;
+            if (typeof curLat === 'number' && typeof curLng === 'number') {
+                const nearestName = getNearestAirportName(curLat, curLng, [origin, dest]);
+                if (nearestName) enrouteIATA = extractIATA(nearestName);
+            }
+
             const originShort = origin.split(',')[0].split('(')[0].trim();
             const destShort   = dest.split(',')[0].split('(')[0].trim();
             const paxStr   = isCargo ? 'cargo only' : `${pax || 0} souls on board`;
@@ -6781,13 +7037,21 @@ if (allCraftsForCheck[type] && allCraftsForCheck[type].waterOnly) {
             const OGND = `🚧 ${origIATA} GND`;
             const TWR  = `🗼 ${origIATA} TWR`;
             const DEP  = `📡 ${origIATA} DEP`;
-            const CTR  = `🛰 ${destIATA} CTR`;
+            const CTR  = `🛰 ${enrouteIATA} CTR`;
             const APP  = `📡 ${destIATA} APP`;
             const DTWR = `🗼 ${destIATA} TWR`;
             const DGND = `🚧 ${destIATA} GND`;
 
             // ── DELIVERY / CLEARANCE ─────────────────────────────────────────
             if ((effectivePhase === 'on ground' || effectivePhase === 'departure') && (state === 'idle' || state === 'parked')) {
+                if (isRotorOrAirship) {
+                    // Helicopters and airships don't taxi — straight to takeoff clearance from the pad/mast.
+                    return seq([
+                        { speaker:PLT,  label:'PILOT', message:`${origIATA} Tower, ${cs}, ready for departure, request IFR clearance to ${destIATA}, ${paxStr}.` },
+                        { speaker:TWR,  label:'ATC',   message:`${cs}, ${origIATA} Tower, cleared to ${destIATA} as filed. Wind ${wind}, cleared for departure, your discretion.` },
+                        { speaker:PLT,  label:'PILOT', message:`Cleared to ${destIATA}, cleared for departure, ${cs}. Lifting off.` },
+                    ], 'airborne');
+                }
                 return seq([
                     { speaker:PLT,  label:'PILOT', message:`${origIATA} Delivery, ${cs}, request IFR clearance to ${destIATA}, with information ${atis}, ${paxStr}.` },
                     { speaker:DEL,  label:'ATC',   message:`${cs}, ${origIATA} Delivery, cleared to ${destIATA} as filed. Climb via SID, maintain 5,000, expect FL${cruiseFL} ten minutes after departure. Squawk ${sq}. Information ${atis} current.` },
@@ -6845,17 +7109,17 @@ if (allCraftsForCheck[type] && allCraftsForCheck[type].waterOnly) {
 
                 const options = [
                     seq([
-                        { speaker:PLT,  label:'PILOT', message:`${destIATA} Center, ${cs}, checking in FL${cruiseFL}, direct ${destIATA}.` },
+                        { speaker:PLT,  label:'PILOT', message:`${enrouteIATA} Center, ${cs}, checking in FL${cruiseFL}, direct ${destIATA}.` },
                         { speaker:CTR,  label:'ATC',   message:`${cs}, Center, radar contact. Maintain FL${cruiseFL}. Traffic, ${trafficDir} o'clock, ${trafficDist} miles, FL${trafficFL}, opposite direction.` },
                         { speaker:PLT,  label:'PILOT', message:`Looking for traffic, ${cs}. Negative contact, maintaining FL${cruiseFL}.` },
                     ], 'cruise'),
                     seq([
-                        { speaker:CTR,  label:'ATC',   message:`${cs}, ${destIATA} Center, say altitude and fuel state.` },
-                        { speaker:PLT,  label:'PILOT', message:`${destIATA} Center, ${cs}, FL${cruiseFL}, fuel ${fuelWarn ? 'minimum — declaring minimum fuel' : 'state normal'}, ${eta} minutes to ${destIATA}.` },
+                        { speaker:CTR,  label:'ATC',   message:`${cs}, ${enrouteIATA} Center, say altitude and fuel state.` },
+                        { speaker:PLT,  label:'PILOT', message:`${enrouteIATA} Center, ${cs}, FL${cruiseFL}, fuel ${fuelWarn ? 'minimum — declaring minimum fuel' : 'state normal'}, ${eta} minutes to ${destIATA}.` },
                         { speaker:CTR,  label:'ATC',   message:`${cs}, roger${fuelWarn ? ', priority handling approved, stand by for direct routing' : '. Proceed as filed, no delay expected'}.` },
                     ], 'cruise'),
                     seq([
-                        { speaker:PLT,  label:'PILOT', message:`${destIATA} Center, ${cs}, requesting ride report for FL${cruiseFL+2}.` },
+                        { speaker:PLT,  label:'PILOT', message:`${enrouteIATA} Center, ${cs}, requesting ride report for FL${cruiseFL+2}.` },
                         { speaker:CTR,  label:'ATC',   message:`${cs}, Center, PIREP FL${cruiseFL+2} — light chop reported by company traffic 20 miles ahead. Your discretion.` },
                         { speaker:PLT,  label:'PILOT', message:`We'll stay at FL${cruiseFL}, ${cs}.` },
                     ], 'cruise'),
@@ -7028,7 +7292,7 @@ if (allCraftsForCheck[type] && allCraftsForCheck[type].waterOnly) {
 </div>
                 ${spec.isCargo ? `<div style="font-size:10px;color:var(--cargo-color);margin-top:6px;font-weight:bold;">📦 CARGO: Earns per KG per NM — high value routes!</div>` : ''}
                 ${spec.type === 'legacy-plane' ? `<div style="font-size:10px;color:#a855f7;margin-top:6px;font-weight:bold;">🕰️ LEGACY: Iconic retired airliner!</div>` : ''}
-                ${spec.rarity ? (() => { const rColors = { mythic:'#ef4444', legendary:'#eab308', epic:'#a855f7', rare:'#06b6d4', uncommon:'#10b981', common:'#94a3b8', exotic:'#00d4ff' }; return `<div style="margin-top:6px;"><span class="rarity-tag rarity-${spec.rarity}">${spec.rarity.toUpperCase()}</span> <span style="font-size:10px;color:${rColors[spec.rarity]};">Secret aircraft — crate drop only</span></div>`; })() : ''}`;
+                ${spec.rarity ? (() => { const rColors = { mythic:'#ef4444', legendary:'#eab308', epic:'#a855f7', rare:'#06b6d4', uncommon:'#10b981', common:'#94a3b8', exotic:'#00d4ff' }; const isSecret = spec.category === 'Secret'; return `<div style="margin-top:6px;"><span class="rarity-tag rarity-${spec.rarity}">${spec.rarity.toUpperCase()}</span>${isSecret ? ` <span style="font-size:10px;color:${rColors[spec.rarity]};">Secret aircraft — crate drop only</span>` : ''}</div>`; })() : ''}`;
             document.getElementById('market-modal-qty').value = 1;
             const btn = document.getElementById('market-modal-buy-btn');
             if (gameState.rank < spec.minRank) { btn.disabled = true; btn.innerText = "Rank Too Low"; }
@@ -7076,7 +7340,7 @@ if (allCraftsForCheck[type] && allCraftsForCheck[type].waterOnly) {
     if (spec.isMilitary) gameState.totalMilitaryPurchased = (gameState.totalMilitaryPurchased || 0) + qty;
 
     // Notification for aircraft purchase
-    const rar = (spec.rarity || 'common').toLowerCase();
+    const rar = getAircraftRarity(selectedBulkAircraft, spec);
     const isCargo2 = spec.isCargo || spec.type === 'cargo-plane';
     const isHeli2 = spec.type === 'helicopter';
     const typeIcon = isHeli2 ? '🚁' : isCargo2 ? '📦' : '✈️';
@@ -7282,6 +7546,28 @@ if (allCraftsForCheck[type] && allCraftsForCheck[type].waterOnly) {
     listEl.innerHTML = html;
 }
 
+        function getFlagHtml(flag, size) {
+            const w = size || 16, h = Math.round(w * 0.75);
+            if (typeof flag === 'string' && flag.startsWith('http')) {
+                return `<img src="${flag}" style="width:${w}px;height:${h}px;border-radius:2px;object-fit:cover;vertical-align:middle;border:1px solid rgba(255,255,255,0.2);">`;
+            }
+            return `<span style="vertical-align:middle;">${flag || ''}</span>`;
+        }
+
+        window._airportNationCache = null;
+        function getFlagForAirport(airportName) {
+            if (!airportName) return '';
+            if (!window._airportNationCache) {
+                const cache = {};
+                for (const r of Object.values(regions)) {
+                    for (const ap of r.airports) cache[ap.name] = r.flag;
+                }
+                window._airportNationCache = cache;
+            }
+            const flag = window._airportNationCache[airportName];
+            return flag ? getFlagHtml(flag, 14) : '';
+        }
+
         function buildDirectoryTree() {
     const container  = document.getElementById('directory-tree');
     const statsBox   = document.getElementById('directory-stats');
@@ -7354,9 +7640,7 @@ if (allCraftsForCheck[type] && allCraftsForCheck[type].waterOnly) {
         if (matchingAps.length === 0) continue;
         anyVisible = true;
 
-        const flagHtml = typeof r.flag === 'string' && r.flag.startsWith('http')
-            ? `<img src="${r.flag}" style="width:18px;height:14px;border-radius:2px;object-fit:cover;vertical-align:middle;margin-right:4px;">`
-            : `<span style="margin-right:4px;">${r.flag}</span>`;
+        const flagHtml = getFlagHtml(r.flag, 18) + ' ';
 
         // Strip trailing country code suffix like " (US)", " (AU)" from the display name
         const regionDisplayName = key.replace(/\s*\([A-Z]{2,3}\)\s*$/, '').trim();
@@ -7504,8 +7788,8 @@ if (allCraftsForCheck[type] && allCraftsForCheck[type].waterOnly) {
                 const questedToday = gameState.lastQuestCompletionDate === today;
                 statusEl.textContent = claimedToday
                     ? (questedToday
-                        ? `Today's bonus claimed and a quest is done — streak is safe. See you tomorrow!`
-                        : `Today's bonus claimed, but you haven't finished a Daily Quest yet — do one today or the streak resets tomorrow!`)
+                        ? `Today's bonus claimed and a quest is done. Your streak is safe. See you tomorrow!`
+                        : `Today's bonus claimed, but you haven't finished a Daily Quest yet. Do one today or the streak resets tomorrow!`)
                     : `Log in and clear at least one Daily Quest today to extend your streak!`;
             }
         }
@@ -8397,7 +8681,7 @@ if (groundAllBtn) {
                     card.innerHTML = `
                         <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:6px;">
                             <div>
-                                <div style="font-size:13px;font-weight:900;color:var(--accent-color);">${origShort} → ${destShort}</div>
+                                <div style="font-size:13px;font-weight:900;color:var(--accent-color);">${getFlagForAirport(route.origin)} ${origShort} → ${getFlagForAirport(route.destination)} ${destShort}</div>
                                 <div style="font-size:10px;color:#64748b;margin-top:1px;">${distStr} · <span style="color:${demandColor};">${demandPct}% demand</span>${isContract ? ' · 🔒 Contract' : ''}${evBadge}${tierBadge}</div>
                             </div>
                             <button onclick="scrapRouteLine(${JSON.stringify(route.id)})" style="background:none;border:1px solid #334155;color:#ef4444;border-radius:4px;padding:3px 7px;font-size:10px;cursor:pointer;">Scrap</button>
@@ -8440,17 +8724,8 @@ if (groundAllBtn) {
                     const bSpec = allCrafts[bType] || {};
                     const capacityOf = spec => spec.isCargo ? (spec.cargo || 0) : (spec.pax || 0);
                     const rarityOf = type => {
-                        const allForSort = { ...aircraftCatalog, ...cargoCatalog, ...legacyAircraftCatalog, ...secretCatalog, ...helicopterCatalog, ...airshipCatalog, ...militaryCatalog };
-                        const r = allForSort[type]?.rarity;
-                        // Order: Exotic=7, Mythic=6, Legendary=5, Epic=4, Rare=3, Uncommon=2, Common=1, unrated=0
                         const map = { exotic:7, mythic:6, legendary:5, epic:4, rare:3, uncommon:2, common:1 };
-                        if (r) return map[r.toLowerCase()] ?? 0;
-                        // Fallback for aircraft without explicit rarity field
-                        if (type === 'Airbus A380' || type === 'Boeing 747-8') return 5;
-                        if (type === 'Airbus A350-900') return 4;
-                        if (type === 'ATR 72-600') return 3;
-                        if (type === 'Cessna 208 Caravan') return 2;
-                        return 0;
+                        return map[getAircraftRarity(type)] ?? 1;
                     };
                     switch (sortBy) {
                         case 'price-high': return (bSpec.price || 0) - (aSpec.price || 0) || aType.localeCompare(bType);
@@ -8481,17 +8756,7 @@ if (groundAllBtn) {
                 const btn = document.createElement('div');
                 btn.className = 'hangar-card-btn';
                 const categoryColor = categoryLabel && gameState.categoryColors?.[categoryLabel] ? gameState.categoryColors[categoryLabel] : null;
-                const allCraftsForRarity = { ...aircraftCatalog, ...cargoCatalog, ...legacyAircraftCatalog, ...secretCatalog, ...helicopterCatalog, ...airshipCatalog, ...militaryCatalog };
-                const craftRarityData = allCraftsForRarity[type];
-                // Rarity: secret catalog has explicit rarity; others use hardcoded rules
-                const craftRarity = craftRarityData?.rarity || (
-                    type === 'Airbus A380' || type === 'Boeing 747-8' ? 'legendary' :
-                    type === 'Airbus A350-900' ? 'epic' :
-                    type === 'ATR 72-600' ? 'rare' :
-                    type === 'Cessna 208 Caravan' ? 'uncommon' : null
-                );
-                const rarityLabels = { exotic: 'EXOTIC', mythic: 'MYTHIC', legendary: 'LEGENDARY', epic: 'EPIC', rare: 'RARE', uncommon: 'UNCOMMON', common: 'COMMON' };
-                const rarityTag = craftRarity ? `<span class="rarity-tag rarity-${craftRarity}">${rarityLabels[craftRarity]}</span>` : '';
+                const rarityTag = getRarityTagHtml(type, spec);
                 if (isCargo) btn.style.borderColor = 'var(--cargo-color)';
                 if (categoryColor) btn.style.boxShadow = `0 0 0 1px ${categoryColor}33`;
                 btn.innerHTML = `
@@ -8521,6 +8786,7 @@ if (groundAllBtn) {
                     ${plane.isNew ? `<div class="new-badge">★ NEW</div>` : ''}
                     <div class="market-item-img" style="background-image:url('${plane.img}')"></div>
                     <div style="font-size:12px;font-weight:bold;margin-bottom:4px;">${plane.name}</div>
+                    <div style="margin-bottom:3px;">${getRarityTagHtml(id, plane)}</div>
                     <div style="font-size:11px;color:${gameState.cash>=getInflatedPrice(plane.price)?'var(--money-color)':'#ef4444'};">$${getInflatedPrice(plane.price).toLocaleString()}</div>
                     ${gameState.rank < plane.minRank ? `<div style="font-size:9px;color:#ef4444;">Rank ${plane.minRank}</div>` : ''}`;
                 catalog.appendChild(item);
@@ -8542,6 +8808,7 @@ if (groundAllBtn) {
                         ${plane.isNew ? `<div class="new-badge">★ NEW</div>` : ''}
                         <div class="market-item-img" style="background-image:url('${plane.img}')"></div>
                         <div style="font-size:11px;font-weight:bold;margin-bottom:2px;color:var(--cargo-color);">📦 ${plane.name}</div>
+                        <div style="margin-bottom:3px;">${getRarityTagHtml(id, plane)}</div>
                         <div style="font-size:10px;color:#94a3b8;margin-bottom:3px;">${plane.cargo?.toLocaleString()}kg</div>
                         <div style="font-size:11px;color:${gameState.cash>=getInflatedPrice(plane.price)?'var(--money-color)':'#ef4444'};">$${getInflatedPrice(plane.price).toLocaleString()}</div>
                         ${gameState.rank < plane.minRank ? `<div style="font-size:9px;color:#ef4444;">Rank ${plane.minRank}</div>` : ''}`;
@@ -8561,6 +8828,7 @@ if (groundAllBtn) {
                     ${plane.isNew ? `<div class="new-badge">★ NEW</div>` : ''}
                     <div class="market-item-img" style="background-image:url('${plane.img}')"></div>
                     <div style="font-size:11px;font-weight:bold;margin-bottom:2px;color:#38bdf8;">🚁 ${plane.name}</div>
+                    <div style="margin-bottom:3px;">${getRarityTagHtml(id, plane)}</div>
                     <div style="font-size:10px;color:#94a3b8;margin-bottom:3px;">${plane.isCargo ? `${plane.cargo?.toLocaleString()}kg` : `${plane.pax} Seats`}</div>
                     <div style="font-size:11px;color:${gameState.cash>=getInflatedPrice(plane.price)?'var(--money-color)':'#ef4444'};">$${getInflatedPrice(plane.price).toLocaleString()}</div>
                     ${gameState.rank < plane.minRank ? `<div style="font-size:9px;color:#ef4444;">Rank ${plane.minRank}</div>` : ''}`;
@@ -8583,6 +8851,7 @@ if (groundAllBtn) {
                         ${plane.isNew ? `<div class="new-badge">★ NEW</div>` : ''}
                         <div class="market-item-img" style="background-image:url('${plane.img}')"></div>
                         <div style="font-size:11px;font-weight:bold;margin-bottom:2px;color:#f472b6;">🎈 ${plane.name}</div>
+                        <div style="margin-bottom:3px;">${getRarityTagHtml(id, plane)}</div>
                         <div style="font-size:10px;color:#94a3b8;margin-bottom:3px;">${plane.pax} Seats</div>
                         <div style="font-size:11px;color:${gameState.cash>=getInflatedPrice(plane.price)?'var(--money-color)':'#ef4444'};">$${getInflatedPrice(plane.price).toLocaleString()}</div>
                         ${gameState.rank < plane.minRank ? `<div style="font-size:9px;color:#ef4444;">Rank ${plane.minRank}</div>` : ''}`;
@@ -8607,6 +8876,7 @@ if (groundAllBtn) {
                         ${plane.isNew ? `<div class="new-badge">★ NEW</div>` : ''}
                         <div class="market-item-img" style="background-image:url('${plane.img}')"></div>
                         <div style="font-size:11px;font-weight:bold;margin-bottom:2px;color:#84cc16;">${typeIcon} ${plane.name}</div>
+                        <div style="margin-bottom:3px;">${getRarityTagHtml(id, plane)}</div>
                         <div style="font-size:10px;color:#94a3b8;margin-bottom:3px;">${plane.isCargo ? `${plane.cargo?.toLocaleString()}kg` : `${plane.pax} Seats`}</div>
                         <div style="font-size:11px;color:${gameState.cash>=getInflatedPrice(plane.price)?'var(--money-color)':'#ef4444'};">$${getInflatedPrice(plane.price).toLocaleString()}</div>
                         ${gameState.rank < plane.minRank ? `<div style="font-size:9px;color:#ef4444;">Rank ${plane.minRank}</div>` : ''}`;
@@ -8630,6 +8900,7 @@ if (groundAllBtn) {
                         ${plane.isNew ? `<div class="new-badge">★ NEW</div>` : ''}
                         <div class="market-item-img" style="background-image:url('${plane.img}')"></div>
                         <div style="font-size:11px;font-weight:bold;margin-bottom:2px;color:#a855f7;">🕰️ ${plane.name}</div>
+                        <div style="margin-bottom:3px;">${getRarityTagHtml(id, plane)}</div>
                         <div style="font-size:10px;color:#94a3b8;margin-bottom:3px;">${plane.pax} Seats</div>
                         <div style="font-size:11px;color:${gameState.tokens>=plane.price?'#06B6D4':'#ef4444'};">
     ✈ ${plane.price.toLocaleString()}
@@ -9329,7 +9600,13 @@ if (groundAllBtn) {
             // Floor reflects the event's base severity even with no active fleet yet, so it's never free
             const severityFloor = Math.round(remainingMin * ((Math.abs(ev.earningsMod||0) + Math.abs(ev.demandMod||0)) * 8 + (affectedFleetCount === 0 ? 3 : 0)));
             cost = Math.max(cost, severityFloor, 5);
-            return Math.min(3000, cost);
+            // Higher-rank airlines have deeper pockets and bigger fleets, so cancellations cost more —
+            // scales gently so early-game players aren't priced out, but late-game skips stay meaningful.
+            const rank = gameState.rank || 1;
+            const rankMultiplier = 1 + Math.min(2.5, (rank - 1) * 0.04);
+            cost = Math.round(cost * rankMultiplier);
+            const cap = Math.round(3000 * rankMultiplier);
+            return Math.min(cap, cost);
         }
 
         // Returns true if an event is net-negative for the player (worth being able to cancel)
@@ -9426,7 +9703,15 @@ if (groundAllBtn) {
                 rarityEl.className = `rarity-tag rarity-${ev.rarity}`;
                 box.style.borderColor = color;
                 const scopeEl = document.getElementById('event-popup-scope');
-                scopeEl.textContent = ev.targetName ? `📍 ${ev.targetName.split(' (')[0]}` : (ev.scope === 'global' ? '🌍 Affects all routes' : '');
+                scopeEl.textContent = ''; // cleared, set below with flag support
+                if (ev.targetName) {
+                    let fEl = '';
+                    if (ev.scope === 'airport') fEl = getFlagForAirport(ev.targetName);
+                    else if (ev.scope === 'region' && regions[ev.targetName]) fEl = getFlagHtml(regions[ev.targetName].flag, 14);
+                    scopeEl.innerHTML = `📍 ${fEl ? fEl + ' ' : ''}${ev.targetName.split(' (')[0]}`;
+                } else if (ev.scope === 'global') {
+                    scopeEl.textContent = '🌍 Affects all routes';
+                }
                 document.getElementById('event-popup-desc').textContent = ev.desc;
                 const minsRemaining = Math.round((ev.endTime - Date.now()) / 60000);
                 document.getElementById('event-popup-duration').textContent = `Duration: ~${minsRemaining} minute${minsRemaining !== 1 ? 's' : ''}`;
@@ -9531,7 +9816,13 @@ if (groundAllBtn) {
                     const mins = Math.floor(remaining / 60000);
                     const secs = Math.floor((remaining % 60000) / 1000);
                     const color = rarityColors[ev.rarity] || '#6366f1';
-                    const scopeTag = ev.targetName ? `<span style="color:#94a3b8;font-size:10px;"> · ${ev.targetName.split(' (')[0]}</span>` : '';
+                    let scopeFlag = '';
+                    if (ev.scope === 'airport' && ev.targetName) {
+                        scopeFlag = getFlagForAirport(ev.targetName);
+                    } else if (ev.scope === 'region' && ev.targetName && regions[ev.targetName]) {
+                        scopeFlag = getFlagHtml(regions[ev.targetName].flag, 14);
+                    }
+                    const scopeTag = ev.targetName ? `<span style="color:#94a3b8;font-size:10px;"> · ${scopeFlag ? scopeFlag + ' ' : ''}${ev.targetName.split(' (')[0]}</span>` : '';
                     const mods = [];
                     if (ev.earningsMod > 0) mods.push(`<span style="color:#10b981;">+${Math.round(ev.earningsMod*100)}% earnings</span>`);
                     if (ev.earningsMod < 0) mods.push(`<span style="color:#ef4444;">${Math.round(ev.earningsMod*100)}% earnings</span>`);
@@ -9569,6 +9860,389 @@ if (groundAllBtn) {
         }
 
         // ============================================================
+        // ---- AIRLINE REPUTATION (per-category star ratings + item shop) ----
+        const REPUTATION_ITEMS = {
+            // Layout order: [0]=root, [1,2,3]=branch heads, [4,5,6]=branch mids, [7,8,9]=branch tails.
+            // Branches: Preparedness (1/4/7), Airframe Hardening (2/5/8), Crew & Ops (3/6/9).
+            safety: [
+                { id: 'radar',     name: 'Weather Radar System',       icon: '📡', cost: 12000, scorePts: 10, desc: 'Storms get spotted before they matter — the foundation everything else builds on' },
+                { id: 'kits',      name: 'Emergency Response Kits',    icon: '🧯', cost: 14000, scorePts: 10, desc: 'Prepared for the worst case' },
+                { id: 'airframe',  name: 'Reinforced Airframe',        icon: '🔩', cost: 18000, scorePts: 10, desc: 'Built to take a beating' },
+                { id: 'crew',      name: 'Crew Safety Training',       icon: '🎓', cost: 16000, scorePts: 10, desc: 'Every crew member drilled and ready' },
+                { id: 'fuel',      name: 'Extra Fuel Reserves',        icon: '⛽', cost: 15000, scorePts: 10, desc: 'A cushion for the unexpected — pairs with your response kits' },
+                { id: 'hydraulics',name: 'Redundant Hydraulics',       icon: '🔧', cost: 19000, scorePts: 10, desc: 'A backup for the backup, reinforcing the airframe' },
+                { id: 'deice',     name: 'Ground Deicing Program',     icon: '❄️', cost: 17000, scorePts: 10, desc: 'Clean wings in any weather — an extension of crew discipline' },
+                { id: 'blackbox',  name: 'Black Box Recorders',        icon: '📼', cost: 20000, scorePts: 10, desc: 'Full transparency, always recording — the payoff of full fuel & response readiness' },
+                { id: 'avionics',  name: 'Advanced Avionics Suite',    icon: '🛰️', cost: 24000, scorePts: 10, desc: 'Sharper instruments, fewer surprises — the airframe program matures here' },
+                { id: 'audit',     name: 'Safety Audit Certification', icon: '📑', cost: 28000, scorePts: 10, desc: 'Independently verified, top to bottom — crowns your crew & ops program' },
+            ],
+            // Branches: Ambience (1/4/7), Connectivity (2/5/8), Luxury Seating (3/6/9).
+            fleet: [
+                { id: 'legroom',  name: 'Extra Legroom',             icon: '📏', cost: 12000, scorePts: 10, desc: 'Room to actually stretch out — the baseline comfort upgrade' },
+                { id: 'lighting', name: 'Mood Lighting',             icon: '💡', cost: 10000, scorePts: 10, desc: 'A cabin that sets the tone' },
+                { id: 'charging', name: 'Charging Ports Everywhere', icon: '🔌', cost: 10000, scorePts: 10, desc: 'Never land on a dead battery' },
+                { id: 'leather',  name: 'Leather Seating',           icon: '💺', cost: 13000, scorePts: 10, desc: 'A cabin that feels premium the moment you sit down' },
+                { id: 'noise',    name: 'Noise-Cancelling Cabin',    icon: '🎧', cost: 18000, scorePts: 10, desc: 'A quieter ride from nose to tail — the mood lighting gets company' },
+                { id: 'wifi',     name: 'WiFi Access',               icon: '📶', cost: 16000, scorePts: 10, desc: 'Stay connected at altitude — now with somewhere to plug in' },
+                { id: 'lavatory', name: 'Premium Lavatories',        icon: '🚻', cost: 11000, scorePts: 10, desc: 'The little details passengers notice, seat to stall' },
+                { id: 'redesign', name: 'Cabin Redesign',            icon: '🛋️', cost: 26000, scorePts: 10, desc: 'A cabin that looks brand new — quiet, dark, done' },
+                { id: 'ife',      name: 'In-Flight Entertainment',   icon: '🎬', cost: 22000, scorePts: 10, desc: 'Something to watch on the long haul, streamed over your own WiFi' },
+                { id: 'suites',   name: 'Business Class Suites',     icon: '🛏️', cost: 32000, scorePts: 10, desc: 'A flat-out upgrade for your best fares — luxury seating, fully realized' },
+            ],
+            // Branches: Fine Dining (1/4/7), Beverages (2/5/8), Hospitality (3/6/9).
+            food: [
+                { id: 'snacks',   name: 'Snack Basket',               icon: '🥨', cost: 8000,  scorePts: 10, desc: 'A small touch that goes a long way — where every menu starts' },
+                { id: 'hotmeal',  name: 'Hot Meal Service',           icon: '🍲', cost: 14000, scorePts: 10, desc: 'A proper meal, not just a snack' },
+                { id: 'bevcart',  name: 'Premium Beverage Cart',      icon: '🥤', cost: 11000, scorePts: 10, desc: 'More than just water and coffee' },
+                { id: 'kidsmenu', name: "Kids' Menu Options",         icon: '🧃', cost: 9000,  scorePts: 10, desc: 'Families fly happier when everyone eats' },
+                { id: 'gourmet',  name: 'Gourmet Dining',             icon: '🍽️', cost: 24000, scorePts: 10, desc: 'Restaurant-quality plates — the hot meal program grows up' },
+                { id: 'coffee',   name: 'Specialty Coffee Bar',       icon: '☕', cost: 12000, scorePts: 10, desc: 'A proper cup, not instant packets — the cart gets an upgrade' },
+                { id: 'crewmeal', name: 'Dedicated Cabin Crew',       icon: '🧑\u200d✈️', cost: 16000, scorePts: 10, desc: 'Attentive, table-side service for every passenger onboard' },
+                { id: 'tasting',  name: 'Chef-Curated Tasting Menu',  icon: '👨\u200d🍳', cost: 32000, scorePts: 10, desc: 'A signature dining experience in the sky — gourmet, perfected' },
+                { id: 'dessert',  name: 'Dessert Cart',               icon: '🍰', cost: 13000, scorePts: 10, desc: 'A sweet finish, rolled out after the coffee bar' },
+                { id: 'local',    name: 'Local Cuisine Partnerships', icon: '🍜', cost: 28000, scorePts: 10, desc: 'A taste of the destination — the full hospitality program in one dish' },
+            ],
+        };
+        const REPUTATION_CATEGORIES = [
+            { key: 'safety', label: 'Safety', icon: '🛡️', color: '#3b82f6', perkDesc: '100 perk: an extra 25% slower aircraft wear' },
+            { key: 'fleet', label: 'Fleet Comfort', icon: '✈️', color: '#a855f7', perkDesc: '100 perk: an extra +10% earnings' },
+            { key: 'food', label: 'Food & Service', icon: '🍽️', color: '#f97316', perkDesc: '100 perk: +8% passenger demand on every route' },
+        ];
+        // Node-graph layout for the mastery tree — same 10-node branching shape for every
+        // category. Positions are in percent (0-100) of the tree canvas; edges are index pairs
+        // into REPUTATION_ITEMS[catKey] that get drawn as connector lines. A node unlocks once
+        // it's adjacent (via an edge) to a node you already own — same rule as node-graph skill
+        // trees like Path of Exile's.
+        const REPUTATION_TREE_LAYOUT = {
+            positions: [
+                { x: 50, y: 6 },                                       // 0 root
+                { x: 20, y: 30 }, { x: 50, y: 30 }, { x: 80, y: 30 },   // 1-3 branch heads
+                { x: 20, y: 58 }, { x: 50, y: 58 }, { x: 80, y: 58 },   // 4-6 branch mids
+                { x: 20, y: 86 }, { x: 50, y: 86 }, { x: 80, y: 86 },   // 7-9 branch tails (stay separate — no merge)
+            ],
+            edges: [
+                [0, 1], [0, 2], [0, 3],
+                [1, 4], [2, 5], [3, 6],
+                [4, 7], [5, 8], [6, 9],
+            ],
+        };
+        // Upgrades are purely cosmetic/score — no per-item gameplay bonuses. Owning all 10
+        // upgrades in a category (10 pts each) takes that category's score to exactly 100.
+        // The only functional payoff lives at the category level: hit 100 and the perk above unlocks.
+        const REPUTATION_EQUIP_MAX = 100;
+        function getReputationCostMultiplier() {
+            const rank = gameState.rank || 1;
+            // Smooth, ever-growing scaling so upgrades stay a meaningful sink at high rank
+            // without exploding absurdly: ~1x at rank 1, ~2.5x at rank 100, ~5.7x at rank 1000.
+            return 1 + Math.sqrt(Math.max(0, rank - 1)) * 0.15;
+        }
+        function getReputationItemCost(item) {
+            const scaled = item.cost * getReputationCostMultiplier();
+            return Math.round(scaled / 100) * 100;
+        }
+        function getReputationOwned() {
+            gameState.reputationItemsOwned = gameState.reputationItemsOwned || { safety: [], fleet: [], food: [] };
+            return gameState.reputationItemsOwned;
+        }
+        function getOwnedItems(catKey) {
+            const owned = getReputationOwned()[catKey] || [];
+            return (REPUTATION_ITEMS[catKey] || []).filter(it => owned.includes(it.id));
+        }
+        // Kept only for save-compatibility with older saves; equip slots no longer gate scoring/perks.
+        function getReputationEquippedMap() {
+            gameState.reputationEquipped = gameState.reputationEquipped || { safety: [], fleet: [], food: [] };
+            return gameState.reputationEquipped;
+        }
+        function computeEquipmentScore(catKey) {
+            return getOwnedItems(catKey).reduce((s, it) => s + it.scorePts, 0); // max 100 (10 items x 10pts)
+        }
+        function computeCategoryScore(catKey) {
+            return Math.max(0, Math.min(100, computeEquipmentScore(catKey)));
+        }
+        // ---- Overall airline star rating (1-5), averaged across all three categories ----
+        function getOverallReputationScore() {
+            const total = REPUTATION_CATEGORIES.reduce((s, cat) => s + computeCategoryScore(cat.key), 0);
+            return total / REPUTATION_CATEGORIES.length;
+        }
+        function getOverallStarRating() {
+            const score = getOverallReputationScore();
+            return Math.max(1, Math.min(5, Math.ceil(score / 20)));
+        }
+        // A 1-star airline is in bad enough shape that customers and operations suffer for it —
+        // but new airlines get a grace period (a few ranks) to actually earn cash and buy their
+        // first upgrades before that penalty can kick in.
+        const REPUTATION_DEBUFF_GRACE_RANK = 5;
+        function isInReputationGracePeriod() {
+            return (gameState.rank || 1) < REPUTATION_DEBUFF_GRACE_RANK;
+        }
+        function isOneStarAirline() {
+            return getOverallStarRating() <= 1 && !isInReputationGracePeriod();
+        }
+        const REPUTATION_REVIEWS = {
+            positive: [
+                "Smoothest flight I've had all year AND right on schedule.", "Crew was fantastic, plane felt brand new.",
+                "Booking was easy and the seat was comfier than expected.", "Never had a delay flying with them, impressive.",
+                "Clean cabin, friendly staff, would fly again.", "Best value fare I've found on this route.",
+                "The meal service was a genuinely nice surprise.", "Loved the legroom, didn't expect that for the price.",
+            ],
+            neutral: [
+                "Flight was fine I guess. Nothing too bad, nothing too good.", "Got where I needed to go.",
+                "Average experience, prices are fair.", "Seats could be better but the flight was on time.",
+            ],
+            negative: [
+                "Aircraft felt rough and worn down.", "Delayed again. Who could've guessed?",
+                "Wish they'd invest more in maintenance.", "Bumpy landing and the cabin needed a clean.",
+                "Not sure I'd fly with them again after this trip.", "Food? Yeah right. This is barely edible.",
+            ],
+        };
+        function getReputationPerkActiveMap() {
+            gameState.reputationPerkActive = gameState.reputationPerkActive || { safety: false, fleet: false, food: false };
+            return gameState.reputationPerkActive;
+        }
+        function isReputationPerkActive(key) {
+            return computeCategoryScore(key) >= 100;
+        }
+        // ---- Perk effects, read live wherever the relevant calculation happens ----
+        // Individual upgrades are cosmetic/score-only now; the only functional bonus comes
+        // from maxing a category out to 100. A 1-star overall rating applies debuffs instead.
+        function getReputationEarningsMultiplier() {
+            let mult = 1 + (isReputationPerkActive('fleet') ? 0.10 : 0);
+            if (isOneStarAirline()) mult -= 0.15; // -15% earnings — nobody pays full price to fly a 1-star airline
+            return Math.max(0.5, mult);
+        }
+        function getReputationDemandBonus() {
+            let bonus = isReputationPerkActive('food') ? 0.08 : 0;
+            if (isOneStarAirline()) bonus -= 0.12; // fewer passengers want to book with a 1-star airline
+            return bonus;
+        }
+        function getReputationFoodPaxBonus() {
+            return 0;
+        }
+        function getReputationWearMultiplier() {
+            let mult = isReputationPerkActive('safety') ? 0.75 : 1;
+            if (isOneStarAirline()) mult += 0.20; // neglected fleets wear out faster
+            return mult;
+        }
+        function isReputationItemUnlocked(catKey, itemId) {
+            const items = REPUTATION_ITEMS[catKey] || [];
+            const idx = items.findIndex(it => it.id === itemId);
+            if (idx <= 0) return true; // root node is always unlocked
+            const owned = getReputationOwned()[catKey] || [];
+            const layout = REPUTATION_TREE_LAYOUT;
+            return layout.edges.some(([a, b]) => {
+                if (a === idx && items[b] && owned.includes(items[b].id)) return true;
+                if (b === idx && items[a] && owned.includes(items[a].id)) return true;
+                return false;
+            });
+        }
+        function buyReputationItem(catKey, itemId) {
+            const item = (REPUTATION_ITEMS[catKey] || []).find(it => it.id === itemId);
+            if (!item) return;
+            const owned = getReputationOwned();
+            owned[catKey] = owned[catKey] || [];
+            if (owned[catKey].includes(itemId)) return;
+            if (!isReputationItemUnlocked(catKey, itemId)) {
+                triggerMilestonePopupNotification('🔒 Locked', 'Unlock the upgrade before it on the mastery tree first.');
+                return;
+            }
+            const cost = getReputationItemCost(item);
+            if (gameState.cash < cost) {
+                triggerMilestonePopupNotification('❌ Not Enough Cash', `Need $${cost.toLocaleString()} for ${item.name}`);
+                return;
+            }
+            gameState.cash -= cost;
+            owned[catKey].push(itemId);
+            triggerMilestonePopupNotification(`${item.icon} ${item.name} Purchased`, item.desc);
+            saveProgress(); updateUI(); renderReputationTab();
+        }
+        function pushReputationReview(sentiment) {
+            const pool = REPUTATION_REVIEWS[sentiment] || REPUTATION_REVIEWS.neutral;
+            const text = pool[Math.floor(Math.random() * pool.length)];
+            const stars = sentiment === 'positive' ? (Math.random() < 0.5 ? 5 : 4) : sentiment === 'negative' ? (Math.random() < 0.5 ? 1 : 2) : 3;
+            gameState.reputationReviews = gameState.reputationReviews || [];
+            gameState.reputationReviews.unshift({ text, stars, ts: Date.now() });
+            gameState.reputationReviews = gameState.reputationReviews.slice(0, 12);
+        }
+        function reputationTick() {
+            const now = Date.now();
+            const perkActive = getReputationPerkActiveMap();
+            let avgScore = 0;
+            REPUTATION_CATEGORIES.forEach(cat => {
+                const score = computeCategoryScore(cat.key);
+                avgScore += score;
+                const isMaxed = score >= 100;
+                const was = !!perkActive[cat.key];
+                if (isMaxed && !was) {
+                    perkActive[cat.key] = true;
+                    triggerMilestonePopupNotification(`⭐ ${cat.icon} ${cat.label} reached 100!`, cat.perkDesc);
+                    pushReputationReview('positive');
+                } else if (!isMaxed && was) {
+                    perkActive[cat.key] = false;
+                    triggerMilestonePopupNotification(`📉 ${cat.icon} ${cat.label} dropped below 100`, 'Perk paused until you earn it back.');
+                    pushReputationReview('negative');
+                }
+            });
+            avgScore /= REPUTATION_CATEGORIES.length;
+            const sentiment = avgScore >= 75 ? 'positive' : avgScore <= 40 ? 'negative' : 'neutral';
+            // Ambient reviews trickle in every ~25-45s to keep the feed feeling alive.
+            if (now - (gameState.reputationLastReviewAt || 0) > (25000 + Math.random() * 20000)) {
+                gameState.reputationLastReviewAt = now;
+                pushReputationReview(sentiment);
+            }
+            if (document.getElementById('reputation')?.classList.contains('active')) renderReputationTab();
+        }
+        let _activeRepCategory = 'safety';
+        let _selectedRepNode = {};
+        function switchRepCategory(key) {
+            _activeRepCategory = key;
+            renderReputationTab();
+        }
+        function selectRepNode(catKey, itemId) {
+            _selectedRepNode[catKey] = itemId;
+            renderReputationTab();
+        }
+        // Guards against the periodic refresh yanking a button out from under an in-progress
+        // tap/click (innerHTML replacement mid-gesture is why buttons felt unresponsive).
+        let _repInteracting = false;
+        function renderReputationTab() {
+            if (_repInteracting) return;
+            const switcherEl = document.getElementById('rep-category-switcher');
+            const detailEl = document.getElementById('rep-category-detail');
+            if (!switcherEl || !detailEl) return;
+            const owned = getReputationOwned();
+            const equippedMap = getReputationEquippedMap();
+
+            // ---- Overall airline star rating ----
+            const overallScore = getOverallReputationScore();
+            const overallStars = getOverallStarRating();
+            const ratingEl = document.getElementById('rep-overall-rating');
+            if (ratingEl) {
+                const starRow = Array.from({ length: 5 }).map((_, i) =>
+                    `<span style="font-size:22px;color:${i < overallStars ? 'var(--achievement-color)' : 'var(--card-border)'};">★</span>`
+                ).join('');
+                const oneStarActive = overallStars <= 1 && !isInReputationGracePeriod();
+                const oneStarGrace = overallStars <= 1 && isInReputationGracePeriod();
+                ratingEl.innerHTML = `<div style="background:var(--card-bg);border:1px solid ${oneStarActive ? '#ef4444' : 'var(--card-border)'};border-radius:12px;padding:14px;">
+                    <div style="display:flex;justify-content:space-between;align-items:center;">
+                        <div>
+                            <div style="font-size:9.5px;font-weight:700;color:#64748b;text-transform:uppercase;letter-spacing:1px;margin-bottom:3px;">Overall Airline Rating</div>
+                            <div style="display:flex;align-items:center;gap:2px;">${starRow}</div>
+                        </div>
+                        <div style="text-align:right;">
+                            <div style="font-size:18px;font-weight:800;">${Math.round(overallScore)}<span style="font-size:11px;color:#64748b;font-weight:600;">/100</span></div>
+                        </div>
+                    </div>
+                    ${oneStarActive ? `<div style="margin-top:10px;font-size:10.5px;padding:7px 9px;border-radius:7px;background:rgba(239,68,68,0.12);color:#ef4444;font-weight:700;">⚠ 1-Star Airline — passenger demand −12%, earnings −15%, aircraft wear +20% until you climb out of 1 star</div>` : ''}
+                    ${oneStarGrace ? `<div style="margin-top:10px;font-size:10.5px;padding:7px 9px;border-radius:7px;background:rgba(148,163,184,0.12);color:#94a3b8;font-weight:600;">🛡 New airline grace period — 1-star debuffs are waived until Rank ${REPUTATION_DEBUFF_GRACE_RANK} (currently Rank ${gameState.rank || 1})</div>` : ''}
+                </div>`;
+            }
+
+            // ---- Category pill switcher ----
+            switcherEl.innerHTML = REPUTATION_CATEGORIES.map(cat => {
+                const score = computeCategoryScore(cat.key);
+                const isMaxed = score >= 100;
+                const active = _activeRepCategory === cat.key;
+                return `<button onclick="switchRepCategory('${cat.key}')" style="flex:1;display:flex;flex-direction:column;align-items:center;gap:2px;padding:9px 4px;border-radius:10px;cursor:pointer;border:1.5px solid ${active ? cat.color : 'var(--card-border)'};background:${active ? cat.color + '22' : 'var(--card-bg)'};transition:all .15s;">
+                    <div style="font-size:17px;">${cat.icon}</div>
+                    <div style="font-size:9.5px;font-weight:700;color:${active ? cat.color : '#94a3b8'};">${cat.label}</div>
+                    <div style="font-size:8.5px;color:${isMaxed ? 'var(--achievement-color)' : '#64748b'};">${Math.round(score)}/100${isMaxed ? ' ⭐' : ''}</div>
+                </button>`;
+            }).join('');
+
+            // ---- Selected category detail panel ----
+            const cat = REPUTATION_CATEGORIES.find(c => c.key === _activeRepCategory) || REPUTATION_CATEGORIES[0];
+            const score = computeCategoryScore(cat.key);
+            const isMaxed = score >= 100;
+            const items = REPUTATION_ITEMS[cat.key] || [];
+            const ownedIds = owned[cat.key] || [];
+
+            const layout = REPUTATION_TREE_LAYOUT;
+            const selectedId = _selectedRepNode[cat.key] || items[0]?.id;
+
+            // ---- Connector lines (lit only once BOTH ends are owned) ----
+            const linesSvg = layout.edges.map(([a, b]) => {
+                const pa = layout.positions[a], pb = layout.positions[b];
+                if (!pa || !pb || !items[a] || !items[b]) return '';
+                const lit = ownedIds.includes(items[a].id) && ownedIds.includes(items[b].id);
+                return `<line x1="${pa.x}" y1="${pa.y}" x2="${pb.x}" y2="${pb.y}" stroke="${lit ? cat.color : 'rgba(148,163,184,0.3)'}" stroke-width="${lit ? 0.9 : 0.6}" vector-effect="non-scaling-stroke" />`;
+            }).join('');
+
+            // ---- Nodes, positioned on the canvas ----
+            const nodesHtml = items.map((it, idx) => {
+                const pos = layout.positions[idx] || { x: 50, y: 10 + idx * 9 };
+                const isOwned = ownedIds.includes(it.id);
+                const isUnlocked = isReputationItemUnlocked(cat.key, it.id);
+                const isSelected = selectedId === it.id;
+                const borderColor = isOwned ? cat.color : (isSelected ? '#e2e8f0' : (isUnlocked ? 'rgba(226,232,240,0.55)' : 'var(--card-border)'));
+                return `<button onclick="selectRepNode('${cat.key}','${it.id}')" title="${it.name}" style="position:absolute;left:${pos.x}%;top:${pos.y}%;transform:translate(-50%,-50%);width:15%;max-width:38px;aspect-ratio:1;min-width:30px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:15px;line-height:1;border:${isSelected ? '2.5px' : '1.5px'} solid ${borderColor};background:${isOwned ? cat.color : 'var(--card-bg)'};color:${isOwned ? 'white' : (isUnlocked ? '#e2e8f0' : '#475569')};cursor:pointer;box-shadow:${isSelected ? `0 0 0 4px ${cat.color}33` : 'none'};z-index:2;padding:0;">${isUnlocked ? it.icon : '🔒'}</button>`;
+            }).join('');
+
+            const treeHtml = `<div style="position:relative;width:100%;height:280px;margin-bottom:10px;background:radial-gradient(circle at 50% 0%, rgba(148,163,184,0.06), transparent 70%);border-radius:10px;overflow:hidden;">
+                <svg viewBox="0 0 100 100" preserveAspectRatio="none" style="position:absolute;top:0;left:0;width:100%;height:100%;z-index:1;">${linesSvg}</svg>
+                ${nodesHtml}
+            </div>`;
+
+            // ---- Detail card for whichever node is selected ----
+            const selItem = items.find(it => it.id === selectedId) || items[0];
+            const selOwned = ownedIds.includes(selItem.id);
+            const selUnlocked = isReputationItemUnlocked(cat.key, selItem.id);
+            const selCost = getReputationItemCost(selItem);
+            const selCanAfford = gameState.cash >= selCost;
+            let selBtn;
+            if (selOwned) {
+                selBtn = `<div style="font-size:10.5px;font-weight:700;padding:7px 12px;border-radius:7px;border:1.5px solid ${cat.color};background:${cat.color};color:white;white-space:nowrap;">✓ Owned</div>`;
+            } else if (selUnlocked) {
+                selBtn = `<button onclick="buyReputationItem('${cat.key}','${selItem.id}')" style="font-size:10.5px;font-weight:700;padding:7px 12px;border-radius:7px;border:none;background:${cat.color};color:white;cursor:pointer;opacity:${selCanAfford ? 1 : 0.55};white-space:nowrap;">Unlock — $${selCost.toLocaleString()}</button>`;
+            } else {
+                selBtn = `<div style="font-size:10.5px;font-weight:700;padding:7px 12px;border-radius:7px;border:1px solid var(--card-border);color:#475569;white-space:nowrap;">🔒 Locked</div>`;
+            }
+            const detailCardHtml = `<div style="display:flex;justify-content:space-between;align-items:center;gap:10px;padding:11px;border-radius:9px;background:var(--card-bg);border:1px solid ${selOwned ? cat.color : 'var(--card-border)'};">
+                <div style="display:flex;align-items:center;gap:10px;min-width:0;">
+                    <div style="font-size:22px;flex-shrink:0;">${selUnlocked ? selItem.icon : '🔒'}</div>
+                    <div style="min-width:0;">
+                        <div style="font-size:12px;font-weight:700;">${selItem.name}</div>
+                        <div style="font-size:9.5px;color:#64748b;margin-top:1px;">${selUnlocked ? selItem.desc : 'Locked — unlock a connected node first'} &nbsp;•&nbsp; +${selItem.scorePts} score</div>
+                    </div>
+                </div>
+                ${selBtn}
+            </div>`;
+
+            detailEl.innerHTML = `<div style="background:var(--card-bg);border:1px solid ${isMaxed ? cat.color : 'var(--card-border)'};border-radius:12px;padding:14px;">
+                <div style="margin-bottom:8px;">
+                    <div style="font-size:13px;font-weight:700;">${cat.icon} ${cat.label}</div>
+                    <div style="font-size:9.5px;color:#64748b;margin-top:2px;">${Math.round(score)}/100 reputation score</div>
+                </div>
+                <div style="height:8px;border-radius:4px;background:var(--card-border);overflow:hidden;margin-bottom:10px;">
+                    <div style="height:100%;width:${score}%;background:${cat.color};border-radius:4px;transition:width .3s;"></div>
+                </div>
+                <div style="font-size:10.5px;padding:7px 9px;border-radius:7px;background:${isMaxed ? cat.color + '22' : 'rgba(148,163,184,0.08)'};color:${isMaxed ? cat.color : '#94a3b8'};font-weight:${isMaxed ? '700' : '400'};margin-bottom:12px;">${isMaxed ? '✓ Active — ' : '🔒 '}${cat.perkDesc}</div>
+
+                <div style="font-size:9.5px;font-weight:700;color:#64748b;text-transform:uppercase;letter-spacing:1px;margin-bottom:9px;">🌳 Mastery Tree &nbsp;•&nbsp; ${ownedIds.length}/${items.length} Unlocked</div>
+                ${treeHtml}
+                ${detailCardHtml}
+                <div style="font-size:8.5px;color:#64748b;margin-top:8px;">Tap a node to see it. Unlock a node to open the paths connected to it — own all ${items.length} to reach 100.</div>
+            </div>`;
+
+            // ---- Reviews ----
+            const reviewsEl = document.getElementById('rep-reviews-list');
+            const reviews = gameState.reputationReviews || [];
+            if (reviews.length === 0) {
+                reviewsEl.innerHTML = `<div style="text-align:center;color:#475569;padding:20px;font-size:12px;">No reviews yet — fly some routes and invest in your airline!</div>`;
+            } else {
+                reviewsEl.innerHTML = `<div style="display:flex;flex-direction:column;gap:6px;">${reviews.map(r => {
+                    const starRow = '⭐'.repeat(r.stars) + '☆'.repeat(5 - r.stars);
+                    const barColor = r.stars >= 4 ? '#22c55e' : r.stars === 3 ? '#eab308' : '#ef4444';
+                    return `<div style="display:flex;gap:9px;padding:9px 10px;border-radius:8px;background:var(--card-bg);border:1px solid var(--card-border);border-left:3px solid ${barColor};">
+                        <div style="flex:1;min-width:0;">
+                            <div style="font-size:11px;color:var(--achievement-color);letter-spacing:1px;">${starRow}</div>
+                            <div style="font-size:11px;color:#94a3b8;margin-top:3px;font-style:italic;">"${r.text}"</div>
+                        </div>
+                    </div>`;
+                }).join('')}</div>`;
+            }
+        }
+        let _reputationTabInterval = null;
+        // ============================================================
         let _eventsTabInterval = null;
         function switchTab(tabId) {
             document.querySelectorAll('.tab-content').forEach(el => el.classList.remove('active'));
@@ -9585,6 +10259,31 @@ if (groundAllBtn) {
                     if (typeof renderEventsTab === 'function') renderEventsTab();
                 }, 1000);
             }
+            if (_reputationTabInterval) { clearInterval(_reputationTabInterval); _reputationTabInterval = null; }
+            if (tabId === 'reputation') {
+                if (typeof renderReputationTab === 'function') renderReputationTab();
+                _reputationTabInterval = setInterval(() => {
+                    if (typeof renderReputationTab === 'function') renderReputationTab();
+                }, 2000);
+                setupReputationInteractionGuard();
+            }
+        }
+        let _repGuardSetUp = false;
+        function setupReputationInteractionGuard() {
+            if (_repGuardSetUp) return;
+            _repGuardSetUp = true;
+            const container = document.getElementById('reputation');
+            if (!container) return;
+            const start = () => { _repInteracting = true; };
+            // Small delay on release so the click/tap that just fired has time to finish
+            // (and so a fresh render doesn't immediately swap out the button being tapped).
+            const end = () => { setTimeout(() => { _repInteracting = false; }, 150); };
+            container.addEventListener('pointerdown', start, true);
+            container.addEventListener('pointerup', end, true);
+            container.addEventListener('pointercancel', end, true);
+            container.addEventListener('touchstart', start, { capture: true, passive: true });
+            container.addEventListener('touchend', end, true);
+            container.addEventListener('touchcancel', end, true);
         }
     </script>
 </body>
