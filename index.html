@@ -335,6 +335,7 @@
         .hangar-card-btn .label { font-size:11px; font-weight:bold; }
         .hangar-card-btn .sub-label { font-size:10px; color:#94a3b8; }
         .hangar-detail-img { width:100%; height:150px; background-size:cover; background-position:center; border-radius:6px; margin-bottom:10px; }
+        .hangar-detail-badge-icon { position:absolute; top:-12px; right:-12px; width:44px; height:44px; object-fit:contain; transform:rotate(35deg); filter:drop-shadow(0 2px 5px rgba(0,0,0,0.6)); pointer-events:none; z-index:5; }
         .hangar-stats-table { width:100%; font-size:13px; }
         .category-chip { display:inline-flex; align-items:center; gap:6px; background:rgba(16,185,129,0.12); color:#a7f3d0; border:1px solid rgba(16,185,129,0.24); border-radius:999px; padding:4px 8px; font-size:11px; }
         .category-chip button { background:none; border:none; color:#a7f3d0; cursor:pointer; padding:0; margin:0; font-size:11px; }
@@ -1395,7 +1396,9 @@ z-index:99999;
     </div>
     <!-- HANGAR DETAIL MODAL -->
     <div id="hangar-detail-modal" class="modal-overlay" style="display:none;">
-        <div class="modal-content" style="max-width:420px;">
+        <div style="position:relative;width:95%;max-width:420px;">
+            <img id="hangar-detail-badge-icon" class="hangar-detail-badge-icon" style="display:none;">
+            <div class="modal-content" style="width:100%;max-width:none;">
             <div id="hangar-detail-img" class="hangar-detail-img"></div>
             <h3 id="hangar-detail-name" style="margin-bottom:8px;"></h3>
             <div id="hangar-detail-route" style="font-size:12px;color:#94a3b8;margin-bottom:10px;"></div>
@@ -1404,6 +1407,7 @@ z-index:99999;
             <div style="display:flex;gap:10px;margin-top:15px;">
                 <button class="btn btn-danger" style="margin:0;flex:1;" onclick="closeHangarDetail()">Close</button>
                 <button class="btn" style="margin:0;flex:1;background:#ef4444;" id="hangar-detail-sell-btn" onclick="executeSellFromDetail()">Sell for <span id="hangar-detail-sell-price"></span></button>
+            </div>
             </div>
         </div>
     </div>
@@ -1417,7 +1421,8 @@ z-index:99999;
         const SPEED_SCALE_FACTOR = 0.12; // arcade pacing (not tied to real-world distance/speed) — reverted per request.
         const CESSNA_ICON_B64 = 'https://github.com/WormDude/Airline-Manager-81-3-64/blob/main/cessna.png?raw=true';
         const CONCORDE_ICON_B64 = 'https://github.com/WormDude/Airline-Manager-81-3-64/blob/main/conc.png?raw=true';
-        const WHISPERJET_ICON_B64 = 'https://github.com/WormDude/Airline-Manager-81-3-64/blob/main/727%20crj.png?raw=true';
+      const CRJ727THING_ICON = 'https://github.com/WormDude/Airline-Manager-81-3-64/blob/main/727%20crj.png?raw=true';
+        const BOEING727_ICON_B64 = 'https://github.com/WormDude/Airline-Manager-81-3-64/blob/main/727.png?raw=true';
         const HELICOPTER_ICON_B64 = 'https://github.com/WormDude/Airline-Manager-81-3-64/blob/main/heli.png?raw=true';
         const COFFIN_ICON_B64 = 'https://github.com/WormDude/Airline-Manager-81-3-64/blob/main/md11.png?raw=true';
         const QUEEN_ICON_B64 = 'https://github.com/WormDude/Airline-Manager-81-3-64/blob/main/a380.png?raw=true';
@@ -1446,6 +1451,244 @@ z-index:99999;
         const CIRCLE_ICON_B64 = 'https://github.com/WormDude/Airline-Manager-81-3-64/blob/main/HAB.png?raw=true';
         const BLIMP_ICON_B64 = 'https://github.com/WormDude/Airline-Manager-81-3-64/blob/main/blimp2.png?raw=true';
         const AIRLANDER_ICON_B64 = 'https://github.com/WormDude/Airline-Manager-81-3-64/blob/main/airlander2.png?raw=true';
+      const BOEING737_100_ICON_B64 = 'https://github.com/WormDude/Airline-Manager-81-3-64/blob/main/737-100.png?raw=true';
+      const BOEING737_300_ICON_B64 = 'https://github.com/WormDude/Airline-Manager-81-3-64/blob/main/737-300.png?raw=true';
+      const BOEING737_600_ICON_B64 = 'https://github.com/WormDude/Airline-Manager-81-3-64/blob/main/737-600.png?raw=true';
+      const BOEING767_300_ICON_B64 = 'https://github.com/WormDude/Airline-Manager-81-3-64/blob/main/767-300.png?raw=true';
+      const BOEING777 = 'https://github.com/WormDude/Airline-Manager-81-3-64/blob/main/777.png?raw=true';
+      const BOEING787 = 'https://github.com/WormDude/Airline-Manager-81-3-64/blob/main/787.png?raw=true';
+      const A_200 = 'https://github.com/WormDude/Airline-Manager-81-3-64/blob/main/A-200.png?raw=true';
+      const A220_100_ICON = 'https://github.com/WormDude/Airline-Manager-81-3-64/blob/main/A220-100.png?raw=true';
+      const A220_300_ICON = 'https://github.com/WormDude/Airline-Manager-81-3-64/blob/main/A220-300.png?raw=true';
+      const A300_ICON = 'https://github.com/WormDude/Airline-Manager-81-3-64/blob/main/A300.png?raw=true';
+      const A310_ICON = 'https://github.com/WormDude/Airline-Manager-81-3-64/blob/main/A310.png?raw=true';
+      const A318_ICON = 'https://github.com/WormDude/Airline-Manager-81-3-64/blob/main/A318.png?raw=true';
+      const A320_ICON = 'https://github.com/WormDude/Airline-Manager-81-3-64/blob/main/A320.png?raw=true';
+      const A330_ICON = 'https://github.com/WormDude/Airline-Manager-81-3-64/blob/main/A330.png?raw=true';
+      const A350_ICON = 'https://github.com/WormDude/Airline-Manager-81-3-64/blob/main/A350.png?raw=true';
+      const A400M_ICON = 'https://github.com/WormDude/Airline-Manager-81-3-64/blob/main/A400M.png?raw=true';
+      const AN26_ICON = 'https://github.com/WormDude/Airline-Manager-81-3-64/blob/main/AN26.png?raw=true';
+      const AN72_ICON = 'https://github.com/WormDude/Airline-Manager-81-3-64/blob/main/AN72.png?raw=true';
+      const ANT20_ICON ='https://github.com/WormDude/Airline-Manager-81-3-64/blob/main/ANT-20.png?raw=true';
+      const ATR42_600_ICON ='https://github.com/WormDude/Airline-Manager-81-3-64/blob/main/ATF%2042-600.png?raw=true';
+      const ATR72_ICON = 'https://github.com/WormDude/Airline-Manager-81-3-64/blob/main/ATR%2072.png?raw=true';
+      const AN12_ICON = 'https://github.com/WormDude/Airline-Manager-81-3-64/blob/main/An12.png?raw=true';
+      const BOEING707_ICON = 'https://github.com/WormDude/Airline-Manager-81-3-64/blob/main/B707.png?raw=true';
+      const BAC_1_11_ICON = 'https://github.com/WormDude/Airline-Manager-81-3-64/blob/main/BAC%201-11.png?raw=true';
+      const BELL206_ICON = 'https://github.com/WormDude/Airline-Manager-81-3-64/blob/main/Bell%20206.png?raw=true';
+      const BELL429_ICON = 'https://github.com/WormDude/Airline-Manager-81-3-64/blob/main/Bell%20429.png?raw=true';
+      const C27J_ICON = 'https://github.com/WormDude/Airline-Manager-81-3-64/blob/main/C-27J.png?raw=true';
+      const C17_ICON = 'https://github.com/WormDude/Airline-Manager-81-3-64/blob/main/C17.png?raw=true';
+      const CA60_ICON = 'https://github.com/WormDude/Airline-Manager-81-3-64/blob/main/Ca.60.png?raw=true';
+      const ROTODYNE_ICON = 'https://github.com/WormDude/Airline-Manager-81-3-64/blob/main/Fairey.png?raw=true';
+      const H145_ICON = 'https://github.com/WormDude/Airline-Manager-81-3-64/blob/main/H145.png?raw=true';
+      const K7_ICON = 'https://github.com/WormDude/Airline-Manager-81-3-64/blob/main/K-7.png?raw=true';
+      const TRIMOTOR_ICON = 'https://github.com/WormDude/Airline-Manager-81-3-64/blob/main/Trimotor.png?raw=true';
+      const V12_ICON = 'https://github.com/WormDude/Airline-Manager-81-3-64/blob/main/V-12.png?raw=true';
+      const VOYAGER_ICON = 'https://github.com/WormDude/Airline-Manager-81-3-64/blob/main/Voyager.png?raw=true';
+      const XB70_ICON = 'https://github.com/WormDude/Airline-Manager-81-3-64/blob/main/XB-70.png?raw=true';
+      const BE30_ICON = 'https://github.com/WormDude/Airline-Manager-81-3-64/blob/main/be-30.png?raw=true';
+      const BOEING307_ICON = 'https://github.com/WormDude/Airline-Manager-81-3-64/blob/main/boeing%20307.png?raw=true';
+      const BOEING377_ICON = 'https://github.com/WormDude/Airline-Manager-81-3-64/blob/main/boeing%20377.png?raw=true';
+      const BRABAZON_ICON = 'https://github.com/WormDude/Airline-Manager-81-3-64/blob/main/brabazon.png?raw=true';
+      const C5_ICON = 'https://github.com/WormDude/Airline-Manager-81-3-64/blob/main/c5.png?raw=true';
+      const CATALINA_ICON = 'https://github.com/WormDude/Airline-Manager-81-3-64/blob/main/catalina.png?raw=true';
+      const CONSTELLATION_ICON = 'https://github.com/WormDude/Airline-Manager-81-3-64/blob/main/constellation.png?raw=true';
+      const DOX_ICON = 'https://github.com/WormDude/Airline-Manager-81-3-64/blob/main/do%20x.png?raw=true';
+      const FOKKER100_ICON = 'https://github.com/WormDude/Airline-Manager-81-3-64/blob/main/fokker%20100.png?raw=true';
+      const FOKKER70_ICON = 'https://github.com/WormDude/Airline-Manager-81-3-64/blob/main/fokker%20100.png?raw=true';
+      const IL76_ICON = 'https://github.com/WormDude/Airline-Manager-81-3-64/blob/main/il76.png?raw=true';
+      const IL96_ICON = 'https://github.com/WormDude/Airline-Manager-81-3-64/blob/main/il96.png?raw=true';
+      const ISLANDER_ICON = 'https://github.com/WormDude/Airline-Manager-81-3-64/blob/main/il96.png?raw=true';
+      const KA22_ICON = 'https://github.com/WormDude/Airline-Manager-81-3-64/blob/main/ka-22.png?raw=true';
+      const KA62_ICON = 'https://github.com/WormDude/Airline-Manager-81-3-64/blob/main/ka-62.png?raw=true';
+      const STALLION_ICON = 'https://github.com/WormDude/Airline-Manager-81-3-64/blob/main/king%20stallion.png?raw=true';
+      const L100_ICON = 'https://github.com/WormDude/Airline-Manager-81-3-64/blob/main/l-100.png?raw=true';
+      const MARS_ICON = 'https://github.com/WormDude/Airline-Manager-81-3-64/blob/main/mars.png?raw=true';
+      const MI26_ICON = 'https://github.com/WormDude/Airline-Manager-81-3-64/blob/main/mi-26.png?raw=true';
+      const MI8_ICON = 'https://github.com/WormDude/Airline-Manager-81-3-64/blob/main/mi-8.png?raw=true';
+      const PC12_ICON = 'https://github.com/WormDude/Airline-Manager-81-3-64/blob/main/pc-12.png?raw=true';
+      const PRINCESS_ICON = 'https://github.com/WormDude/Airline-Manager-81-3-64/blob/main/princess.png?raw=true';
+      const R22_ICON = 'https://github.com/WormDude/Airline-Manager-81-3-64/blob/main/r22.png?raw=true';
+      const SKYSHIP_ICON = 'https://github.com/WormDude/Airline-Manager-81-3-64/blob/main/skyship%20500.png?raw=true';
+      const TRILANDER_ICON = 'https://github.com/WormDude/Airline-Manager-81-3-64/blob/main/trislander.png?raw=true';
+      const TU154_ICON = 'https://github.com/WormDude/Airline-Manager-81-3-64/blob/main/tu-154.png?raw=true';
+      const XC99_ICON = 'https://github.com/WormDude/Airline-Manager-81-3-64/blob/main/xc-99.png?raw=true'
+      const A340_ICON = 'https://github.com/WormDude/Airline-Manager-81-3-64/blob/main/a340.png?raw=true';
+      const B757_ICON = 'https://github.com/WormDude/Airline-Manager-81-3-64/blob/main/757%20prob.png?raw=true';
+      const BELUGA_ICON = 'https://github.com/WormDude/Airline-Manager-81-3-64/blob/main/beluga.png?raw=true';
+      const CRANE_ICON = 'https://github.com/WormDude/Airline-Manager-81-3-64/blob/main/skycrane.png?raw=true';
+      const CHINOOK_ICON = 'https://github.com/WormDude/Airline-Manager-81-3-64/blob/main/chinook.png?raw=true';
+      const KMAX_ICON = 'https://github.com/WormDude/Airline-Manager-81-3-64/blob/main/KMAX.png?raw=true';
+        const AIRCRAFT_ICON_LOOKUP = {
+            "Cessna 208 Caravan": CESSNA_ICON_B64,
+            "Cessna 172 Skyhawk": CESSNA_ICON_B64,
+            "Concorde": CONCORDE_ICON_B64,
+            "Boeing 727-200": BOEING727_ICON_B64,
+            "Boeing 717": BOEING727_ICON_B64,
+            "McDonnell Douglas DC-9": BOEING727_ICON_B64,
+            "McDonnell Douglas MD-90": BOEING727_ICON_B64,
+            "McDonnell Douglas MD-80": BOEING727_ICON_B64,
+            "Bell 407 Helicopter": HELICOPTER_ICON_B64,
+            "Mil V-12": V12_ICON,
+            "Sikorsky S-64 Skycrane": CRANE_ICON,
+            "Kaman K-MAX": KMAX_ICON,
+            "Airbus Helicopters H135": HELICOPTER_ICON_B64,
+            "Airbus Helicopters EC160": HELICOPTER_ICON_B64,
+            "Boeing-Vertol H-47 Chinook": CHINOOK_ICON,
+            "Mil Mi-6": HELICOPTER_ICON_B64,
+            "McDonnell Douglas DC-10": COFFIN_ICON_B64,
+            "Vickers VC10": VICKERS_ICON_B64,
+            "Airbus A380": QUEEN_ICON_B64,
+            "Boeing 747-8": KING_ICON_B64,
+            "Boeing 747-4": KING_ICON_B64,
+            "Antonov An-124 Ruslan": KING_ICON_B64,
+            "Lockheed SR-71 Blackbird": SPEEDSTER_ICON_B64,
+            "Lun-Class Ekranoplan": LUNC_ICON_B64,
+            "Antonov An-225 Mriya": UKRAINEGIANT_ICON_B64,
+            "Hughes H-4 Hercules": HERCULE_ICON_B64,
+            "Messerschmitt Me 323 Gigant": GIGANT_ICON_B64,
+            "Scaled Composites Model 351 Stratolaunch": STRATO_ICON_B64,
+            "Wright Flyer": WRIGHT_ICON_B64,
+            "North American XB-70 Valkyrie": XB70_ICON,
+            "Douglas DC-3": OLDDOUG_ICON_B64,
+            "Boeing 314 Clipper": CLIPPER_ICON_B64,
+            "Boeing 747-400 LCF Dreamlifter": DREAMLIFTER_ICON_B64,
+            "Antonov An-22": ANTWOTWO_ICON_B64,
+            "A-90 Orlyonok": ORLYONOK_ICON_B64,
+            "de Havilland Canada DHC-6 Twin Otter": OTTER_ICON_B64,
+            "Bartini Beriev VVA-14": TURTLE_ICON_B64,
+            "Saab 340": SAAB_ICON_B64,
+            "ATR 72-600": SAAB_ICON_B64,
+            "Beechcraft 1900": SAAB_ICON_B64,
+            "Beechcraft King Air": Q400_ICON_B64,
+            "Flying-V": FLYINGV_ICON_B64,
+            "Short 360": SHORT360_ICON_B64,
+            "Airlander 10": AIRLANDER_ICON_B64,
+            "Hot Air Balloon": CIRCLE_ICON_B64,
+            "Boeing 737-100": BOEING737_100_ICON_B64,
+            "Boeing 737-300": BOEING737_300_ICON_B64,
+            "Boeing 737-600": BOEING737_600_ICON_B64,
+            "ATR 42-600": ATR42_600_ICON,
+            "ATR 72 Freighter": ATR72_ICON,
+            "Airbus A220-100": A220_100_ICON,
+            "Airbus A220-300": A220_300_ICON,
+            "Airbus A300": A300_ICON,
+            "Airbus A310": A310_ICON,
+            "Airbus A318": A318_ICON,
+            "Airbus A319": A318_ICON,
+            "Airbus A319neo": A318_ICON,
+            "Airbus A320": A320_ICON,
+            "Airbus A320neo": A320_ICON,
+            "Airbus A321": A320_ICON,
+            "Airbus A321neo": A320_ICON,
+            "Airbus A330-200": A330_ICON,
+            "Airbus A330-200F": A330_ICON,
+            "Airbus A330-300": A330_ICON,
+            "Airbus A350-1000": A350_ICON,
+            "Airbus A350-900": A350_ICON,
+            "Airbus A400M Atlas": A400M_ICON,
+            "Airbus Helicopters H145": H145_ICON,
+            "Alenia C-27J Spartan": C27J_ICON,
+            "Antonov An-12": AN12_ICON,
+            "Antonov An-26": AN26_ICON,
+            "Antonov An-72": AN72_ICON,
+            "Aérospatiale N 262": ATR42_600_ICON,
+            "BAC One-Eleven": BAC_1_11_ICON,
+            "Bell 206 JetRanger": BELL206_ICON,
+            "Bell 429 GlobalRanger": BELL429_ICON,
+            "Beriev Be-30": BE30_ICON,
+            "Boeing 307 Stratoliner": BOEING307_ICON,
+            "Boeing 377 Stratocruiser": BOEING377_ICON,
+            "Boeing 707": BOEING707_ICON,
+            "Boeing 727F": BOEING727_ICON_B64,
+            "Boeing 737 MAX 10": BOEING737_600_ICON_B64,
+            "Boeing 737 MAX 8": BOEING737_600_ICON_B64,
+            "Boeing 737 MAX 9": BOEING737_600_ICON_B64,
+            "Boeing 737-200": BOEING737_100_ICON_B64,
+            "Boeing 737-700": BOEING737_600_ICON_B64,
+            "Boeing 737-800": BOEING737_600_ICON_B64,
+            "Boeing 737-800F": BOEING737_600_ICON_B64,
+            "Boeing 737-900": BOEING737_600_ICON_B64,
+            "Boeing 747-400": KING_ICON_B64,
+            "Boeing 747-8F": KING_ICON_B64,
+            "Boeing 767-300": BOEING767_300_ICON_B64,
+            "Boeing 767-300F": BOEING767_300_ICON_B64,
+            "Boeing 777F": BOEING777,
+            "Boeing 787-9 Dreamliner": BOEING787,
+            "Boeing C-17 Globemaster III": C17_ICON,
+            "Bombardier CRJ-900": CRJ727THING_ICON,
+            "Bombardier CRJ200": CRJ727THING_ICON,
+            "Bombardier CRJ700": CRJ727THING_ICON,
+            "Bombardier Q400": Q400_ICON_B64,
+            "Bristol Brabazon": BRABAZON_ICON,
+            "Britten-Norman BN-2 Islander": ISLANDER_ICON,
+            "Britten-Norman Trislander": TRILANDER_ICON,
+            "COMAC C919": A320_ICON,
+            "Caproni Ca.60 Noviplano": CA60_ICON,
+            "Cessna 208B Cargomaster": CESSNA_ICON_B64,
+            "Cessna 408 SkyCourier": ATR72_ICON,
+            "Consolidated PBY Catalina": CATALINA_ICON,
+            "Convair XC-99": XC99_ICON,
+            "Dornier Do X": DOX_ICON,
+            "Douglas C-47 Skytrain": OLDDOUG_ICON_B64,
+            "Douglas DC-1": OLDDOUG_ICON_B64,
+            "Douglas DC-2": OLDDOUG_ICON_B64,
+            "Douglas DC-8": BOEING707_ICON,
+            "Embraer E145": CRJ727THING_ICON,
+            "Embraer E175": A320_ICON,
+            "Embraer E190": A330_ICON,
+            "Fokker 100": FOKKER100_ICON,
+            "Fokker 50": BE30_ICON,
+            "Fokker 70": FOKKER70_ICON,
+            "Ford Trimotor": TRIMOTOR_ICON,  
+            "Ilyushin Il-76": IL76_ICON,
+            "Ilyushin Il-96": IL96_ICON,
+            "Kamov Ka-22": KA22_ICON,
+            "Kamov Ka-62": KA62_ICON,
+            "LZ 127 Graf Zeppelin": BLIMP_ICON_B64,
+            "LZ 129 Hindenburg": BLIMP_ICON_B64,
+            "Lockheed C-5 Galaxy": C5_ICON,
+            "Lockheed Constellation": CONSTELLATION_ICON,
+            "Lockheed L-100 Hercules": L100_ICON,
+            "Lockheed L-1011 TriStar": COFFIN_ICON_B64,
+            "Martin JRM Mars": MARS_ICON,
+            "McDonnell Douglas MD-11": COFFIN_ICON_B64,
+            "McDonnell Douglas MD-11F": COFFIN_ICON_B64,
+            "Mil Mi-26": MI26_ICON,
+            "Mil Mi-8": MI8_ICON,
+            "Pilatus PC-12": PC12_ICON,
+            "R101": BLIMP_ICON_B64,
+            "Robinson R22": R22_ICON,
+            "Robinson R44": R22_ICON,
+            "Saunders-Roe SR.45 Princess": PRINCESS_ICON,
+            "Sikorsky CH-53K King Stallion": STALLION_ICON,
+            "Skyship 500": SKYSHIP_ICON,
+            "Skyship 600": SKYSHIP_ICON,
+            "Tupolev Tu-154": TU154_ICON,
+            "USS Akron (ZRS-4)": BLIMP_ICON_B64,
+            "USS Macon (ZRS-5)": BLIMP_ICON_B64,
+            "Zeppelin NT": BLIMP_ICON_B64,
+            "Airbus A340": A340_ICON,
+            "Boeing 757-200": B757_ICON,
+            "Airbus Beluga": BELUGA_ICON,
+            "Airbus BelugaXL": BELUGA_ICON,
+            "Beriev Be-200 Altair": A_200,
+            "Kaman K-1125": HELICOPTER_ICON_B64,
+            "Kalinin K-7": K7_ICON,
+            "Tupolev ANT-20": ANT20_ICON,
+            "Rutan Voyager": VOYAGER_ICON,
+            "Fairey Rotodyne": ROTODYNE_ICON,
+        };  
+
+        function getAircraftBadgeIcon(type, spec) {
+            if (AIRCRAFT_ICON_LOOKUP[type]) return AIRCRAFT_ICON_LOOKUP[type];
+            if (spec) {
+                if (spec.type === 'helicopter') return HELICOPTER_ICON_B64;
+                if (spec.category === 'Airship' || spec.type === 'airship') return BLIMP_ICON_B64;
+            }
+            return null;
+        }
         const EARNINGS_MULTIPLIER = 0.28;        // $ per NM per pax — tuned so Cessna earns back price in ~5min active play
         const CARGO_EARNINGS_MULTIPLIER = 0.00055; // $ per NM per kg — cargo is now meaningfully more lucrative than passengers
         const BACKGROUND_EARNINGS_RATIO = 1.0;    // tab-unfocused: no bonus, no penalty
@@ -3389,6 +3632,15 @@ z-index:99999;
             "up_up_and_away":   { title: "Up, Up and Away",          desc: "Purchase an airship or blimp for the first time", unlocked: false, badge: "🎈", rewardDesc: "$25,000 and +15 AeroTokens", rarity: "Rare" },
             "top_gun":          { title: "Top Gun",                  desc: "Purchase a military aircraft for the first time", unlocked: false, badge: "🎖️", rewardDesc: "$50,000 and +20 AeroTokens", rarity: "Rare" },
             "old_school":       { title: "Old School",               desc: "Purchase a legacy aircraft for the first time",   unlocked: false, badge: "🕰️", rewardDesc: "$25,000 and +15 AeroTokens", rarity: "Uncommon" },
+            "second_home":      { title: "Second Home",              desc: "Establish another hub for the first time",       unlocked: false, badge: "🏙️", rewardDesc: "$50,000 and +20 AeroTokens", rarity: "Uncommon" },
+            "first_contract":   { title: "First Contract",           desc: "Complete your first special contract",           unlocked: false, badge: "📜", rewardDesc: "$10,000 and +10 AeroTokens", rarity: "Common" },
+            "contracts_10":     { title: "Contractor",               desc: "Complete 10 special contracts",                  unlocked: false, badge: "🖋️", rewardDesc: "$50,000 and +25 AeroTokens", rarity: "Uncommon" },
+            "contracts_100":    { title: "Contract Baron",           desc: "Complete 100 special contracts",                 unlocked: false, badge: "📚", rewardDesc: "$500,000 and +150 AeroTokens", rarity: "Epic" },
+            "streak_7":         { title: "Weekly Regular",           desc: "Reach a 7 day login streak",                     unlocked: false, badge: "📅", rewardDesc: "$25,000 and +20 AeroTokens", rarity: "Uncommon" },
+            "streak_30":        { title: "Creature of Habit",        desc: "Reach a 30 day login streak",                    unlocked: false, badge: "🗓️", rewardDesc: "$250,000 and +100 AeroTokens", rarity: "Epic" },
+            "five_star_airline": { title: "Five Star Airline",       desc: "Achieve a 5 star overall reputation rating",     unlocked: false, badge: "⭐", rewardDesc: "$300,000 and +75 AeroTokens", rarity: "Epic" },
+            "quests_perfect_day": { title: "Quest Sweep",            desc: "Complete all 5 daily quests for the first time", unlocked: false, badge: "🎯", rewardDesc: "$30,000 and +20 AeroTokens", rarity: "Uncommon" },
+            "manufacturer_collector": { title: "Brand Loyalist",     desc: "Own at least one aircraft from every manufacturer", unlocked: false, badge: "🏭", rewardDesc: "$2,000,000 and +400 AeroTokens", rarity: "Legendary" },
         };
         const DEFAULT_STATE = {
             cash: 0, tokens: 0, rank: 1, xp: 0, airlineName: "", primaryHub: "",
@@ -3414,9 +3666,10 @@ z-index:99999;
             totalRepairs: 0, totalAircraftSold: 0, lifetimeTokensEarned: 0, totalDistanceFlownNM: 0,
             totalLegacyPurchased: 0, totalCargoPurchased: 0, totalHelicopterPurchased: 0, totalMilitaryPurchased: 0,
             totalCashSpent: 0, totalInternationalRoutes: 0, continueFlyingOffline: false,
-            reputationItemsOwned: { safety: [], fleet: [], food: [] }, reputationPerkActive: { safety: false, fleet: false, food: false },
-            reputationEquipped: { safety: [], fleet: [], food: [] }, totalFoodPaxServed: 0,
-            reputationReviews: [], reputationLastReviewAt: 0
+            reputationItemsOwned: { safety: [], fleet: [], food: [], ops: [] }, reputationPerkActive: { safety: false, fleet: false, food: false, ops: false },
+            reputationEquipped: { safety: [], fleet: [], food: [], ops: [] }, totalFoodPaxServed: 0,
+            reputationReviews: [], reputationLastReviewAt: 0,
+            reputationDecay: { safety: 0, fleet: 0, food: 0, ops: 0 }, reputationLastDecayAt: 0
         };
         let uiUpdatePending = false;
         let _lastUiRender = 0;
@@ -3661,6 +3914,23 @@ document.addEventListener('visibilitychange', () => {
         const CRASH_FUEL_THRESHOLD  = 0;      // crash if fuel hits 0 mid-flight
         const CRASH_COND_THRESHOLD  = 5;      // crash if condition hits this mid-flight
         const COOLDOWN_TICKS        = 30;     // # of 100ms ticks for the ground cooldown (~2 seconds)
+        // ---- Freak random crashes — unrelated to fuel/condition, just rare bad luck. Rolled
+        // once per aircraft on every live (real-time) tick (ticks fire every 100ms), so this is
+        // calibrated to average out to roughly one such crash per aircraft per day of continuous
+        // real-time flying (864,000 ticks/day → 1/864000 chance per tick).
+        const RANDOM_CRASH_CHANCE = 1 / 864000;
+        const RANDOM_CRASH_REASONS = {
+            // Only rollable while the aircraft is at/near an airport (progress <= 3 or >= 97).
+            ground: [
+                'overrunning the runway on takeoff 🛬', 'a bird strike during takeoff 🐦', 'an aborted takeoff gone wrong 🚨',
+                'a hard landing 💥', 'a ground collision on the tarmac 🚧', 'a blown tire on the runway 🛞',
+            ],
+            // Only rollable once the aircraft is actually airborne and away from the runway.
+            airborne: [
+                'a mid-air structural failure 🔧', 'a hijacking ☠️', 'severe turbulence 🌪️',
+                'a mid-air collision ✈️', 'a lightning strike ⚡', 'an in-flight engine fire 🔥',
+            ],
+        };
  
         function getAircraftStat(fleetId, key) {
             const id = String(fleetId);
@@ -3855,6 +4125,15 @@ function repairAllGrounded() {
             // First crash achievement
             gameState.totalCrashes = (gameState.totalCrashes || 0) + 1;
             gameState.opsSinceLastCrash = 0; // safety score streak resets on a crash
+            // A crash is the sharpest hit reputation can take — it dents safety hard and
+            // shakes confidence in the fleet generally, on top of whatever gradual wear exists.
+            if (typeof getReputationDecayMap === 'function') {
+                const decayMap = getReputationDecayMap();
+                decayMap.safety = Math.min(100, (decayMap.safety || 0) + 18);
+                decayMap.fleet = Math.min(100, (decayMap.fleet || 0) + 6);
+                decayMap.ops = Math.min(100, (decayMap.ops || 0) + 10); // a crash throws off every schedule downstream of it
+                if (typeof pushReputationReview === 'function') pushReputationReview('negative', 'safety');
+            }
             if (!achievements.first_crash.unlocked) {
                 achievements.first_crash.unlocked = true;
                 gameState.tokens += 5;
@@ -4763,6 +5042,14 @@ if (prize.rarity === 'exotic' && !achievements['hidden_exotic'].unlocked) {
     if (!gameState.totalFoodPaxServed) gameState.totalFoodPaxServed = 0;
     if (!gameState.reputationReviews) gameState.reputationReviews = [];
     if (!gameState.reputationLastReviewAt) gameState.reputationLastReviewAt = 0;
+    if (!gameState.reputationDecay) gameState.reputationDecay = { safety: 0, fleet: 0, food: 0 };
+    if (!gameState.reputationLastDecayAt) gameState.reputationLastDecayAt = 0;
+    // New "Operations" reputation tree — backfill the key on older saves that only know
+    // about safety/fleet/food.
+    if (!gameState.reputationItemsOwned.ops) gameState.reputationItemsOwned.ops = [];
+    if (gameState.reputationPerkActive.ops === undefined) gameState.reputationPerkActive.ops = false;
+    if (!gameState.reputationEquipped.ops) gameState.reputationEquipped.ops = [];
+    if (!gameState.reputationDecay.ops) gameState.reputationDecay.ops = 0;
     if (!gameState.totalInternationalRoutes) gameState.totalInternationalRoutes = 0;
     if (gameState.continueFlyingOffline === undefined) gameState.continueFlyingOffline = false;
     // Reconcile hangarPool against hangar counts per aircraft type. Older saves (and the
@@ -6289,6 +6576,30 @@ const hub =
 
                                 setAircraftStat(f.id, 'fuel', Math.max(0, newFuel));
                                 setAircraftStat(f.id, 'condition', Math.max(0, newCond));
+
+                                // ---- Freak accidents: a small, flat chance per aircraft per live tick
+                                // of an unrelated crash — nothing to do with fuel or condition, just bad
+                                // luck. The cause is picked to match where the plane actually is: ground/
+                                // near-airport mishaps only near takeoff or landing, mid-air incidents only
+                                // once it's actually up at cruise.
+                                if (Math.random() < RANDOM_CRASH_CHANCE * deltaTicks * ((typeof getReputationCrashChanceMultiplier === 'function') ? getReputationCrashChanceMultiplier() : 1)) {
+                                    const nearAirport = f.progress <= 3 || f.progress >= 97;
+                                    const originName = f.directionForward ? route.origin : route.destination;
+                                    const destName = f.directionForward ? route.destination : route.origin;
+                                    const airportName = f.progress >= 97 ? destName : originName;
+                                    const pool = nearAirport ? RANDOM_CRASH_REASONS.ground : RANDOM_CRASH_REASONS.airborne;
+                                    let reason = pool[Math.floor(Math.random() * pool.length)];
+                                    if (nearAirport && airportName) reason += ` at ${airportName}`;
+                                    if (activeFlightMarkers[f.id]) { map.removeLayer(activeFlightMarkers[f.id]); delete activeFlightMarkers[f.id]; }
+                                    if (gameState.hangar[f.type]) { gameState.hangar[f.type]--; if (gameState.hangar[f.type] <= 0) delete gameState.hangar[f.type]; }
+                                    route.fleet.splice(i, 1);
+                                    delete (gameState.aircraftStats || {})[f.id];
+                                    delete (gameState.voluntarilyGrounded || {})[f.id];
+                                    delete (gameState.pendingGround || {})[f.id];
+                                    showCrashModal(f.type, reason, f.id);
+                                    uiDirty = true;
+                                    continue;
+                                }
                             }
 
                             f.progress += progressAdded;
@@ -6480,29 +6791,29 @@ const hub =
                         } else if (f.type === "Concorde") {
                             htmlContent = `<img src="${CONCORDE_ICON_B64}" style="${imgStyle}">`;
                         } else if (f.type === "Boeing 727-200") {
-                            htmlContent = `<img src="${WHISPERJET_ICON_B64}" style="${imgStyle}">`;
+                            htmlContent = `<img src="${BOEING727_ICON_B64}" style="${imgStyle}">`;
                         } else if (f.type === "Boeing 717") {
-                            htmlContent = `<img src="${WHISPERJET_ICON_B64}" style="${imgStyle}">`;
+                            htmlContent = `<img src="${BOEING727_ICON_B64}" style="${imgStyle}">`;
                         } else if (f.type === "McDonnell Douglas DC-9") {
-                            htmlContent = `<img src="${WHISPERJET_ICON_B64}" style="${imgStyle}">`;
+                            htmlContent = `<img src="${BOEING727_ICON_B64}" style="${imgStyle}">`;
                         } else if (f.type === "McDonnell Douglas MD-90") {
-                            htmlContent = `<img src="${WHISPERJET_ICON_B64}" style="${imgStyle}">`;
+                            htmlContent = `<img src="${BOEING727_ICON_B64}" style="${imgStyle}">`;
                         } else if (f.type === "McDonnell Douglas MD-80") {
-                            htmlContent = `<img src="${WHISPERJET_ICON_B64}" style="${imgStyle}">`;
+                            htmlContent = `<img src="${BOEING727_ICON_B64}" style="${imgStyle}">`;
                         } else if (f.type === "Bell 407 Helicopter") {
                             htmlContent = `<img src="${HELICOPTER_ICON_B64}" style="${imgStyle}">`;
                         } else if (f.type === "Mil V-12") {
-                            htmlContent = `<img src="${HELICOPTER_ICON_B64}" style="${imgStyle}">`;
+                            htmlContent = `<img src="${V12_ICON}" style="${imgStyle}">`;
                         } else if (f.type === "Sikorsky S-64 Skycrane") {
-                            htmlContent = `<img src="${HELICOPTER_ICON_B64}" style="${imgStyle}">`;
+                            htmlContent = `<img src="${CRANE_ICON}" style="${imgStyle}">`;
                         } else if (f.type === "Kaman K-MAX") {
-                            htmlContent = `<img src="${HELICOPTER_ICON_B64}" style="${imgStyle}">`;
+                            htmlContent = `<img src="${KMAX_ICON}" style="${imgStyle}">`;
                         } else if (f.type === "Airbus Helicopters H135") {
                             htmlContent = `<img src="${HELICOPTER_ICON_B64}" style="${imgStyle}">`;
                         } else if (f.type === "Airbus Helicopters EC160") {
                             htmlContent = `<img src="${HELICOPTER_ICON_B64}" style="${imgStyle}">`;
                         } else if (f.type === "Boeing-Vertol H-47 Chinook") {
-                            htmlContent = `<img src="${HELICOPTER_ICON_B64}" style="${imgStyle}">`;
+                            htmlContent = `<img src="${CHINOOK_ICON}" style="${imgStyle}">`;
                         } else if (f.type === "Mil Mi-6") {
                             htmlContent = `<img src="${HELICOPTER_ICON_B64}" style="${imgStyle}">`;
                         } else if (f.type === "McDonnell Douglas DC-10") {
@@ -6534,7 +6845,7 @@ const hub =
                         } else if (f.type === "Wright Flyer") {
                             htmlContent = `<img src="${WRIGHT_ICON_B64}" style="${imgStyle}">`;
                         } else if (f.type === "North American XB-70 Valkyrie") {
-                            htmlContent = `<img src="${SPEEDSTER_ICON_B64}" style="${imgStyle}">`;
+                            htmlContent = `<img src="${XB70_ICON}" style="${imgStyle}">`;
                         } else if (f.type === "Douglas DC-3") {
                             htmlContent = `<img src="${OLDDOUG_ICON_B64}" style="${imgStyle}">`;
                         } else if (f.type === "Boeing 314 Clipper") {
@@ -6568,6 +6879,232 @@ const hub =
                             htmlContent = `<img src="${AIRLANDER_ICON_B64}" style="${imgStyle}">`;
                         } else if (f.type === "Hot Air Balloon") {
                             htmlContent = `<img src="${CIRCLE_ICON_B64}" style="${imgStyle}">`;
+                          } else if (f.type === "Boeing 737-100") {
+                            htmlContent = `<img src="${BOEING737_100_ICON_B64}" style="${imgStyle}">`;
+                        } else if (f.type === "Boeing 737-300") {
+                            htmlContent = `<img src="${BOEING737_300_ICON_B64}" style="${imgStyle}">`;
+                                                                 } else if (f.type === "Boeing 737-600") {
+                            htmlContent = `<img src="${BOEING737_600_ICON_B64}" style="${imgStyle}">`;
+                        } else if (f.type === "ATR 42-600") {
+                            htmlContent = `<img src="${ATR42_600_ICON}" style="${imgStyle}">`;
+                        } else if (f.type === "ATR 72 Freighter") {
+                            htmlContent = `<img src="${ATR72_ICON}" style="${imgStyle}">`;
+                        } else if (f.type === "Airbus A220-100") {
+                            htmlContent = `<img src="${A220_100_ICON}" style="${imgStyle}">`;
+                        } else if (f.type === "Airbus A220-300") {
+                            htmlContent = `<img src="${A220_300_ICON}" style="${imgStyle}">`;
+                        } else if (f.type === "Airbus A300") {
+                            htmlContent = `<img src="${A300_ICON}" style="${imgStyle}">`;
+                        } else if (f.type === "Airbus A310") {
+                            htmlContent = `<img src="${A310_ICON}" style="${imgStyle}">`;
+                        } else if (f.type === "Airbus A318") {
+                            htmlContent = `<img src="${A318_ICON}" style="${imgStyle}">`;
+                        } else if (f.type === "Airbus A319") {
+                            htmlContent = `<img src="${A318_ICON}" style="${imgStyle}">`;
+                        } else if (f.type === "Airbus A319neo") {
+                            htmlContent = `<img src="${A318_ICON}" style="${imgStyle}">`;
+                        } else if (f.type === "Airbus A320") {
+                            htmlContent = `<img src="${A320_ICON}" style="${imgStyle}">`;
+                        } else if (f.type === "Airbus A320neo") {
+                            htmlContent = `<img src="${A320_ICON}" style="${imgStyle}">`;
+                        } else if (f.type === "Airbus A321") {
+                            htmlContent = `<img src="${A320_ICON}" style="${imgStyle}">`;
+                        } else if (f.type === "Airbus A321neo") {
+                            htmlContent = `<img src="${A320_ICON}" style="${imgStyle}">`;
+                        } else if (f.type === "Airbus A330-200") {
+                            htmlContent = `<img src="${A330_ICON}" style="${imgStyle}">`;
+                        } else if (f.type === "Airbus A330-200F") {
+                            htmlContent = `<img src="${A330_ICON}" style="${imgStyle}">`;
+                        } else if (f.type === "Airbus A330-300") {
+                            htmlContent = `<img src="${A330_ICON}" style="${imgStyle}">`;
+                        } else if (f.type === "Airbus A350-1000") {
+                            htmlContent = `<img src="${A350_ICON}" style="${imgStyle}">`;
+                        } else if (f.type === "Airbus A350-900") {
+                            htmlContent = `<img src="${A350_ICON}" style="${imgStyle}">`;
+                        } else if (f.type === "Airbus A400M Atlas") {
+                            htmlContent = `<img src="${A400M_ICON}" style="${imgStyle}">`;
+                        } else if (f.type === "Airbus Helicopters H145") {
+                            htmlContent = `<img src="${H145_ICON}" style="${imgStyle}">`;
+                        } else if (f.type === "Alenia C-27J Spartan") {
+                            htmlContent = `<img src="${C27J_ICON}" style="${imgStyle}">`;
+                        } else if (f.type === "Antonov An-12") {
+                            htmlContent = `<img src="${AN12_ICON}" style="${imgStyle}">`;
+                        } else if (f.type === "Antonov An-26") {
+                            htmlContent = `<img src="${AN26_ICON}" style="${imgStyle}">`;
+                        } else if (f.type === "Antonov An-72") {
+                            htmlContent = `<img src="${AN72_ICON}" style="${imgStyle}">`;
+                        } else if (f.type === "Aérospatiale N 262") {
+                            htmlContent = `<img src="${ATR42_600_ICON}" style="${imgStyle}">`;
+                        } else if (f.type === "BAC One-Eleven") {
+                            htmlContent = `<img src="${BAC_1_11_ICON}" style="${imgStyle}">`;
+                        } else if (f.type === "Bell 206 JetRanger") {
+                            htmlContent = `<img src="${BELL206_ICON}" style="${imgStyle}">`;
+                        } else if (f.type === "Bell 429 GlobalRanger") {
+                            htmlContent = `<img src="${BELL429_ICON}" style="${imgStyle}">`;
+                        } else if (f.type === "Beriev Be-30") {
+                            htmlContent = `<img src="${BE30_ICON}" style="${imgStyle}">`;
+                        } else if (f.type === "Boeing 307 Stratoliner") {
+                            htmlContent = `<img src="${BOEING307_ICON}" style="${imgStyle}">`;
+                        } else if (f.type === "Boeing 377 Stratocruiser") {
+                            htmlContent = `<img src="${BOEING377_ICON}" style="${imgStyle}">`;
+                        } else if (f.type === "Boeing 707") {
+                            htmlContent = `<img src="${BOEING707_ICON}" style="${imgStyle}">`;
+                        } else if (f.type === "Boeing 727F") {
+                            htmlContent = `<img src="${BOEING727_ICON_B64}" style="${imgStyle}">`;
+                        } else if (f.type === "Boeing 737 MAX 10") {
+                            htmlContent = `<img src="${BOEING737_600_ICON_B64}" style="${imgStyle}">`;
+                        } else if (f.type === "Boeing 737 MAX 8") {
+                            htmlContent = `<img src="${BOEING737_600_ICON_B64}" style="${imgStyle}">`;
+                        } else if (f.type === "Boeing 737 MAX 9") {
+                            htmlContent = `<img src="${BOEING737_600_ICON_B64}" style="${imgStyle}">`;
+                        } else if (f.type === "Boeing 737-200") {
+                            htmlContent = `<img src="${BOEING737_100_ICON_B64}" style="${imgStyle}">`;
+                        } else if (f.type === "Boeing 737-700") {
+                            htmlContent = `<img src="${BOEING737_600_ICON_B64}" style="${imgStyle}">`;
+                        } else if (f.type === "Boeing 737-800") {
+                            htmlContent = `<img src="${BOEING737_600_ICON_B64}" style="${imgStyle}">`;
+                        } else if (f.type === "Boeing 737-800F") {
+                            htmlContent = `<img src="${BOEING737_600_ICON_B64}" style="${imgStyle}">`;
+                        } else if (f.type === "Boeing 737-900") {
+                            htmlContent = `<img src="${BOEING737_600_ICON_B64}" style="${imgStyle}">`;
+                        } else if (f.type === "Boeing 747-400") {
+                            htmlContent = `<img src="${KING_ICON_B64}" style="${imgStyle}">`;
+                        } else if (f.type === "Boeing 747-8F") {
+                            htmlContent = `<img src="${KING_ICON_B64}" style="${imgStyle}">`;
+                        } else if (f.type === "Boeing 767-300") {
+                            htmlContent = `<img src="${BOEING767_300_ICON_B64}" style="${imgStyle}">`;
+                        } else if (f.type === "Boeing 767-300F") {
+                            htmlContent = `<img src="${BOEING767_300_ICON_B64}" style="${imgStyle}">`;
+                        } else if (f.type === "Boeing 777F") {
+                            htmlContent = `<img src="${BOEING777}" style="${imgStyle}">`;
+                        } else if (f.type === "Boeing 787-9 Dreamliner") {
+                            htmlContent = `<img src="${BOEING787}" style="${imgStyle}">`;
+                        } else if (f.type === "Boeing C-17 Globemaster III") {
+                            htmlContent = `<img src="${C17_ICON}" style="${imgStyle}">`;
+                        } else if (f.type === "Bombardier CRJ-900") {
+                            htmlContent = `<img src="${CRJ727THING_ICON}" style="${imgStyle}">`;
+                        } else if (f.type === "Bombardier CRJ200") {
+                            htmlContent = `<img src="${CRJ727THING_ICON}" style="${imgStyle}">`;
+                        } else if (f.type === "Bombardier CRJ700") {
+                            htmlContent = `<img src="${CRJ727THING_ICON}" style="${imgStyle}">`;
+                        } else if (f.type === "Bombardier Q400") {
+                            htmlContent = `<img src="${Q400_ICON_B64}" style="${imgStyle}">`;
+                        } else if (f.type === "Bristol Brabazon") {
+                            htmlContent = `<img src="${BRABAZON_ICON}" style="${imgStyle}">`;
+                        } else if (f.type === "Britten-Norman BN-2 Islander") {
+                            htmlContent = `<img src="${ISLANDER_ICON}" style="${imgStyle}">`;
+                        } else if (f.type === "Britten-Norman Trislander") {
+                            htmlContent = `<img src="${TRILANDER_ICON}" style="${imgStyle}">`;
+                        } else if (f.type === "COMAC C919") {
+                            htmlContent = `<img src="${A320_ICON}" style="${imgStyle}">`;
+                        } else if (f.type === "Caproni Ca.60 Noviplano") {
+                            htmlContent = `<img src="${CA60_ICON}" style="${imgStyle}">`;
+                        } else if (f.type === "Cessna 208B Cargomaster") {
+                            htmlContent = `<img src="${CESSNA_ICON_B64}" style="${imgStyle}">`;
+                        } else if (f.type === "Cessna 408 SkyCourier") {
+                            htmlContent = `<img src="${ATR72_ICON}" style="${imgStyle}">`;
+                        } else if (f.type === "Consolidated PBY Catalina") {
+                            htmlContent = `<img src="${CATALINA_ICON}" style="${imgStyle}">`;
+                        } else if (f.type === "Convair XC-99") {
+                            htmlContent = `<img src="${XC99_ICON}" style="${imgStyle}">`;
+                        } else if (f.type === "Dornier Do X") {
+                            htmlContent = `<img src="${DOX_ICON}" style="${imgStyle}">`;
+                        } else if (f.type === "Douglas C-47 Skytrain") {
+                            htmlContent = `<img src="${OLDDOUG_ICON_B64}" style="${imgStyle}">`;
+                        } else if (f.type === "Douglas DC-1") {
+                            htmlContent = `<img src="${OLDDOUG_ICON_B64}" style="${imgStyle}">`;
+                        } else if (f.type === "Douglas DC-2") {
+                            htmlContent = `<img src="${OLDDOUG_ICON_B64}" style="${imgStyle}">`;
+                        } else if (f.type === "Douglas DC-8") {
+                            htmlContent = `<img src="${BOEING707_ICON}" style="${imgStyle}">`;
+                        } else if (f.type === "Embraer E145") {
+                            htmlContent = `<img src="${CRJ727THING_ICON}" style="${imgStyle}">`;
+                        } else if (f.type === "Embraer E175") {
+                            htmlContent = `<img src="${A320_ICON}" style="${imgStyle}">`;
+                        } else if (f.type === "Embraer E190") {
+                            htmlContent = `<img src="${A330_ICON}" style="${imgStyle}">`;
+                        } else if (f.type === "Fokker 100") {
+                            htmlContent = `<img src="${FOKKER100_ICON}" style="${imgStyle}">`;
+                        } else if (f.type === "Fokker 50") {
+                            htmlContent = `<img src="${BE30_ICON}" style="${imgStyle}">`;
+                        } else if (f.type === "Fokker 70") {
+                            htmlContent = `<img src="${FOKKER70_ICON}" style="${imgStyle}">`;
+                        } else if (f.type === "Ford Trimotor") {
+                            htmlContent = `<img src="${TRIMOTOR_ICON}" style="${imgStyle}">`;
+                        } else if (f.type === "Ilyushin Il-76") {
+                            htmlContent = `<img src="${IL76_ICON}" style="${imgStyle}">`;
+                        } else if (f.type === "Ilyushin Il-96") {
+                            htmlContent = `<img src="${IL96_ICON}" style="${imgStyle}">`;
+                        } else if (f.type === "Kamov Ka-22") {
+                            htmlContent = `<img src="${KA22_ICON}" style="${imgStyle}">`;
+                        } else if (f.type === "Kamov Ka-62") {
+                            htmlContent = `<img src="${KA62_ICON}" style="${imgStyle}">`;
+                        } else if (f.type === "LZ 127 Graf Zeppelin") {
+                            htmlContent = `<img src="${BLIMP_ICON_B64}" style="${imgStyle}">`;
+                        } else if (f.type === "LZ 129 Hindenburg") {
+                            htmlContent = `<img src="${BLIMP_ICON_B64}" style="${imgStyle}">`;
+                        } else if (f.type === "Lockheed C-5 Galaxy") {
+                            htmlContent = `<img src="${C5_ICON}" style="${imgStyle}">`;
+                        } else if (f.type === "Lockheed Constellation") {
+                            htmlContent = `<img src="${CONSTELLATION_ICON}" style="${imgStyle}">`;
+                        } else if (f.type === "Lockheed L-100 Hercules") {
+                            htmlContent = `<img src="${L100_ICON}" style="${imgStyle}">`;
+                        } else if (f.type === "Lockheed L-1011 TriStar") {
+                            htmlContent = `<img src="${COFFIN_ICON_B64}" style="${imgStyle}">`;
+                        } else if (f.type === "Martin JRM Mars") {
+                            htmlContent = `<img src="${MARS_ICON}" style="${imgStyle}">`;
+                        } else if (f.type === "McDonnell Douglas MD-11") {
+                            htmlContent = `<img src="${COFFIN_ICON_B64}" style="${imgStyle}">`;
+                        } else if (f.type === "McDonnell Douglas MD-11F") {
+                            htmlContent = `<img src="${COFFIN_ICON_B64}" style="${imgStyle}">`;
+                        } else if (f.type === "Mil Mi-26") {
+                            htmlContent = `<img src="${MI26_ICON}" style="${imgStyle}">`;
+                        } else if (f.type === "Mil Mi-8") {
+                            htmlContent = `<img src="${MI8_ICON}" style="${imgStyle}">`;
+                        } else if (f.type === "Pilatus PC-12") {
+                            htmlContent = `<img src="${PC12_ICON}" style="${imgStyle}">`;
+                        } else if (f.type === "R101") {
+                            htmlContent = `<img src="${BLIMP_ICON_B64}" style="${imgStyle}">`;
+                        } else if (f.type === "Robinson R22") {
+                            htmlContent = `<img src="${R22_ICON}" style="${imgStyle}">`;
+                        } else if (f.type === "Robinson R44") {
+                            htmlContent = `<img src="${R22_ICON}" style="${imgStyle}">`;
+                        } else if (f.type === "Saunders-Roe SR.45 Princess") {
+                            htmlContent = `<img src="${PRINCESS_ICON}" style="${imgStyle}">`;
+                        } else if (f.type === "Sikorsky CH-53K King Stallion") {
+                            htmlContent = `<img src="${STALLION_ICON}" style="${imgStyle}">`;
+                        } else if (f.type === "Skyship 500") {
+                            htmlContent = `<img src="${SKYSHIP_ICON}" style="${imgStyle}">`;
+                        } else if (f.type === "Skyship 600") {
+                            htmlContent = `<img src="${SKYSHIP_ICON}" style="${imgStyle}">`;
+                        } else if (f.type === "Tupolev Tu-154") {
+                            htmlContent = `<img src="${TU154_ICON}" style="${imgStyle}">`;
+                        } else if (f.type === "USS Akron (ZRS-4)") {
+                            htmlContent = `<img src="${BLIMP_ICON_B64}" style="${imgStyle}">`;
+                        } else if (f.type === "USS Macon (ZRS-5)") {
+                            htmlContent = `<img src="${BLIMP_ICON_B64}" style="${imgStyle}">`;
+                        } else if (f.type === "Zeppelin NT") {
+                            htmlContent = `<img src="${BLIMP_ICON_B64}" style="${imgStyle}">`;
+                        } else if (f.type === "Airbus A340") {
+                            htmlContent = `<img src="${A340_ICON}" style="${imgStyle}">`;
+                        } else if (f.type === "Boeing 757-200") {
+                            htmlContent = `<img src="${B757_ICON}" style="${imgStyle}">`;
+                        } else if (f.type === "Airbus Beluga") {
+                            htmlContent = `<img src="${BELUGA_ICON}" style="${imgStyle}">`;
+                        } else if (f.type === "Airbus BelugaXL") {
+                            htmlContent = `<img src="${BELUGA_ICON}" style="${imgStyle}">`;
+                        } else if (f.type === "Beriev Be-200 Altair") {
+                            htmlContent = `<img src="${A_200}" style="${imgStyle}">`;
+                        } else if (f.type === "Kaman K-1125") {
+                            htmlContent = `<img src="${HELICOPTER_ICON_B64}" style="${imgStyle}">`;
+                        } else if (f.type === "Kalinin K-7") {
+                            htmlContent = `<img src="${K7_ICON}" style="${imgStyle}">`;
+                        } else if (f.type === "Tupolev ANT-20") {
+                            htmlContent = `<img src="${ANT20_ICON}" style="${imgStyle}">`;
+                        } else if (f.type === "Rutan Voyager") {
+                            htmlContent = `<img src="${VOYAGER_ICON}" style="${imgStyle}">`;
+                        } else if (f.type === "Fairey Rotodyne") {
+                            htmlContent = `<img src="${ROTODYNE_ICON}" style="${imgStyle}">`;
                         } else if (isAirship) {
                             htmlContent = `<img src="${BLIMP_ICON_B64}" style="${imgStyle}">`;
                         } else {
@@ -8523,6 +9060,58 @@ if (!achievements.route_it_ns.unlocked && routeExists("Bolzano Airport", "Lamped
                 triggerMilestonePopupNotification(achievements.helicopter_squadron.title, achievements.helicopter_squadron.rewardDesc);
             }
 
+            // Second Home: establish another hub for the first time
+            if (!achievements.second_home.unlocked && (gameState.totalHubsPurchased || 0) >= 1) {
+                achievements.second_home.unlocked = true; gameState.cash += 50000; gameState.tokens += 20;
+                triggerMilestonePopupNotification(achievements.second_home.title, achievements.second_home.rewardDesc);
+            }
+
+            // First Contract / Contractor / Contract Baron: special contracts completed
+            if (!achievements.first_contract.unlocked && (gameState.totalContractsCompleted || 0) >= 1) {
+                achievements.first_contract.unlocked = true; gameState.cash += 10000; gameState.tokens += 10;
+                triggerMilestonePopupNotification(achievements.first_contract.title, achievements.first_contract.rewardDesc);
+            }
+            if (!achievements.contracts_10.unlocked && (gameState.totalContractsCompleted || 0) >= 10) {
+                achievements.contracts_10.unlocked = true; gameState.cash += 50000; gameState.tokens += 25;
+                triggerMilestonePopupNotification(achievements.contracts_10.title, achievements.contracts_10.rewardDesc);
+            }
+            if (!achievements.contracts_100.unlocked && (gameState.totalContractsCompleted || 0) >= 100) {
+                achievements.contracts_100.unlocked = true; gameState.cash += 500000; gameState.tokens += 150;
+                triggerMilestonePopupNotification(achievements.contracts_100.title, achievements.contracts_100.rewardDesc);
+            }
+
+            // Weekly Regular / Creature of Habit: login streak milestones
+            if (!achievements.streak_7.unlocked && (gameState.loginStreak || 0) >= 7) {
+                achievements.streak_7.unlocked = true; gameState.cash += 25000; gameState.tokens += 20;
+                triggerMilestonePopupNotification(achievements.streak_7.title, achievements.streak_7.rewardDesc);
+            }
+            if (!achievements.streak_30.unlocked && (gameState.loginStreak || 0) >= 30) {
+                achievements.streak_30.unlocked = true; gameState.cash += 250000; gameState.tokens += 100;
+                triggerMilestonePopupNotification(achievements.streak_30.title, achievements.streak_30.rewardDesc);
+            }
+
+            // Five Star Airline: overall reputation rating hits 5 stars
+            if (!achievements.five_star_airline.unlocked && typeof getOverallStarRating === 'function' && getOverallStarRating() >= 5) {
+                achievements.five_star_airline.unlocked = true; gameState.cash += 300000; gameState.tokens += 75;
+                triggerMilestonePopupNotification(achievements.five_star_airline.title, achievements.five_star_airline.rewardDesc);
+            }
+
+            // Quest Sweep: all 5 daily quests cleared in one day for the first time
+            if (!achievements.quests_perfect_day.unlocked && gameState.questsBonusClaimed) {
+                achievements.quests_perfect_day.unlocked = true; gameState.cash += 30000; gameState.tokens += 20;
+                triggerMilestonePopupNotification(achievements.quests_perfect_day.title, achievements.quests_perfect_day.rewardDesc);
+            }
+
+            // Brand Loyalist: own at least one aircraft from every manufacturer
+            if (!achievements.manufacturer_collector.unlocked) {
+                const allManufacturers = new Set(Object.keys(allCraftsSpecs).map(t => getAircraftManufacturer(t)));
+                const ownedManufacturers = new Set([...ownedTypes].map(t => getAircraftManufacturer(t)));
+                if (allManufacturers.size > 0 && [...allManufacturers].every(m => ownedManufacturers.has(m))) {
+                    achievements.manufacturer_collector.unlocked = true; gameState.cash += 2000000; gameState.tokens += 400;
+                    triggerMilestonePopupNotification(achievements.manufacturer_collector.title, achievements.manufacturer_collector.rewardDesc);
+                }
+            }
+
             // The Completionist: every OTHER achievement unlocked (checked last so it can't unlock itself early)
             if (!achievements.completionist.unlocked && Object.entries(achievements).every(([key, a]) => key === 'completionist' || a.unlocked)) {
                 achievements.completionist.unlocked = true; gameState.cash += 25000000; gameState.tokens += 10000;
@@ -9599,6 +10188,15 @@ if (groundAllBtn) {
            
             document.getElementById('hangar-detail-img').style.backgroundImage = `url('${spec.img}')`;
             document.getElementById('hangar-detail-name').innerText = type;
+
+            const badgeIconEl = document.getElementById('hangar-detail-badge-icon');
+            const badgeIconUrl = getAircraftBadgeIcon(type, spec);
+            if (badgeIconUrl) {
+                badgeIconEl.src = badgeIconUrl;
+                badgeIconEl.style.display = 'block';
+            } else {
+                badgeIconEl.style.display = 'none';
+            }
            
             // Find route info
             let routeInfo = 'Idle in hangar';
@@ -10206,11 +10804,25 @@ if (groundAllBtn) {
                 { id: 'dessert',  name: 'Dessert Cart',               icon: '🍰', cost: 13000, scorePts: 10, desc: 'A sweet finish, rolled out after the coffee bar' },
                 { id: 'local',    name: 'Local Cuisine Partnerships', icon: '🍜', cost: 28000, scorePts: 10, desc: 'A taste of the destination — the full hospitality program in one dish' },
             ],
+            // Branches: Scheduling Tech (1/4/7), Ground Handling (2/5/8), Crew Scheduling (3/6/9).
+            ops: [
+                { id: 'dashboard',  name: 'Flight Ops Dashboard',       icon: '📊', cost: 13000, scorePts: 10, desc: 'A single source of truth for every departure — the base everything else plugs into' },
+                { id: 'gateopt',    name: 'Gate Optimization Software', icon: '🛫', cost: 15000, scorePts: 10, desc: 'Fewer gate conflicts, faster turnarounds' },
+                { id: 'groundcrew', name: 'Ground Crew Training',       icon: '🧑\u200d🔧', cost: 14000, scorePts: 10, desc: 'A well-drilled ramp team keeps everything on schedule' },
+                { id: 'crewsched',  name: 'Crew Scheduling System',     icon: '🗓️', cost: 17000, scorePts: 10, desc: 'The right crew, in the right place, on time' },
+                { id: 'autodisp',   name: 'Automated Dispatch',         icon: '🤖', cost: 21000, scorePts: 10, desc: 'Routing decisions made in seconds, not minutes — builds on the gate software' },
+                { id: 'turnaround', name: 'Rapid Turnaround Teams',     icon: '⚡', cost: 19000, scorePts: 10, desc: 'Wheels-up again in record time — the ground crew program matures here' },
+                { id: 'reservecrew',name: 'Reserve Crew Pool',          icon: '👥', cost: 18000, scorePts: 10, desc: 'A bench of ready crews so one sick call never grounds a flight' },
+                { id: 'predictive', name: 'Predictive Delay Analytics', icon: '📈', cost: 26000, scorePts: 10, desc: "Sees tomorrow's bottleneck today — the dispatch program, fully realized" },
+                { id: 'rampsafety', name: 'Ramp Safety Certification', icon: '🦺', cost: 23000, scorePts: 10, desc: 'Independently verified ground operations — crowns the turnaround program' },
+                { id: 'fatigue',    name: 'Fatigue Risk Management',    icon: '😴', cost: 27000, scorePts: 10, desc: 'Crews that are actually rested — the reserve pool, done right' },
+            ],
         };
         const REPUTATION_CATEGORIES = [
             { key: 'safety', label: 'Safety', icon: '🛡️', color: '#3b82f6', perkDesc: '100 perk: an extra 25% slower aircraft wear' },
             { key: 'fleet', label: 'Fleet Comfort', icon: '✈️', color: '#a855f7', perkDesc: '100 perk: an extra +10% earnings' },
             { key: 'food', label: 'Food & Service', icon: '🍽️', color: '#f97316', perkDesc: '100 perk: +8% passenger demand on every route' },
+            { key: 'ops', label: 'Operations', icon: '🕐', color: '#84cc16', perkDesc: '100 perk: -20% chance of freak accidents' },
         ];
         // Node-graph layout for the mastery tree — same 10-node branching shape for every
         // category. Positions are in percent (0-100) of the tree canvas; edges are index pairs
@@ -10245,7 +10857,8 @@ if (groundAllBtn) {
             return Math.round(scaled / 100) * 100;
         }
         function getReputationOwned() {
-            gameState.reputationItemsOwned = gameState.reputationItemsOwned || { safety: [], fleet: [], food: [] };
+            gameState.reputationItemsOwned = gameState.reputationItemsOwned || { safety: [], fleet: [], food: [], ops: [] };
+            if (!gameState.reputationItemsOwned.ops) gameState.reputationItemsOwned.ops = [];
             return gameState.reputationItemsOwned;
         }
         function getOwnedItems(catKey) {
@@ -10254,14 +10867,49 @@ if (groundAllBtn) {
         }
         // Kept only for save-compatibility with older saves; equip slots no longer gate scoring/perks.
         function getReputationEquippedMap() {
-            gameState.reputationEquipped = gameState.reputationEquipped || { safety: [], fleet: [], food: [] };
+            gameState.reputationEquipped = gameState.reputationEquipped || { safety: [], fleet: [], food: [], ops: [] };
+            if (!gameState.reputationEquipped.ops) gameState.reputationEquipped.ops = [];
             return gameState.reputationEquipped;
         }
         function computeEquipmentScore(catKey) {
             return getOwnedItems(catKey).reduce((s, it) => s + it.scorePts, 0); // max 100 (10 items x 10pts)
         }
+        // ---- Reputation decay ("wear") — upgrades set your ceiling, but standards slip if you
+        // don't keep reinvesting. This is what makes holding 5 stars an ongoing cost instead of
+        // a one-time purchase: decay only accrues once a category is fully built out (100 base),
+        // and passengers/press are less forgiving the bigger your airline gets.
+        function getReputationDecayMap() {
+            gameState.reputationDecay = gameState.reputationDecay || { safety: 0, fleet: 0, food: 0, ops: 0 };
+            if (gameState.reputationDecay.ops === undefined) gameState.reputationDecay.ops = 0;
+            return gameState.reputationDecay;
+        }
         function computeCategoryScore(catKey) {
-            return Math.max(0, Math.min(100, computeEquipmentScore(catKey)));
+            const base = Math.max(0, Math.min(100, computeEquipmentScore(catKey)));
+            const decay = getReputationDecayMap()[catKey] || 0;
+            return Math.max(0, Math.min(100, base - decay));
+        }
+        // Cash cost to fully re-polish a category back to its equipment ceiling. Scales with
+        // rank like everything else, and with how much ground there is to make up.
+        function getReputationMaintainCost(catKey) {
+            const decay = getReputationDecayMap()[catKey] || 0;
+            if (decay <= 0) return 0;
+            const base = 6000 + decay * 900;
+            return Math.round(base * getReputationCostMultiplier() / 50) * 50;
+        }
+        function maintainReputationCategory(catKey) {
+            const decayMap = getReputationDecayMap();
+            const decay = decayMap[catKey] || 0;
+            if (decay <= 0) return;
+            const cost = getReputationMaintainCost(catKey);
+            if (gameState.cash < cost) {
+                triggerMilestonePopupNotification('❌ Not Enough Cash', `Need $${cost.toLocaleString()} to restore standards`);
+                return;
+            }
+            gameState.cash -= cost;
+            decayMap[catKey] = 0;
+            const cat = REPUTATION_CATEGORIES.find(c => c.key === catKey);
+            triggerMilestonePopupNotification(`${cat ? cat.icon : '✨'} Standards Restored`, `${cat ? cat.label : catKey} is back to full polish.`);
+            saveProgress(); updateUI(); renderReputationTab();
         }
         // ---- Overall airline star rating (1-5), averaged across all three categories ----
         function getOverallReputationScore() {
@@ -10287,7 +10935,7 @@ if (groundAllBtn) {
                 "Smoothest flight I've had all year AND right on schedule.", "Crew was fantastic, plane felt brand new.",
                 "Booking was easy and the seat was comfier than expected.", "Never had a delay flying with them, impressive.",
                 "Clean cabin, friendly staff, would fly again.", "Best value fare I've found on this route.",
-                "The meal service was a genuinely nice surprise.", "Loved the legroom, didn't expect that for the price.",
+                "The meal service was a genuinely nice surprise.", "Loved the legroom, didn't expect that for the price.", "my momy telled me to giev u 5 starz"
             ],
             neutral: [
                 "Flight was fine I guess. Nothing too bad, nothing too good.", "Got where I needed to go.",
@@ -10296,11 +10944,34 @@ if (groundAllBtn) {
             negative: [
                 "Aircraft felt rough and worn down.", "Delayed again. Who could've guessed?",
                 "Wish they'd invest more in maintenance.", "Bumpy landing and the cabin needed a clean.",
-                "Not sure I'd fly with them again after this trip.", "Food? Yeah right. This is barely edible.",
+                "Not sure I'd fly with them again after this trip.", "Food? Yeah right. This is barely edible.", "I HATE YOU I HATE YOU I HATE YOU I HATE YOU I HATE YOU I HATE YOU I HATE YOU I HATE YOU I HATE YOU I HATE YOU I HATE YOU I HATE YOU!!!!!!!!!!!!!!!!!!!"
             ],
         };
+        // Reviews that call out one specific tree by name — used when something happens to that
+        // category in particular (it maxes out, drops below 100, or gets singled out ambiently)
+        // so the feed actually reads like it's reacting to what you've built, not just noise.
+        const REPUTATION_CATEGORY_REVIEWS = {
+            safety: {
+                positive: ["I felt genuinely safe the whole flight, for once.", "Loved how thorough the safety briefing was. You can tell they take it seriously.", "Everything about this airline screams well-maintained."],
+                negative: ["The plane felt like it was one bad landing from falling apart.", "Overheard ground crew arguing about a maintenance issue.", "Turbulence had me white-knuckled and this airline didn't help my nerves."],
+            },
+            fleet: {
+                positive: ["These seats are unreal for the price!", "Loved the mood lighting and the noise-cancelling cabin.", "Business suites were worth every penny."],
+                negative: ["Cramped seats, zero personal space, my knees were against the seat back.", "Cabin felt dated and worn, like it hadn't been touched in years.", "No WiFi, no charging, nothing to do for six hours."],
+            },
+            food: {
+                positive: ["The food was actually restaurant-quality, didn't expect that at 30,000 feet.", "Loved the coffee bar, best cup I've had on a plane.", "Kids' menu was a lifesaver on a long flight with toddlers."],
+                negative: ["Food was inedible, sent it back untouched.", "No snacks, no drinks offered the entire flight.", "A bag of pretzels is not a meal."],
+            },
+            ops: {
+                positive: ["Departed ten minutes early somehow, incredible.", "Smoothest boarding process I've ever experienced, no chaos at the gate.", "Zero delays across two connections...whoever runs their ops is doing something right."],
+                negative: ["Delayed for hours with zero communication from the gate.", "Gate changed three times in twenty minutes, total chaos.", "Missed my connection because they couldn't turn the plane around on time."],
+            },
+        };
+
         function getReputationPerkActiveMap() {
-            gameState.reputationPerkActive = gameState.reputationPerkActive || { safety: false, fleet: false, food: false };
+            gameState.reputationPerkActive = gameState.reputationPerkActive || { safety: false, fleet: false, food: false, ops: false };
+            if (gameState.reputationPerkActive.ops === undefined) gameState.reputationPerkActive.ops = false;
             return gameState.reputationPerkActive;
         }
         function isReputationPerkActive(key) {
@@ -10326,6 +10997,11 @@ if (groundAllBtn) {
             let mult = isReputationPerkActive('safety') ? 0.75 : 1;
             if (isOneStarAirline()) mult += 0.20; // neglected fleets wear out faster
             return mult;
+        }
+        function getReputationCrashChanceMultiplier() {
+            let mult = isReputationPerkActive('ops') ? 0.80 : 1; // tight ops catch problems before they become accidents
+            if (isOneStarAirline()) mult += 0.30; // a poorly-run airline is an accident waiting to happen
+            return Math.max(0.3, mult);
         }
         function isReputationItemUnlocked(catKey, itemId) {
             const items = REPUTATION_ITEMS[catKey] || [];
@@ -10359,16 +11035,51 @@ if (groundAllBtn) {
             triggerMilestonePopupNotification(`${item.icon} ${item.name} Purchased`, item.desc);
             saveProgress(); updateUI(); renderReputationTab();
         }
-        function pushReputationReview(sentiment) {
-            const pool = REPUTATION_REVIEWS[sentiment] || REPUTATION_REVIEWS.neutral;
+        // catKey is optional — pass a REPUTATION_CATEGORIES key to pull from that tree's own
+        // review pool (falls back to the generic pool if that sentiment has no targeted lines,
+        // e.g. there's no category-specific "neutral" set).
+        function pushReputationReview(sentiment, catKey) {
+            const targeted = catKey && REPUTATION_CATEGORY_REVIEWS[catKey] && REPUTATION_CATEGORY_REVIEWS[catKey][sentiment];
+            const pool = targeted || REPUTATION_REVIEWS[sentiment] || REPUTATION_REVIEWS.neutral;
             const text = pool[Math.floor(Math.random() * pool.length)];
             const stars = sentiment === 'positive' ? (Math.random() < 0.5 ? 5 : 4) : sentiment === 'negative' ? (Math.random() < 0.5 ? 1 : 2) : 3;
+            const cat = targeted ? REPUTATION_CATEGORIES.find(c => c.key === catKey) : null;
             gameState.reputationReviews = gameState.reputationReviews || [];
-            gameState.reputationReviews.unshift({ text, stars, ts: Date.now() });
+            gameState.reputationReviews.unshift({ text, stars, ts: Date.now(), catKey: cat ? cat.key : null, catIcon: cat ? cat.icon : null, catLabel: cat ? cat.label : null, catColor: cat ? cat.color : null });
             gameState.reputationReviews = gameState.reputationReviews.slice(0, 12);
+        }
+        // Average condition across every aircraft actually in service — the same number
+        // players already watch per-plane when assigning aircraft to routes.
+        function getAverageFleetCondition() {
+            const stats = gameState.aircraftStats || {};
+            const ids = Object.keys(stats);
+            if (ids.length === 0) return 100;
+            const total = ids.reduce((s, id) => s + (stats[id]?.condition ?? 100), 0);
+            return total / ids.length;
         }
         function reputationTick() {
             const now = Date.now();
+            // ---- Wear is earned, not timed: it only builds up from things you can see and
+            // control — a neglected fleet, an actual crash. Keep the planes in good shape and
+            // there's nothing here to fight; let condition slide and standards slip with it.
+            if (now - (gameState.reputationLastDecayAt || 0) > 15000) {
+                gameState.reputationLastDecayAt = now;
+                const decayMap = getReputationDecayMap();
+                const avgCond = getAverageFleetCondition();
+                REPUTATION_CATEGORIES.forEach(cat => {
+                    const base = computeEquipmentScore(cat.key);
+                    if (base < 60) return; // nobody expects much from a small operation yet
+                    const current = decayMap[cat.key] || 0;
+                    if (avgCond < 55) {
+                        // Running planes down hurts safety and cabin comfort the most.
+                        const catWeight = cat.key === 'safety' ? 1 : cat.key === 'fleet' ? 0.7 : cat.key === 'ops' ? 0.5 : 0.3;
+                        decayMap[cat.key] = Math.min(100, current + (55 - avgCond) * 0.06 * catWeight);
+                    } else if (current > 0) {
+                        // A well-kept fleet earns its reputation back on its own.
+                        decayMap[cat.key] = Math.max(0, current - 1.2);
+                    }
+                });
+            }
             const perkActive = getReputationPerkActiveMap();
             let avgScore = 0;
             REPUTATION_CATEGORIES.forEach(cat => {
@@ -10379,19 +11090,27 @@ if (groundAllBtn) {
                 if (isMaxed && !was) {
                     perkActive[cat.key] = true;
                     triggerMilestonePopupNotification(`⭐ ${cat.icon} ${cat.label} reached 100!`, cat.perkDesc);
-                    pushReputationReview('positive');
+                    pushReputationReview('positive', cat.key);
                 } else if (!isMaxed && was) {
                     perkActive[cat.key] = false;
                     triggerMilestonePopupNotification(`📉 ${cat.icon} ${cat.label} dropped below 100`, 'Perk paused until you earn it back.');
-                    pushReputationReview('negative');
+                    pushReputationReview('negative', cat.key);
                 }
             });
             avgScore /= REPUTATION_CATEGORIES.length;
             const sentiment = avgScore >= 75 ? 'positive' : avgScore <= 40 ? 'negative' : 'neutral';
-            // Ambient reviews trickle in every ~25-45s to keep the feed feeling alive.
+            // Ambient reviews trickle in every ~25-45s to keep the feed feeling alive. Most of the
+            // time these are generic, but ~45% of the time they call out a specific tree — biased
+            // toward whichever category is most responsible for the current mood (best category
+            // for a good review, worst category for a bad one) so the feed reads as reactive.
             if (now - (gameState.reputationLastReviewAt || 0) > (25000 + Math.random() * 20000)) {
                 gameState.reputationLastReviewAt = now;
-                pushReputationReview(sentiment);
+                let targetCat = null;
+                if (Math.random() < 0.45) {
+                    const ranked = [...REPUTATION_CATEGORIES].sort((a, b) => computeCategoryScore(b.key) - computeCategoryScore(a.key));
+                    targetCat = sentiment === 'positive' ? ranked[0].key : sentiment === 'negative' ? ranked[ranked.length - 1].key : null;
+                }
+                pushReputationReview(sentiment, targetCat);
             }
             if (document.getElementById('reputation')?.classList.contains('active')) renderReputationTab();
         }
@@ -10457,6 +11176,8 @@ if (groundAllBtn) {
             const cat = REPUTATION_CATEGORIES.find(c => c.key === _activeRepCategory) || REPUTATION_CATEGORIES[0];
             const score = computeCategoryScore(cat.key);
             const isMaxed = score >= 100;
+            const decay = getReputationDecayMap()[cat.key] || 0;
+            const maintainCost = getReputationMaintainCost(cat.key);
             const items = REPUTATION_ITEMS[cat.key] || [];
             const ownedIds = owned[cat.key] || [];
 
@@ -10519,7 +11240,14 @@ if (groundAllBtn) {
                 <div style="height:8px;border-radius:4px;background:var(--card-border);overflow:hidden;margin-bottom:10px;">
                     <div style="height:100%;width:${score}%;background:${cat.color};border-radius:4px;transition:width .3s;"></div>
                 </div>
-                <div style="font-size:10.5px;padding:7px 9px;border-radius:7px;background:${isMaxed ? cat.color + '22' : 'rgba(148,163,184,0.08)'};color:${isMaxed ? cat.color : '#94a3b8'};font-weight:${isMaxed ? '700' : '400'};margin-bottom:12px;">${isMaxed ? '✓ Active — ' : '🔒 '}${cat.perkDesc}</div>
+                <div style="font-size:10.5px;padding:7px 9px;border-radius:7px;background:${isMaxed ? cat.color + '22' : 'rgba(148,163,184,0.08)'};color:${isMaxed ? cat.color : '#94a3b8'};font-weight:${isMaxed ? '700' : '400'};margin-bottom:${decay > 0 ? '8px' : '12px'};">${isMaxed ? '✓ Active — ' : '🔒 '}${cat.perkDesc}</div>
+                ${decay > 0 ? `<div style="display:flex;justify-content:space-between;align-items:center;gap:8px;padding:8px 9px;border-radius:7px;background:rgba(239,68,68,0.08);border:1px solid rgba(239,68,68,0.25);margin-bottom:12px;">
+                    <div style="min-width:0;">
+                        <div style="font-size:10px;font-weight:700;color:#ef4444;">📉 Standards slipping — ${decay.toFixed(0)} pts of wear</div>
+                        <div style="font-size:9px;color:#64748b;margin-top:1px;">Caused by a crash or a run-down fleet — keep condition up and it fades on its own, or pay to fix it now.</div>
+                    </div>
+                    <button onclick="maintainReputationCategory('${cat.key}')" style="font-size:10px;font-weight:700;padding:6px 10px;border-radius:7px;border:none;background:#ef4444;color:white;cursor:pointer;white-space:nowrap;flex-shrink:0;">Restore — $${maintainCost.toLocaleString()}</button>
+                </div>` : ''}
 
                 <div style="font-size:9.5px;font-weight:700;color:#64748b;text-transform:uppercase;letter-spacing:1px;margin-bottom:9px;">🌳 Mastery Tree &nbsp;•&nbsp; ${ownedIds.length}/${items.length} Unlocked</div>
                 ${treeHtml}
@@ -10536,9 +11264,12 @@ if (groundAllBtn) {
                 reviewsEl.innerHTML = `<div style="display:flex;flex-direction:column;gap:6px;">${reviews.map(r => {
                     const starRow = '⭐'.repeat(r.stars) + '☆'.repeat(5 - r.stars);
                     const barColor = r.stars >= 4 ? '#22c55e' : r.stars === 3 ? '#eab308' : '#ef4444';
+                    const catChip = r.catLabel ? `<span style="font-size:9px;font-weight:700;padding:2px 6px;border-radius:5px;background:${r.catColor}22;color:${r.catColor};margin-left:6px;white-space:nowrap;">${r.catIcon} ${r.catLabel}</span>` : '';
                     return `<div style="display:flex;gap:9px;padding:9px 10px;border-radius:8px;background:var(--card-bg);border:1px solid var(--card-border);border-left:3px solid ${barColor};">
                         <div style="flex:1;min-width:0;">
-                            <div style="font-size:11px;color:var(--achievement-color);letter-spacing:1px;">${starRow}</div>
+                            <div style="display:flex;align-items:center;flex-wrap:wrap;">
+                                <div style="font-size:11px;color:var(--achievement-color);letter-spacing:1px;">${starRow}</div>${catChip}
+                            </div>
                             <div style="font-size:11px;color:#94a3b8;margin-top:3px;font-style:italic;">"${r.text}"</div>
                         </div>
                     </div>`;
@@ -10591,4 +11322,4 @@ if (groundAllBtn) {
         }
     </script>
 </body>
-</html>
+</html>    
